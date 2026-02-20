@@ -4,7 +4,7 @@ export function printHelp(): void {
   const lines: string[] = [];
 
   lines.push('');
-  lines.push(`${pc.bold('macos-layouts')} - TODO: describe your CLI tool`);
+  lines.push(`${pc.bold('macos-layouts')} - Trigger perfect window layouts in macOS`);
   lines.push('');
 
   lines.push(pc.bold('USAGE'));
@@ -13,7 +13,7 @@ export function printHelp(): void {
 
   lines.push(pc.bold('COMMANDS'));
   const commands = [
-    { name: 'TODO', desc: 'Add your commands here' },
+    { name: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
   ];
   const maxNameLength = Math.max(...commands.map((c) => c.name.length));
   for (const cmd of commands) {
@@ -30,7 +30,16 @@ export function printHelp(): void {
 
   lines.push(pc.bold('EXAMPLES'));
   const examples = [
-    { cmd: 'macos-layouts TODO', comment: 'TODO: describe this example' },
+    { cmd: 'macos-layouts dump', comment: 'Show current screens and windows (human-readable)' },
+    { cmd: 'macos-layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
+    {
+      cmd: 'macos-layouts dump --json --pretty --include-minimized',
+      comment: 'Include minimized windows',
+    },
+    {
+      cmd: 'macos-layouts dump --include-hidden',
+      comment: 'Include non-standard windows (panels, popovers)',
+    },
   ];
   const maxCmdLength = Math.max(...examples.map((e) => e.cmd.length));
   for (const ex of examples) {

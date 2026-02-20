@@ -153,6 +153,8 @@ export interface IsAvailableParams {
 }
 
 export interface DumpParams {
+  /** Self-contained Lua script to execute; must return a JSON string. */
+  readonly lua: string;
   readonly timeoutMs?: number;
 }
 
@@ -179,9 +181,8 @@ export async function isAvailable({ timeoutMs = 3_000 }: IsAvailableParams = {})
  * This is the primary data source for `layout dump` and the
  * matching phase of `layout apply`.
  */
-export async function dump({ timeoutMs }: DumpParams = {}): Promise<HsResult<RuntimeDump>> {
-  const expr = `return hs.json.encode(require("${HS_MODULE}").dump())`;
-  const raw = await runHs({ expr, timeoutMs });
+export async function dump({ lua, timeoutMs }: DumpParams): Promise<HsResult<RuntimeDump>> {
+  const raw = await runHs({ expr: lua, timeoutMs });
   if (!raw.ok) return raw;
   return parseJson<RuntimeDump>(raw.value);
 }
