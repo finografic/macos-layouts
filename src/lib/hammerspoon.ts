@@ -70,8 +70,12 @@ async function runHs(
     const { stdout } = await execa(HS_BINARY, ['-c', expr], {
       timeout: timeoutMs,
       stripFinalNewline: true,
+      input: '',
     });
-    return { ok: true, value: stdout };
+    // Strip Hammerspoon info lines (e.g. "-- Loading extension: json")
+    // that prefix the actual return value on first use.
+    const value = stdout.split('\n').filter((l) => !l.startsWith('--')).join('\n');
+    return { ok: true, value };
   } catch (err) {
     if (!(err instanceof Error)) {
       return { ok: false, error: { kind: 'execError', message: String(err) } };
