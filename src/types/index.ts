@@ -9,7 +9,8 @@ export type {
   SaveOptions,
   SharedCliOptions,
 } from './cli.types.js';
-export { ExitCode } from './cli.types.js';
+export type { ExitCode } from './cli.types.js';
+export { EXIT_CODE } from './cli.types.js';
 export type {
   DisplayMatch,
   DisplayMatchBuiltin,
