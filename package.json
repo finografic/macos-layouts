@@ -35,6 +35,7 @@
   ],
   "exports": {
     ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -108,7 +109,7 @@
     "pre-commit": "npx lint-staged --allow-empty"
   },
   "bin": {
-    "macos-layouts": "./dist/index.mjs"
+    "macos-layouts": "./dist/cli.mjs"
   },
   "dependencies": {
     "@standard-schema/spec": "^1.1.0",

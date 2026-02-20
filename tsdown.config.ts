@@ -4,6 +4,7 @@ export default defineConfig({
   exports: { legacy: true },
   entry: {
     index: 'src/index.ts',
+    cli: 'src/cli.ts',
   },
   format: ['esm'],
   dts: true,
