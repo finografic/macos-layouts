@@ -25,6 +25,7 @@ return (function()
   local focusedId = focused and focused:id() or nil
   local builtinScreen = hs.screen.find("Built%-in")
   local builtinId = builtinScreen and builtinScreen:id() or nil
+  local primaryId = hs.screen.primaryScreen():id()
 
   local screens = {}
   for _, s in ipairs(hs.screen.allScreens()) do
@@ -35,6 +36,7 @@ return (function()
       id = tostring(s:id()),
       name = s:name() or "",
       isBuiltin = (s:id() == builtinId),
+      isPrimary = (s:id() == primaryId),
       frame = { x = f.x, y = f.y, w = f.w, h = f.h },
       fullFrame = { x = ff.x, y = ff.y, w = ff.w, h = ff.h },
       resolution = { w = mode and mode.w or ff.w, h = mode and mode.h or ff.h }

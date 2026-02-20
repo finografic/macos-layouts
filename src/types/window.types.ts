@@ -15,7 +15,7 @@
  *   before matching, so slot assignment is stable.
  */
 
-import type { NormalizedRect } from './geometry.js';
+import type { NormalizedRect } from './geometry.types.js';
 
 // ─── App identity ────────────────────────────────────────────────────────────
 

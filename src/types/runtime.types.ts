@@ -11,7 +11,7 @@
  * and focuses on fast, reliable execution.
  */
 
-import type { Rect } from './geometry.js';
+import type { Rect } from './geometry.types.js';
 
 // ─── Runtime dump (what Hammerspoon sees right now) ──────────────────────────
 
@@ -25,6 +25,9 @@ export interface RuntimeScreen {
 
   /** Whether this is the built-in laptop display */
   readonly isBuiltin: boolean;
+
+  /** Whether this is the macOS primary display (menu bar, coordinate origin 0,0) */
+  readonly isPrimary: boolean;
 
   /** Usable frame excluding menu bar and Dock (what we normalize against) */
   readonly frame: Rect;

@@ -17,6 +17,26 @@ export interface DisplayMatchBuiltin {
   readonly kind: 'builtin';
 }
 
+/**
+ * Match the macOS primary display — the one with the menu bar,
+ * whose coordinate origin is (0, 0) in the global coordinate space.
+ *
+ * Configurable in System Settings > Displays > Arrange (grey bar).
+ * Hammerspoon exposes this via hs.screen.primaryScreen().
+ *
+ * This is the recommended default "main" matcher for most layouts.
+ * It works across any monitor setup as long as the user sets their
+ * preferred primary in System Settings — which they typically do
+ * for ergonomic reasons anyway.
+ *
+ * Note: at work with a dock, primary is often the laptop (builtin).
+ * At home with externals only, primary is whichever external you choose.
+ * Both cases are handled naturally.
+ */
+export interface DisplayMatchPrimary {
+  readonly kind: 'primary';
+}
+
 /** Match the largest external display by pixel area (w × h of fullFrame) */
 export interface DisplayMatchLargestExternal {
   readonly kind: 'largestExternal';
@@ -48,6 +68,7 @@ export interface DisplayMatchByName {
 
 export type DisplayMatch =
   | DisplayMatchBuiltin
+  | DisplayMatchPrimary
   | DisplayMatchLargestExternal
   | DisplayMatchSmallestExternal
   | DisplayMatchExternalByIndex

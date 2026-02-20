@@ -17,11 +17,12 @@ export type {
   DisplayMatchByName,
   DisplayMatchExternalByIndex,
   DisplayMatchLargestExternal,
+  DisplayMatchPrimary,
   DisplayMatchSmallestExternal,
   DisplayRole,
   DisplayRoleMap,
 } from './display.types.js';
-export type { NormalizedRect, Rect } from './geometry.js';
+export type { NormalizedRect, Rect } from './geometry.types.js';
 export type { Layout, LayoutOptions } from './layout.types.js';
 export type {
   ApplyError,
