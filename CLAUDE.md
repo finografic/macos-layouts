@@ -48,9 +48,9 @@ This file bridges context between local development (Claude Code CLI) and extern
 
 **Purpose:** Provide a concise, current snapshot of project state — enough for a separate Claude instance (with no repo access) to understand what exists, what was decided, and what's next.
 
-**When to update:** After any session that changes architecture, adds/removes features, resolves open questions, or shifts priorities. Not every session — only when the project state meaningfully changed.
+**When to update:** Always after: the first session in a repo, any session that installs dependencies, changes architecture, adds/removes features, resolves open questions, or shifts priorities. Skip only read-only sessions (exploration, research, code review) where nothing was built or decided.
 
-**What to write:** Update only the sections that changed. Keep the entire file under 150 lines. Write for an audience that is familiar with the project's goals but cannot see the codebase.
+**What to write:** Update only the sections that changed. Keep the entire file under 150 lines. Write for an audience that knows the project goals but has no repo access, no terminal, and no git history — only this file.
 
 **Structure (maintain these sections in order):**
 
@@ -64,6 +64,8 @@ This file bridges context between local development (Claude Code CLI) and extern
 8. `## Status` — Current implementation state: what's done, what's in progress, what's next. Plain prose, 3-5 lines max.
 
 **Rules:**
+
+- This file is a bridge, not a sync. It does not need to reflect every change — it needs to be accurate enough that Claude.ai can reason about the project without seeing the repo.
 - Do not duplicate content from `memory.md` — that file tracks session work, this file tracks project state.
 - Do not include code snippets or file contents — describe what exists, not how it's implemented.
 - Write in present tense ("The CLI uses X to do Y") not past tense.

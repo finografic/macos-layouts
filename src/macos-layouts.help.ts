@@ -17,7 +17,9 @@ export function printHelp(): void {
   ];
   const maxNameLength = Math.max(...commands.map((c) => c.name.length));
   for (const cmd of commands) {
-    lines.push(`  ${pc.cyan(cmd.name)}${' '.repeat(maxNameLength - cmd.name.length + 4)}${cmd.desc}`);
+    lines.push(
+      `  ${pc.cyan(cmd.name)}${' '.repeat(maxNameLength - cmd.name.length + 4)}${cmd.desc}`,
+    );
   }
   lines.push('');
 
@@ -32,12 +34,18 @@ export function printHelp(): void {
   ];
   const maxCmdLength = Math.max(...examples.map((e) => e.cmd.length));
   for (const ex of examples) {
-    lines.push(`  ${ex.cmd}${' '.repeat(maxCmdLength - ex.cmd.length + 4)}${pc.dim('# ' + ex.comment)}`);
+    lines.push(
+      `  ${ex.cmd}${' '.repeat(maxCmdLength - ex.cmd.length + 4)}${pc.dim('# ' + ex.comment)}`,
+    );
   }
   lines.push('');
 
   lines.push(pc.bold('GET HELP'));
-  lines.push(`  ${pc.cyanBright('macos-layouts')} ${pc.dim(pc.cyan('<command>'))} --help       ${pc.dim('# Show detailed help for a command')}`);
+  lines.push(
+    `  ${pc.cyanBright('macos-layouts')} ${pc.dim(pc.cyan('<command>'))} --help       ${
+      pc.dim('# Show detailed help for a command')
+    }`,
+  );
   lines.push('');
 
   console.log(lines.join('\n'));

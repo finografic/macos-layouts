@@ -98,6 +98,7 @@ If you see `npm error You cannot publish over the previously published versions:
 **This means the version is already published.** You have two options:
 
 1. **Use the release scripts (recommended):** These automatically bump the version before publishing:
+
    ```bash
    pnpm release.github.patch  # Bumps to next patch version
    ```

@@ -123,10 +123,13 @@ export interface ApplyResult {
   readonly layoutName: string;
 
   /** How display roles were resolved */
-  readonly resolvedDisplays: Record<string, {
-    readonly screenId: string;
-    readonly screenName: string;
-  } | null>;
+  readonly resolvedDisplays: Record<
+    string,
+    {
+      readonly screenId: string;
+      readonly screenName: string;
+    } | null
+  >;
 
   /** Windows that were moved/resized */
   readonly moved: readonly ApplyMoveResult[];

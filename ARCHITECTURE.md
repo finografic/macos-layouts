@@ -42,13 +42,13 @@ excluded from subsequent matching. This prevents ambiguity with 2+ externals.
 
 ```json
 {
-  "mainExternal":      { "match": { "kind": "largestExternal" } },
+  "mainExternal": { "match": { "kind": "largestExternal" } },
   "secondaryExternal": { "match": { "kind": "externalByIndex", "index": 0 }, "fallback": "builtin" }
 }
 ```
 
 After `mainExternal` claims the largest external, `externalByIndex: 0` picks
-the first *remaining* external (sorted by area, descending).
+the first _remaining_ external (sorted by area, descending).
 
 ### 2. Window rules are processed in declaration order (claim-once)
 
@@ -108,20 +108,20 @@ src/types/
 
 ## Schema Changes from Planning Thread
 
-| Thread concept | What changed | Why |
-|---|---|---|
-| `match.kind: "frontmost"` | Removed | Nondeterministic — depends on focus order at apply time. Use `mainWindow` instead. |
-| `match.kind: "any"` | Renamed to `byIndex` | Clearer intent. `any` was confusing when `index` was present. |
-| `match.kind: "byRole"` | Removed | `AXWindow` is the only useful value — filtering to standard windows handles this. |
-| `Placement.mode: "maximize"` | Removed | Ambiguous (macOS fullscreen vs rect {0,0,1,1}). Use rect values directly. |
-| `options.moveMinimizedWindows` | Renamed to `restoreMinimized` | Positive naming is clearer. |
-| `options.focusAfterApply.mode` | Flattened to string union | Simpler — no nested object needed. |
-| `displayRoles.*.match.kind: "otherExternal"` | Replaced with `externalByIndex` | Scales to 3+ externals without relying on `relativeTo`. |
-| `RuntimeDump.screens[].resolution` | Added | Needed for accurate pixel-area calculation in display role resolution. |
-| `RuntimeWindow.app.pid` | Added | Useful for disambiguating multiple instances of same app. |
-| `ApplyResult.resolvedDisplays` | Added | Critical for debugging — shows how roles mapped to physical displays. |
-| `ApplyResult.durationMs` | Added | Performance tracking. |
-| `WindowRule.space` | Added (reserved) | Forward-compatible for yabai Spaces support in v2. |
+| Thread concept                               | What changed                    | Why                                                                                |
+| -------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `match.kind: "frontmost"`                    | Removed                         | Nondeterministic — depends on focus order at apply time. Use `mainWindow` instead. |
+| `match.kind: "any"`                          | Renamed to `byIndex`            | Clearer intent. `any` was confusing when `index` was present.                      |
+| `match.kind: "byRole"`                       | Removed                         | `AXWindow` is the only useful value — filtering to standard windows handles this.  |
+| `Placement.mode: "maximize"`                 | Removed                         | Ambiguous (macOS fullscreen vs rect {0,0,1,1}). Use rect values directly.          |
+| `options.moveMinimizedWindows`               | Renamed to `restoreMinimized`   | Positive naming is clearer.                                                        |
+| `options.focusAfterApply.mode`               | Flattened to string union       | Simpler — no nested object needed.                                                 |
+| `displayRoles.*.match.kind: "otherExternal"` | Replaced with `externalByIndex` | Scales to 3+ externals without relying on `relativeTo`.                            |
+| `RuntimeDump.screens[].resolution`           | Added                           | Needed for accurate pixel-area calculation in display role resolution.             |
+| `RuntimeWindow.app.pid`                      | Added                           | Useful for disambiguating multiple instances of same app.                          |
+| `ApplyResult.resolvedDisplays`               | Added                           | Critical for debugging — shows how roles mapped to physical displays.              |
+| `ApplyResult.durationMs`                     | Added                           | Performance tracking.                                                              |
+| `WindowRule.space`                           | Added (reserved)                | Forward-compatible for yabai Spaces support in v2.                                 |
 
 ---
 

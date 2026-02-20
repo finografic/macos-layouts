@@ -7,7 +7,7 @@
 
 // ─── Exit codes ──────────────────────────────────────────────────────────────
 
-export const ExitCode = {
+export const EXIT_CODE = {
   /** Successful execution */
   Success: 0,
 
@@ -27,7 +27,7 @@ export const ExitCode = {
   StrictFailure: 5,
 } as const;
 
-export type ExitCode = (typeof ExitCode)[keyof typeof ExitCode];
+export type ExitCode = (typeof EXIT_CODE)[keyof typeof EXIT_CODE];
 
 // ─── Shared CLI options ──────────────────────────────────────────────────────
 
