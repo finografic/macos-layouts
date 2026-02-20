@@ -1,0 +1,209 @@
+/* custom-dark theme for markdown preview */
+
+:root {
+  --bg: #1a1b26;
+  --fg: #c0caf5;
+  --fg-dim: #565f89;
+  --accent: #7aa2f7;
+  --green: #9ece6a;
+  --red: #f7768e;
+  --yellow: #e0af68;
+  --cyan: #7dcfff;
+  --magenta: #bb9af7;
+  --orange: #ff9e64;
+  --border: #3b4261;
+  --code-bg: #24283b;
+  --blockquote-bg: #1f2335;
+  --blockquote-border: #3d59a1;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
+  margin-top: 2em;
+}
+
+h1 { font-size: 1.6em; }
+h2 { font-size: 1.3em; color: var(--cyan); }
+h3 { font-size: 1.1em; color: var(--magenta); border-bottom: none; }
+
+/* User prompts */
+blockquote {
+  background: var(--blockquote-bg);
+  border-left: 3px solid var(--blockquote-border);
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+blockquote strong {
+  color: var(--cyan);
+}
+
+/* Inline code */
+code {
+  background: var(--code-bg);
+  color: var(--orange);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Code blocks */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+pre code {
+  background: none;
+  color: var(--fg);
+  padding: 0;
+  font-size: 0.85em;
+}
+
+/* Diff highlighting */
+pre code .line-added,
+pre code .addition {
+  color: var(--green);
+}
+
+pre code .line-removed,
+pre code .deletion {
+  color: var(--red);
+}
+
+/* Diff syntax: lines starting with + or - inside diff blocks */
+pre code {
+  display: block;
+  white-space: pre;
+}
+
+/* Style diff lines via CSS when using a markdown renderer that adds classes */
+.language-diff .line:has(+) { color: var(--green); }
+.language-diff .line:has(-) { color: var(--red); }
+
+/* Bold */
+strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* Italic / timing */
+em {
+  color: var(--fg-dim);
+  font-style: italic;
+}
+
+/* Tables (rendered as code blocks with box-drawing) */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.8em;
+  text-align: left;
+}
+
+th {
+  background: var(--code-bg);
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background: var(--blockquote-bg);
+}
+
+/* Details/summary (collapsed tool output) */
+details {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+details summary {
+  cursor: pointer;
+  padding: 0.5em 1em;
+  color: var(--fg-dim);
+  font-size: 0.9em;
+}
+
+details summary:hover {
+  color: var(--accent);
+}
+
+details > pre {
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 6px 6px;
+  margin: 0;
+}
+
+/* Horizontal rules */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+/* Lists */
+ul, ol {
+  padding-left: 1.5em;
+}
+
+li {
+  margin: 0.25em 0;
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Tool call styling */
+p > strong:first-child {
+  color: var(--green);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}

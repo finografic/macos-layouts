@@ -1,0 +1,38 @@
+{
+  "npm.packageManager": "pnpm",
+  "editor.formatOnSave": true,
+  "eslint.enable": true,
+  "eslint.useFlatConfig": true,
+  "prettier.enable": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "dprint.experimentalLsp": true,
+  "dprint.verbose": true,
+  "markdownlint.config": {
+    "default": true,
+    "MD025": false,
+    "MD041": false
+  },
+  "markdown.styles": [
+    ".vscode/markdown-github-light.css"
+  ]
+}
