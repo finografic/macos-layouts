@@ -22,7 +22,9 @@ build/
 # OS
 .DS_Store
 Thumbs.db
-Icon?
+**/Icon?
+!./Icon?
+
 
 # Logs
 *.log

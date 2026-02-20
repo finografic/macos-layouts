@@ -1,0 +1,72 @@
+{
+  "$schema": "https://finografic.github.io/macos-layout/schema/v0.1.json",
+  "version": "0.1",
+  "name": "home",
+  "description": "Home desk: Mac Studio + 2× 4K externals (no laptop display)",
+
+  "displayRoles": {
+    "mainExternal": {
+      "match": { "kind": "largestExternal" }
+    },
+    "secondaryExternal": {
+      "match": { "kind": "externalByIndex", "index": 0 },
+      "fallback": "mainExternal"
+    }
+  },
+
+  "windows": [
+    {
+      "id": "code-main",
+      "app": { "bundleId": "com.microsoft.VSCode", "name": "Code" },
+      "match": { "kind": "byIndex", "index": 0 },
+      "place": {
+        "display": "mainExternal",
+        "rect": { "x": 0, "y": 0, "w": 0.55, "h": 1 }
+      },
+      "required": true
+    },
+    {
+      "id": "terminal",
+      "app": { "bundleId": "com.mitchellh.ghostty", "name": "Ghostty" },
+      "match": { "kind": "mainWindow" },
+      "place": {
+        "display": "mainExternal",
+        "rect": { "x": 0.55, "y": 0, "w": 0.45, "h": 1 }
+      },
+      "required": true
+    },
+    {
+      "id": "browser",
+      "app": { "bundleId": "com.google.Chrome", "name": "Google Chrome" },
+      "match": { "kind": "byIndex", "index": 0 },
+      "place": {
+        "display": "secondaryExternal",
+        "rect": { "x": 0, "y": 0, "w": 0.5, "h": 1 }
+      }
+    },
+    {
+      "id": "claude",
+      "app": { "bundleId": "com.anthropic.claudefordesktop", "name": "Claude" },
+      "match": { "kind": "mainWindow" },
+      "place": {
+        "display": "secondaryExternal",
+        "rect": { "x": 0.5, "y": 0, "w": 0.5, "h": 1 }
+      }
+    },
+    {
+      "id": "slack",
+      "app": { "bundleId": "com.tinyspeck.slackmacgap", "name": "Slack" },
+      "match": { "kind": "mainWindow" },
+      "place": {
+        "display": "secondaryExternal",
+        "rect": { "x": 0.5, "y": 0, "w": 0.5, "h": 1 }
+      }
+    }
+  ],
+
+  "options": {
+    "allowOverlap": true,
+    "restoreMinimized": false,
+    "focusAfterApply": "code-main"
+  }
+}

@@ -1,4 +1,4 @@
-# 🦋 @finografic/macos-layouts
+# 🖥️ @finografic/macos-layouts
 
 > Trigger perfect window layouts in macOS
 
