@@ -3,8 +3,9 @@
 import { applyCommand } from './commands/apply.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { listCommand } from './commands/list.command.js';
+import { saveCommand } from './commands/save.command.js';
 import { printHelp } from './macos-layouts.help.js';
-import type { ApplyOptions, DumpOptions, ListOptions } from './types/cli.types.js';
+import type { ApplyOptions, DumpOptions, ListOptions, SaveOptions } from './types/cli.types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -46,6 +47,35 @@ async function main(): Promise<void> {
       focus: focusArg ?? undefined,
     };
     const code = await applyCommand({ name: layoutName, options });
+    process.exit(code);
+    return;
+  }
+
+  if (command === 'save') {
+    const [layoutName, ...saveRest] = rest;
+    if (!layoutName) {
+      console.error('Error: layout name is required. Usage: macos-layouts save <name>');
+      process.exit(1);
+      return;
+    }
+    const layoutsDirIdx = saveRest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? saveRest[layoutsDirIdx + 1] : undefined;
+    // Collect repeated --include / --exclude values
+    const include: string[] = [];
+    const exclude: string[] = [];
+    for (let i = 0; i < saveRest.length; i++) {
+      if (saveRest[i] === '--include' && saveRest[i + 1]) include.push(saveRest[++i]!);
+      if (saveRest[i] === '--exclude' && saveRest[i + 1]) exclude.push(saveRest[++i]!);
+    }
+    const options: SaveOptions = {
+      layoutsDir: layoutsDirArg,
+      interactive: hasFlag(saveRest, '--no-interactive') ? false : undefined,
+      json: hasFlag(saveRest, '--json'),
+      verbose: hasFlag(saveRest, '--verbose'),
+      include: include.length > 0 ? include : undefined,
+      exclude: exclude.length > 0 ? exclude : undefined,
+    };
+    const code = await saveCommand({ name: layoutName, options });
     process.exit(code);
     return;
   }
