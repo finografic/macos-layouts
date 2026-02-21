@@ -29,9 +29,12 @@ async function main(): Promise<void> {
       process.exit(1);
       return;
     }
-    const timeoutArg = applyRest[applyRest.indexOf('--timeout-ms') + 1];
-    const layoutsDirArg = applyRest[applyRest.indexOf('--layouts-dir') + 1];
-    const focusArg = applyRest[applyRest.indexOf('--focus') + 1];
+    const timeoutIdx = applyRest.indexOf('--timeout-ms');
+    const timeoutArg = timeoutIdx !== -1 ? applyRest[timeoutIdx + 1] : undefined;
+    const layoutsDirIdx = applyRest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? applyRest[layoutsDirIdx + 1] : undefined;
+    const focusIdx = applyRest.indexOf('--focus');
+    const focusArg = focusIdx !== -1 ? applyRest[focusIdx + 1] : undefined;
     const options: ApplyOptions = {
       dryRun: hasFlag(applyRest, '--dry-run'),
       strict: hasFlag(applyRest, '--strict'),
