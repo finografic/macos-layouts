@@ -68,8 +68,8 @@ describe('listCommand', () => {
   it('empty directory prints "No layouts found" message', async () => {
     const code = await listCommand({ options: { layoutsDir: testDir } });
     expect(code).toBe(EXIT_CODE.Success);
-    expect(console.log).toHaveBeenCalledOnce();
-    const output = vi.mocked(console.log).mock.calls[0]?.[0] ?? '';
+    const calls = vi.mocked(console.log).mock.calls.map((c) => String(c[0]));
+    const output = calls.join('\n');
     expect(output).toContain('No layouts found');
   });
 });

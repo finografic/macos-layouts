@@ -20,26 +20,30 @@ export async function listCommand({ options }: ListCommandParams): Promise<numbe
     return EXIT_CODE.Success;
   }
 
+  console.log();
+  console.log(`  ${pc.bold(pc.gray('🖥️  LAYOUTS'))}`);
+  console.log();
+
   if (names.length === 0) {
-    console.log(pc.dim('No layouts found.'));
+    console.log(pc.gray('  No layouts found. To create one, run:'));
+    console.log(pc.gray(`  $ ${pc.cyanBright('macos-layouts save')} ${pc.white('<name>')}`));
+    console.log();
     return EXIT_CODE.Success;
   }
 
-  // Load each layout to get its description
   const rows = await Promise.all(
     names.map(async (name) => {
       const result = await loadLayout(name, options.layoutsDir);
-      const description = result.ok ? (result.layout.description ?? '') : '';
-      return { name, description };
+      return { name, description: result.ok ? (result.layout.description ?? '') : '' };
     }),
   );
 
-  const maxNameLength = Math.max(...rows.map((r) => r.name.length));
+  const pad = Math.max(...rows.map((r) => r.name.length));
   for (const { name, description } of rows) {
-    const padding = ' '.repeat(maxNameLength - name.length + 4);
-    const desc = description ? pc.dim(description) : '';
-    console.log(`  ${pc.cyan(name)}${padding}${desc}`);
+    const gap = ' '.repeat(pad - name.length + 4);
+    console.log(`  ${pc.bold(pc.cyan(name))}${gap}${pc.white(description)}`);
   }
 
+  console.log();
   return EXIT_CODE.Success;
 }
