@@ -2,66 +2,58 @@
   "$schema": "https://finografic.github.io/macos-layout/schema/v0.1.json",
   "version": "0.1",
   "name": "work",
-  "description": "Work desk: MacBook Pro + 2× 1080p externals",
+  "description": "Work desk: MacBook Pro + external monitor (laptop builtin + primary external)",
 
   "displayRoles": {
     "builtin": {
       "match": { "kind": "builtin" }
     },
-    "mainExternal": {
-      "match": { "kind": "largestExternal" }
-    },
-    "secondaryExternal": {
-      "match": { "kind": "externalByIndex", "index": 0 },
+    "primary": {
+      "match": { "kind": "primary" },
       "fallback": "builtin"
+    },
+    "secondary": {
+      "match": { "kind": "externalByIndex", "index": 0 },
+      "fallback": "primary"
     }
   },
 
   "windows": [
     {
-      "id": "code-main",
-      "app": { "bundleId": "com.microsoft.VSCode", "name": "Code" },
+      "id": "cursor-main",
+      "app": { "bundleId": "com.todesktop.230313mzl4w4u92", "name": "Cursor" },
       "match": { "kind": "byIndex", "index": 0 },
       "place": {
-        "display": "mainExternal",
+        "display": "primary",
         "rect": { "x": 0, "y": 0, "w": 0.62, "h": 1 }
       },
       "required": true
     },
     {
-      "id": "code-secondary",
-      "app": { "bundleId": "com.microsoft.VSCode", "name": "Code" },
+      "id": "cursor-secondary",
+      "app": { "bundleId": "com.todesktop.230313mzl4w4u92", "name": "Cursor" },
       "match": { "kind": "byIndex", "index": 1 },
       "place": {
-        "display": "secondaryExternal",
+        "display": "secondary",
         "rect": { "x": 0, "y": 0, "w": 1, "h": 1 }
       }
     },
     {
-      "id": "terminal",
+      "id": "ghostty-main",
       "app": { "bundleId": "com.mitchellh.ghostty", "name": "Ghostty" },
       "match": { "kind": "mainWindow" },
       "place": {
-        "display": "mainExternal",
+        "display": "primary",
         "rect": { "x": 0.62, "y": 0, "w": 0.38, "h": 1 }
       },
       "required": true
     },
     {
-      "id": "browser",
+      "id": "chrome-main",
       "app": { "bundleId": "com.google.Chrome", "name": "Google Chrome" },
-      "match": { "kind": "byIndex", "index": 0 },
-      "place": {
-        "display": "secondaryExternal",
-        "rect": { "x": 0, "y": 0, "w": 1, "h": 1 }
-      }
-    },
-    {
-      "id": "slack",
-      "app": { "bundleId": "com.tinyspeck.slackmacgap", "name": "Slack" },
       "match": { "kind": "mainWindow" },
       "place": {
-        "display": "builtin",
+        "display": "secondary",
         "rect": { "x": 0, "y": 0, "w": 1, "h": 1 }
       }
     },
@@ -73,12 +65,21 @@
         "display": "builtin",
         "rect": { "x": 0, "y": 0, "w": 1, "h": 1 }
       }
+    },
+    {
+      "id": "slack",
+      "app": { "bundleId": "com.tinyspeck.slackmacgap", "name": "Slack" },
+      "match": { "kind": "mainWindow" },
+      "place": {
+        "display": "builtin",
+        "rect": { "x": 0, "y": 0, "w": 1, "h": 1 }
+      }
     }
   ],
 
   "options": {
     "allowOverlap": false,
     "restoreMinimized": false,
-    "focusAfterApply": "code-main"
+    "focusAfterApply": "cursor-main"
   }
 }
