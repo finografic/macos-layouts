@@ -44,7 +44,17 @@ export function matchWindows(
 ): MatchResult {
   const restoreMinimized = options?.restoreMinimized ?? false;
 
-  // Build per-app pools keyed by bundleId then name (sorted once, used immutably)
+  // Track all known apps (before eligibility filtering) to distinguish
+  // "app not running" from "app running but all windows filtered out"
+  const knownBundleIds = new Set<string>();
+  const knownNames = new Set<string>();
+
+  for (const w of windows) {
+    if (w.app.bundleId !== null) knownBundleIds.add(w.app.bundleId);
+    knownNames.add(w.app.name);
+  }
+
+  // Build per-app pools from eligible windows only (sorted once, used immutably)
   const poolByBundleId = new Map<string, RuntimeWindow[]>();
   const poolByName = new Map<string, RuntimeWindow[]>();
 
@@ -93,7 +103,9 @@ export function matchWindows(
     }
 
     if (pool === undefined) {
-      skipped.push({ ruleId: rule.id, app: label, reason: 'appNotRunning' });
+      const known = (rule.app.bundleId !== undefined && knownBundleIds.has(rule.app.bundleId))
+        || (rule.app.name !== undefined && knownNames.has(rule.app.name));
+      skipped.push({ ruleId: rule.id, app: label, reason: known ? 'noWindows' : 'appNotRunning' });
       continue;
     }
 
