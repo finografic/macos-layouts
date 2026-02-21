@@ -17,6 +17,7 @@ export function printHelp(): void {
     { name: 'save', desc: 'Save current window positions as a new layout' },
     { name: 'list', desc: 'List available layouts' },
     { name: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
+    { name: 'doctor', desc: 'Check environment (Hammerspoon, permissions, layouts directory)' },
   ];
   const maxNameLength = Math.max(...commands.map((c) => c.name.length));
   for (const cmd of commands) {
@@ -53,6 +54,8 @@ export function printHelp(): void {
       cmd: 'macos-layouts dump --include-hidden',
       comment: 'Include non-standard windows (panels, popovers)',
     },
+    { cmd: 'macos-layouts doctor', comment: 'Check environment' },
+    { cmd: 'macos-layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
   ];
   const maxCmdLength = Math.max(...examples.map((e) => e.cmd.length));
   for (const ex of examples) {

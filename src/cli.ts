@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 
 import { applyCommand } from './commands/apply.command.js';
+import { doctorCommand } from './commands/doctor.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { listCommand } from './commands/list.command.js';
 import { saveCommand } from './commands/save.command.js';
 import { printHelp } from './macos-layouts.help.js';
-import type { ApplyOptions, DumpOptions, ListOptions, SaveOptions } from './types/cli.types.js';
+import type {
+  ApplyOptions,
+  DoctorOptions,
+  DumpOptions,
+  ListOptions,
+  SaveOptions,
+} from './types/cli.types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -101,6 +108,20 @@ async function main(): Promise<void> {
       verbose: hasFlag(rest, '--verbose'),
     };
     const code = await dumpCommand({ options });
+    process.exit(code);
+    return;
+  }
+
+  if (command === 'doctor') {
+    const layoutsDirIdx = rest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? rest[layoutsDirIdx + 1] : undefined;
+    const options: DoctorOptions = {
+      json: hasFlag(rest, '--json'),
+      fix: hasFlag(rest, '--fix'),
+      verbose: hasFlag(rest, '--verbose'),
+      layoutsDir: layoutsDirArg,
+    };
+    const code = await doctorCommand({ options });
     process.exit(code);
     return;
   }
