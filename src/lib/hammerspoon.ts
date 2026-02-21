@@ -147,7 +147,11 @@ export function luaLongString(s: string): string {
     level++;
   }
   const eq = '='.repeat(level);
-  return `[${eq}[${s}]${eq}]`;
+  // Wrap with newlines: Lua strips the leading newline so the decoded value
+  // is unchanged. The trailing newline prevents boundary collision when the
+  // content ends with ']' (e.g. JSON arrays), which would otherwise cause
+  // ']' + ']]' = ']]]' to close the long string one character too early.
+  return `[${eq}[\n${s}\n]${eq}]`;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
