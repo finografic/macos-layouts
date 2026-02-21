@@ -27,6 +27,7 @@ export function printHelp(): void {
     { cmd: 'list', desc: 'List available layouts' },
     { cmd: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
     { cmd: 'doctor', desc: 'Check environment (Hammerspoon, permissions, layouts directory)' },
+    { cmd: 'compile', desc: 'Compile a saved layout to a standalone Lua file for Hammerspoon' },
   ];
   const cmdWidth = columnMax(commands, (c) => c.cmd);
   for (const command of commands) lines.push(renderCommand(command, cmdWidth));
@@ -61,6 +62,14 @@ export function printHelp(): void {
     },
     { cmd: 'macos-layouts doctor', comment: 'Check environment' },
     { cmd: 'macos-layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
+    {
+      cmd: 'macos-layouts compile home',
+      comment: 'Compile "home" layout to ~/.hammerspoon/layouts/home.lua',
+    },
+    {
+      cmd: 'macos-layouts compile home --output ~/Desktop/home.lua',
+      comment: 'Write to a custom path',
+    },
   ];
   const exampleWidth = columnMax(examples, (e) => e.cmd);
   for (const example of examples) lines.push(renderExample(example, exampleWidth));

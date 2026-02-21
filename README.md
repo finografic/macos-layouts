@@ -99,6 +99,29 @@ macos-layouts dump --include-hidden                      # Include non-standard 
 | `--include-hidden`    | Include non-standard windows (panels, popovers) |
 | `--verbose`           | Show detailed output                            |
 
+### `compile`
+
+Compile a saved layout to a self-contained Lua file for direct use in Hammerspoon.
+The generated file embeds all layout data and runtime logic — no Node.js required at trigger time.
+
+```bash
+macos-layouts compile home                             # Write to ~/.hammerspoon/layouts/home.lua
+macos-layouts compile home --output ~/Desktop/home.lua # Write to a custom path
+```
+
+| Flag                   | Description                                   |
+| ---------------------- | --------------------------------------------- |
+| `--output <path>`      | Write to a custom path instead of the default |
+| `--layouts-dir <path>` | Use a custom layouts directory                |
+
+After compiling, add a hotkey to `~/.hammerspoon/init.lua`:
+
+```lua
+hs.hotkey.bind({"cmd","alt"}, "h", function()
+  dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/home.lua")
+end)
+```
+
 ### `doctor`
 
 Check environment health — Hammerspoon, IPC, accessibility, and layouts directory.

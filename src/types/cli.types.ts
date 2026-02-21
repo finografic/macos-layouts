@@ -92,3 +92,8 @@ export interface DoctorOptions extends SharedCliOptions {
   /** Show fix instructions for issues found */
   readonly fix?: boolean;
 }
+
+export interface CompileOptions extends SharedCliOptions {
+  /** Write the compiled Lua to this path instead of ~/.hammerspoon/layouts/<name>.lua */
+  readonly output?: string;
+}

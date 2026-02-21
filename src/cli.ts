@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { applyCommand } from './commands/apply.command.js';
+import { compileCommand } from './commands/compile.command.js';
 import { doctorCommand } from './commands/doctor.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { listCommand } from './commands/list.command.js';
@@ -8,6 +9,7 @@ import { saveCommand } from './commands/save.command.js';
 import { printHelp } from './macos-layouts.help.js';
 import type {
   ApplyOptions,
+  CompileOptions,
   DoctorOptions,
   DumpOptions,
   ListOptions,
@@ -122,6 +124,26 @@ async function main(): Promise<void> {
       layoutsDir: layoutsDirArg,
     };
     const code = await doctorCommand({ options });
+    process.exit(code);
+    return;
+  }
+
+  if (command === 'compile') {
+    const [layoutName, ...compileRest] = rest;
+    if (!layoutName) {
+      console.error('Error: layout name is required. Usage: macos-layouts compile <name>');
+      process.exit(1);
+      return;
+    }
+    const outputIdx = compileRest.indexOf('--output');
+    const outputArg = outputIdx !== -1 ? compileRest[outputIdx + 1] : undefined;
+    const layoutsDirIdx = compileRest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? compileRest[layoutsDirIdx + 1] : undefined;
+    const options: CompileOptions = {
+      output: outputArg,
+      layoutsDir: layoutsDirArg,
+    };
+    const code = await compileCommand({ name: layoutName, options });
     process.exit(code);
     return;
   }
