@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+import { applyCommand } from './commands/apply.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { printHelp } from './macos-layouts.help.js';
-import type { DumpOptions } from './types/cli.types.js';
+import type { ApplyOptions, DumpOptions } from './types/cli.types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,30 @@ const [command, ...rest] = args;
 async function main(): Promise<void> {
   if (!command || hasFlag(args, '--help', '-h')) {
     printHelp();
+    return;
+  }
+
+  if (command === 'apply') {
+    const [layoutName, ...applyRest] = rest;
+    if (!layoutName) {
+      console.error('Error: layout name is required. Usage: macos-layouts apply <name>');
+      process.exit(1);
+      return;
+    }
+    const timeoutArg = applyRest[applyRest.indexOf('--timeout-ms') + 1];
+    const layoutsDirArg = applyRest[applyRest.indexOf('--layouts-dir') + 1];
+    const focusArg = applyRest[applyRest.indexOf('--focus') + 1];
+    const options: ApplyOptions = {
+      dryRun: hasFlag(applyRest, '--dry-run'),
+      strict: hasFlag(applyRest, '--strict'),
+      json: hasFlag(applyRest, '--json'),
+      verbose: hasFlag(applyRest, '--verbose'),
+      timeoutMs: timeoutArg ? parseInt(timeoutArg, 10) : undefined,
+      layoutsDir: layoutsDirArg ?? undefined,
+      focus: focusArg ?? undefined,
+    };
+    const code = await applyCommand({ name: layoutName, options });
+    process.exit(code);
     return;
   }
 
