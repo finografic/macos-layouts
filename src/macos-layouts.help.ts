@@ -1,5 +1,14 @@
 import pc from 'picocolors';
 
+import {
+  columnMax,
+  type HelpCommand,
+  type HelpExample,
+  renderCommand,
+  renderExample,
+  renderUsage,
+} from './utils/help.utils.js';
+
 export function printHelp(): void {
   const lines: string[] = [];
 
@@ -8,23 +17,19 @@ export function printHelp(): void {
   lines.push('');
 
   lines.push(pc.bold('USAGE'));
-  lines.push(`  ${pc.cyanBright('macos-layouts')} ${pc.dim(pc.cyan('<command>'))} [options]`);
+  lines.push(`  ${renderUsage('macos-layouts', '<command>', '[options]')}`);
   lines.push('');
 
   lines.push(pc.bold('COMMANDS'));
-  const commands = [
-    { name: 'apply', desc: 'Apply a saved layout to current windows' },
-    { name: 'save', desc: 'Save current window positions as a new layout' },
-    { name: 'list', desc: 'List available layouts' },
-    { name: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
-    { name: 'doctor', desc: 'Check environment (Hammerspoon, permissions, layouts directory)' },
+  const commands: HelpCommand[] = [
+    { cmd: 'apply', desc: 'Apply a saved layout to current windows' },
+    { cmd: 'save', desc: 'Save current window positions as a new layout' },
+    { cmd: 'list', desc: 'List available layouts' },
+    { cmd: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
+    { cmd: 'doctor', desc: 'Check environment (Hammerspoon, permissions, layouts directory)' },
   ];
-  const maxNameLength = Math.max(...commands.map((c) => c.name.length));
-  for (const cmd of commands) {
-    lines.push(
-      `  ${pc.cyan(cmd.name)}${' '.repeat(maxNameLength - cmd.name.length + 4)}${cmd.desc}`,
-    );
-  }
+  const cmdWidth = columnMax(commands, (c) => c.cmd);
+  for (const command of commands) lines.push(renderCommand(command, cmdWidth));
   lines.push('');
 
   lines.push(pc.bold('OPTIONS'));
@@ -33,7 +38,7 @@ export function printHelp(): void {
   lines.push('');
 
   lines.push(pc.bold('EXAMPLES'));
-  const examples = [
+  const examples: HelpExample[] = [
     { cmd: 'macos-layouts apply work', comment: 'Apply the "work" layout' },
     { cmd: 'macos-layouts apply home --dry-run', comment: 'Preview what would move' },
     { cmd: 'macos-layouts apply home --strict', comment: 'Fail if any required rule is skipped' },
@@ -57,17 +62,13 @@ export function printHelp(): void {
     { cmd: 'macos-layouts doctor', comment: 'Check environment' },
     { cmd: 'macos-layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
   ];
-  const maxCmdLength = Math.max(...examples.map((e) => e.cmd.length));
-  for (const ex of examples) {
-    lines.push(
-      `  ${ex.cmd}${' '.repeat(maxCmdLength - ex.cmd.length + 4)}${pc.dim('# ' + ex.comment)}`,
-    );
-  }
+  const exampleWidth = columnMax(examples, (e) => e.cmd);
+  for (const example of examples) lines.push(renderExample(example, exampleWidth));
   lines.push('');
 
   lines.push(pc.bold('GET HELP'));
   lines.push(
-    `  ${pc.cyanBright('macos-layouts')} ${pc.dim(pc.cyan('<command>'))} --help       ${
+    `  ${renderUsage('macos-layouts', '<command>', '--help')}       ${
       pc.dim('# Show detailed help for a command')
     }`,
   );
