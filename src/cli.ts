@@ -2,8 +2,9 @@
 
 import { applyCommand } from './commands/apply.command.js';
 import { dumpCommand } from './commands/dump.command.js';
+import { listCommand } from './commands/list.command.js';
 import { printHelp } from './macos-layouts.help.js';
-import type { ApplyOptions, DumpOptions } from './types/cli.types.js';
+import type { ApplyOptions, DumpOptions, ListOptions } from './types/cli.types.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,18 @@ async function main(): Promise<void> {
       focus: focusArg ?? undefined,
     };
     const code = await applyCommand({ name: layoutName, options });
+    process.exit(code);
+    return;
+  }
+
+  if (command === 'list') {
+    const layoutsDirIdx = rest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? rest[layoutsDirIdx + 1] : undefined;
+    const options: ListOptions = {
+      json: hasFlag(rest, '--json'),
+      layoutsDir: layoutsDirArg,
+    };
+    const code = await listCommand({ options });
     process.exit(code);
     return;
   }

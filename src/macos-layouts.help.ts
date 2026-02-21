@@ -14,6 +14,7 @@ export function printHelp(): void {
   lines.push(pc.bold('COMMANDS'));
   const commands = [
     { name: 'apply', desc: 'Apply a saved layout to current windows' },
+    { name: 'list', desc: 'List available layouts' },
     { name: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
   ];
   const maxNameLength = Math.max(...commands.map((c) => c.name.length));
@@ -34,6 +35,8 @@ export function printHelp(): void {
     { cmd: 'macos-layouts apply work', comment: 'Apply the "work" layout' },
     { cmd: 'macos-layouts apply home --dry-run', comment: 'Preview what would move' },
     { cmd: 'macos-layouts apply home --strict', comment: 'Fail if any required rule is skipped' },
+    { cmd: 'macos-layouts list', comment: 'List available layouts' },
+    { cmd: 'macos-layouts list --json', comment: 'List layout names as JSON array' },
     { cmd: 'macos-layouts dump', comment: 'Show current screens and windows (human-readable)' },
     { cmd: 'macos-layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
     {

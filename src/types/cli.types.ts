@@ -86,6 +86,8 @@ export interface DumpOptions extends SharedCliOptions {
   readonly includeHidden?: boolean;
 }
 
+export interface ListOptions extends SharedCliOptions {}
+
 export interface DoctorOptions extends SharedCliOptions {
   /** Show fix instructions for issues found */
   readonly fix?: boolean;
