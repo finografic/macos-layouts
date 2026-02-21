@@ -11,6 +11,7 @@ import { DEFAULT_LAYOUTS_DIR, expandHome } from '../lib/layout-loader.js';
 import type { SaveOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
+import { compileCommand } from './compile.command.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -221,6 +222,13 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
 
   if (options.json) {
     console.log(JSON.stringify(layout, null, 2));
+  }
+
+  if (interactive) {
+    const shouldCompile = await confirm({ message: `Compile "${name}" for Hammerspoon hotkey?` });
+    if (!isCancel(shouldCompile) && shouldCompile) {
+      await compileCommand({ name, options: { layoutsDir: options.layoutsDir } });
+    }
   }
 
   return EXIT_CODE.Success;

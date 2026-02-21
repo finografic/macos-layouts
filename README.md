@@ -114,13 +114,17 @@ macos-layouts compile home --output ~/Desktop/home.lua # Write to a custom path
 | `--output <path>`      | Write to a custom path instead of the default |
 | `--layouts-dir <path>` | Use a custom layouts directory                |
 
-After compiling, add a hotkey to `~/.hammerspoon/init.lua`:
+After compiling, add a hotkey to `~/.hammerspoon/init.lua`. The `compile` command does this automatically, but here's a complete recommended setup:
 
 ```lua
+hs.window.animationDuration = 0  -- instant window moves (default is 0.2s)
+
 hs.hotkey.bind({"cmd","alt"}, "h", function()
   dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/home.lua")
 end)
 ```
+
+> The `compile` command automatically appends the hotkey snippet on first run. `hs.window.animationDuration = 0` must be added manually.
 
 ### `doctor`
 
