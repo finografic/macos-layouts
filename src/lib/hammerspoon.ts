@@ -141,7 +141,7 @@ function parseJson<T>(raw: string): HsResult<T> {
  * in the payload. For JSON this is almost always level 0 (`[[...]]`), but the
  * function increments the level defensively.
  */
-function luaLongString(s: string): string {
+export function luaLongString(s: string): string {
   let level = 0;
   while (s.includes(`]${'='.repeat(level)}]`)) {
     level++;
@@ -189,6 +189,14 @@ export async function dump({ lua, timeoutMs }: DumpParams): Promise<HsResult<Run
   const raw = await runHs({ expr: lua, timeoutMs });
   if (!raw.ok) return raw;
   return parseJson<RuntimeDump>(raw.value);
+}
+
+/**
+ * Run an arbitrary Lua expression in the running Hammerspoon instance.
+ * Returns the raw stdout string. Use this for self-contained IIFE scripts.
+ */
+export async function runLua(lua: string, timeoutMs?: number): Promise<HsResult<string>> {
+  return runHs({ expr: lua, timeoutMs });
 }
 
 /**
