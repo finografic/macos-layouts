@@ -6,7 +6,7 @@ import { doctorCommand } from './commands/doctor.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { listCommand } from './commands/list.command.js';
 import { saveCommand } from './commands/save.command.js';
-import { printHelp } from './macos-layouts.help.js';
+import { printHelp } from './layouts.help.js';
 import type {
   ApplyOptions,
   CompileOptions,
@@ -36,7 +36,7 @@ async function main(): Promise<void> {
   if (command === 'apply') {
     const [layoutName, ...applyRest] = rest;
     if (!layoutName) {
-      console.error('Error: layout name is required. Usage: macos-layouts apply <name>');
+      console.error('Error: layout name is required. Usage: layouts apply <name>');
       process.exit(1);
       return;
     }
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
   if (command === 'save') {
     const [layoutName, ...saveRest] = rest;
     if (!layoutName) {
-      console.error('Error: layout name is required. Usage: macos-layouts save <name>');
+      console.error('Error: layout name is required. Usage: layouts save <name>');
       process.exit(1);
       return;
     }
@@ -131,7 +131,7 @@ async function main(): Promise<void> {
   if (command === 'compile') {
     const [layoutName, ...compileRest] = rest;
     if (!layoutName) {
-      console.error('Error: layout name is required. Usage: macos-layouts compile <name>');
+      console.error('Error: layout name is required. Usage: layouts compile <name>');
       process.exit(1);
       return;
     }

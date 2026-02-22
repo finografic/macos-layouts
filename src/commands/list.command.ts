@@ -26,7 +26,7 @@ export async function listCommand({ options }: ListCommandParams): Promise<numbe
 
   if (names.length === 0) {
     console.log(pc.gray('  No layouts found. To create one, run:'));
-    console.log(pc.gray(`  $ ${pc.cyanBright('macos-layouts save')} ${pc.white('<name>')}`));
+    console.log(pc.gray(`  $ ${pc.cyanBright('layouts save')} ${pc.white('<name>')}`));
     console.log();
     return EXIT_CODE.Success;
   }

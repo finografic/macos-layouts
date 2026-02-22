@@ -109,7 +109,7 @@
     "pre-commit": "npx lint-staged --allow-empty"
   },
   "bin": {
-    "macos-layouts": "./dist/cli.mjs"
+    "layouts": "./dist/cli.mjs"
   },
   "dependencies": {
     "@clack/prompts": "^1.0.1",

@@ -24,7 +24,7 @@ function buildInitSnippet(name: string): string {
   const fn = `_mlApply_${name}`;
   return [
     '',
-    `-- macos-layouts: ${name}`,
+    `-- layouts: ${name}`,
     `local ${fn}_lastRun = 0`,
     `local function ${fn}()`,
     `  local now = hs.timer.secondsSinceEpoch()`,

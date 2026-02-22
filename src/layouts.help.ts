@@ -13,11 +13,11 @@ export function printHelp(): void {
   const lines: string[] = [];
 
   lines.push('');
-  lines.push(`${pc.bold('macos-layouts')} - Trigger perfect window layouts in macOS`);
+  lines.push(`${pc.bold('layouts')} - Trigger perfect window layouts in macOS`);
   lines.push('');
 
   lines.push(pc.bold('USAGE'));
-  lines.push(`  ${renderUsage('macos-layouts', '<command>', '[options]')}`);
+  lines.push(`  ${renderUsage('layouts', '<command>', '[options]')}`);
   lines.push('');
 
   lines.push(pc.bold('COMMANDS'));
@@ -40,34 +40,34 @@ export function printHelp(): void {
 
   lines.push(pc.bold('EXAMPLES'));
   const examples: HelpExample[] = [
-    { cmd: 'macos-layouts apply work', comment: 'Apply the "work" layout' },
-    { cmd: 'macos-layouts apply home --dry-run', comment: 'Preview what would move' },
-    { cmd: 'macos-layouts apply home --strict', comment: 'Fail if any required rule is skipped' },
+    { cmd: 'layouts apply work', comment: 'Apply the "work" layout' },
+    { cmd: 'layouts apply home --dry-run', comment: 'Preview what would move' },
+    { cmd: 'layouts apply home --strict', comment: 'Fail if any required rule is skipped' },
     {
-      cmd: 'macos-layouts save work',
+      cmd: 'layouts save work',
       comment: 'Save current windows as "work" layout (interactive)',
     },
-    { cmd: 'macos-layouts save home --no-interactive', comment: 'Save without prompts' },
-    { cmd: 'macos-layouts list', comment: 'List available layouts' },
-    { cmd: 'macos-layouts list --json', comment: 'List layout names as JSON array' },
-    { cmd: 'macos-layouts dump', comment: 'Show current screens and windows (human-readable)' },
-    { cmd: 'macos-layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
+    { cmd: 'layouts save home --no-interactive', comment: 'Save without prompts' },
+    { cmd: 'layouts list', comment: 'List available layouts' },
+    { cmd: 'layouts list --json', comment: 'List layout names as JSON array' },
+    { cmd: 'layouts dump', comment: 'Show current screens and windows (human-readable)' },
+    { cmd: 'layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
     {
-      cmd: 'macos-layouts dump --json --pretty --include-minimized',
+      cmd: 'layouts dump --json --pretty --include-minimized',
       comment: 'Include minimized windows',
     },
     {
-      cmd: 'macos-layouts dump --include-hidden',
+      cmd: 'layouts dump --include-hidden',
       comment: 'Include non-standard windows (panels, popovers)',
     },
-    { cmd: 'macos-layouts doctor', comment: 'Check environment' },
-    { cmd: 'macos-layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
+    { cmd: 'layouts doctor', comment: 'Check environment' },
+    { cmd: 'layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
     {
-      cmd: 'macos-layouts compile home',
+      cmd: 'layouts compile home',
       comment: 'Compile "home" layout to ~/.hammerspoon/layouts/home.lua',
     },
     {
-      cmd: 'macos-layouts compile home --output ~/Desktop/home.lua',
+      cmd: 'layouts compile home --output ~/Desktop/home.lua',
       comment: 'Write to a custom path',
     },
   ];
@@ -77,7 +77,7 @@ export function printHelp(): void {
 
   lines.push(pc.bold('GET HELP'));
   lines.push(
-    `  ${renderUsage('macos-layouts', '<command>', '--help')}       ${
+    `  ${renderUsage('layouts', '<command>', '--help')}       ${
       pc.dim('# Show detailed help for a command')
     }`,
   );

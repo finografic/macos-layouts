@@ -1,4 +1,4 @@
-# 🖥️ @finografic/macos-layouts
+# 🖥️ macos-layouts
 
 > Trigger perfect window layouts in macOS
 
@@ -17,7 +17,7 @@ pnpm install && pnpm link --global
 ## 🚀 Usage
 
 ```text
-macos-layouts <command> [options]
+layouts <command> [options]
 
   apply     Apply a saved layout to current windows
   save      Save current window positions as a new layout
@@ -31,9 +31,9 @@ macos-layouts <command> [options]
 Apply a saved layout by name.
 
 ```bash
-macos-layouts apply work                # Apply the "work" layout
-macos-layouts apply home --dry-run      # Preview what would move
-macos-layouts apply home --strict       # Fail if any required rule is skipped
+layouts apply work                # Apply the "work" layout
+layouts apply home --dry-run      # Preview what would move
+layouts apply home --strict       # Fail if any required rule is skipped
 ```
 
 | Flag                   | Description                                     |
@@ -51,10 +51,10 @@ macos-layouts apply home --strict       # Fail if any required rule is skipped
 Save current window positions as a named layout.
 
 ```bash
-macos-layouts save work                     # Save current windows as "work" (interactive)
-macos-layouts save home --no-interactive    # Save without prompts
-macos-layouts save work --include Slack     # Only include Slack
-macos-layouts save work --exclude Mail      # Exclude Mail
+layouts save work                     # Save current windows as "work" (interactive)
+layouts save home --no-interactive    # Save without prompts
+layouts save work --include Slack     # Only include Slack
+layouts save work --exclude Mail      # Exclude Mail
 ```
 
 | Flag                   | Description                        |
@@ -71,8 +71,8 @@ macos-layouts save work --exclude Mail      # Exclude Mail
 List all saved layouts.
 
 ```bash
-macos-layouts list           # List available layouts
-macos-layouts list --json    # Output as JSON array
+layouts list           # List available layouts
+layouts list --json    # Output as JSON array
 ```
 
 | Flag                   | Description                       |
@@ -85,10 +85,10 @@ macos-layouts list --json    # Output as JSON array
 Print current screen and window state from Hammerspoon.
 
 ```bash
-macos-layouts dump                                       # Show screens and windows (human-readable)
-macos-layouts dump --json --pretty                       # Pretty-print full JSON snapshot
-macos-layouts dump --json --pretty --include-minimized   # Include minimized windows
-macos-layouts dump --include-hidden                      # Include non-standard windows
+layouts dump                                       # Show screens and windows (human-readable)
+layouts dump --json --pretty                       # Pretty-print full JSON snapshot
+layouts dump --json --pretty --include-minimized   # Include minimized windows
+layouts dump --include-hidden                      # Include non-standard windows
 ```
 
 | Flag                  | Description                                     |
@@ -105,8 +105,8 @@ Compile a saved layout to a self-contained Lua file for direct use in Hammerspoo
 The generated file embeds all layout data and runtime logic — no Node.js required at trigger time.
 
 ```bash
-macos-layouts compile home                             # Write to ~/.hammerspoon/layouts/home.lua
-macos-layouts compile home --output ~/Desktop/home.lua # Write to a custom path
+layouts compile home                             # Write to ~/.hammerspoon/layouts/home.lua
+layouts compile home --output ~/Desktop/home.lua # Write to a custom path
 ```
 
 | Flag                   | Description                                   |
@@ -119,7 +119,7 @@ After compiling, the `compile` command automatically appends a snippet to `~/.ha
 ```lua
 hs.window.animationDuration = 0  -- instant window moves (default is 0.2s)
 
--- macos-layouts: home  (appended automatically by `compile`)
+-- layouts: home  (appended automatically by `compile`)
 local _mlApply_home_lastRun = 0
 local function _mlApply_home()
   local now = hs.timer.secondsSinceEpoch()
@@ -166,8 +166,8 @@ killall Dock
 Check environment health — Hammerspoon, IPC, accessibility, and layouts directory.
 
 ```bash
-macos-layouts doctor         # Check environment
-macos-layouts doctor --fix   # Show fix instructions for failed checks
+layouts doctor         # Check environment
+layouts doctor --fix   # Show fix instructions for failed checks
 ```
 
 | Flag                   | Description                             |
@@ -184,7 +184,7 @@ macos-layouts doctor --fix   # Show fix instructions for failed checks
 - `require("hs.ipc")` added to `~/.hammerspoon/init.lua`
 - Accessibility permissions granted to Hammerspoon in **System Settings > Privacy & Security > Accessibility**
 
-Run `macos-layouts doctor` to verify your setup.
+Run `layouts doctor` to verify your setup.
 
 ## 💻 Development
 
