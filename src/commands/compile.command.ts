@@ -22,13 +22,16 @@ interface CompileCommandParams {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildHotkeySnippet(name: string): string {
+function buildInitSnippet(name: string): string {
+  const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
   return [
     '',
-    `-- macos-layouts: ${name} (change key binding as needed)`,
-    `hs.hotkey.bind({"cmd","alt"}, "h", function()`,
-    `  dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua")`,
-    `end)`,
+    `-- macos-layouts: ${name}`,
+    `local function _mlApply_${name}()`,
+    `  dofile(${path})`,
+    `end`,
+    `hs.hotkey.bind({"cmd","alt"}, "h", _mlApply_${name})  -- change key binding as needed`,
+    `hs.screen.watcher.new(_mlApply_${name}):start()         -- re-applies when Dock moves/shows/hides`,
     '',
   ].join('\n');
 }
@@ -49,7 +52,7 @@ async function updateInitLua(name: string): Promise<'added' | 'exists'> {
   }
 
   await mkdir(dirname(initLuaPath), { recursive: true });
-  await writeFile(initLuaPath, existing + buildHotkeySnippet(name), 'utf-8');
+  await writeFile(initLuaPath, existing + buildInitSnippet(name), 'utf-8');
   return 'added';
 }
 
