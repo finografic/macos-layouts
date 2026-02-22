@@ -1,7 +1,7 @@
 {
   "name": "@finografic/macos-layouts",
   "type": "module",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "packageManager": "pnpm@10.8.0",
   "description": "Trigger perfect window layouts in macOS",
   "homepage": "https://github.com/finografic/macos-layouts",
