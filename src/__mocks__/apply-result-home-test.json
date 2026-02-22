@@ -1,0 +1,74 @@
+{
+  "ok": true,
+  "timestamp": "2026-02-21T01:56:00.308Z",
+  "layoutName": "home-test",
+  "resolvedDisplays": {
+    "primary": {
+      "screenId": "4",
+      "screenName": "LG HDR 4K"
+    },
+    "secondary": {
+      "screenId": "3",
+      "screenName": "LG Ultra HD"
+    }
+  },
+  "moved": [
+    {
+      "windowId": "52035",
+      "ruleId": "cursor-main",
+      "app": "Cursor",
+      "displayRole": "primary",
+      "from": {
+        "y": 30,
+        "w": 2304,
+        "x": 0,
+        "h": 2081
+      },
+      "to": {
+        "y": 30,
+        "w": 2304,
+        "x": 0,
+        "h": 2082
+      }
+    },
+    {
+      "windowId": "28025",
+      "ruleId": "ghostty-main",
+      "app": "Ghostty",
+      "displayRole": "primary",
+      "from": {
+        "y": 30,
+        "w": 1536,
+        "x": 2304,
+        "h": 2081
+      },
+      "to": {
+        "y": 30,
+        "w": 1536,
+        "x": 2304,
+        "h": 2082
+      }
+    },
+    {
+      "windowId": "39822",
+      "ruleId": "chrome-main",
+      "app": "Google Chrome",
+      "displayRole": "secondary",
+      "from": {
+        "y": 30,
+        "w": 3840,
+        "x": -3840,
+        "h": 2130
+      },
+      "to": {
+        "y": 30,
+        "w": 3840,
+        "x": -3840,
+        "h": 2130
+      }
+    }
+  ],
+  "skipped": [],
+  "errors": [],
+  "durationMs": 737
+}

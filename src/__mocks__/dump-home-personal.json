@@ -1,0 +1,371 @@
+{
+  "windows": [
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 2560,
+        "x": -3840,
+        "h": 1394
+      },
+      "id": "76",
+      "app": {
+        "name": "Obsidian",
+        "pid": 752,
+        "bundleId": "md.obsidian"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "🦋🎨 FRAMEWORKS + PATTERNS - OBSIDIAN_PERSONAL - Obsidian v1.11.7"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 2560,
+        "x": -3840,
+        "h": 1394
+      },
+      "id": "15682",
+      "app": {
+        "name": "GitHub Desktop",
+        "pid": 6640,
+        "bundleId": "com.github.GitHubClient"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "GitHub Desktop"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 1668,
+        "x": -3840,
+        "h": 2082
+      },
+      "id": "52073",
+      "app": {
+        "name": "Typora",
+        "pid": 32586,
+        "bundleId": "abnerworks.Typora"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "CLAUDE.md"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 688,
+        "w": 1280,
+        "x": -1280,
+        "h": 1424
+      },
+      "id": "28025",
+      "app": {
+        "name": "Ghostty",
+        "pid": 42186,
+        "bundleId": "com.mitchellh.ghostty"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": true,
+      "isMinimized": false,
+      "title": "✳ Git commit request"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 1279,
+        "x": -1279,
+        "h": 860
+      },
+      "id": "51890",
+      "app": {
+        "name": "Ghostty",
+        "pid": 42186,
+        "bundleId": "com.mitchellh.ghostty"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "~/repos-finografic/macos-layouts"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 379,
+        "w": 1840,
+        "x": -3189,
+        "h": 1598
+      },
+      "id": "51385",
+      "app": {
+        "name": "Ghostty",
+        "pid": 42186,
+        "bundleId": "com.mitchellh.ghostty"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "~/repos-finografic/@finografic-core"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 594,
+        "w": 1680,
+        "x": -2961,
+        "h": 650
+      },
+      "id": "32130",
+      "app": {
+        "name": "Ghostty",
+        "pid": 42186,
+        "bundleId": "com.mitchellh.ghostty"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "~/repos-finografic/@finografic-core"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 1680,
+        "x": -2961,
+        "h": 563
+      },
+      "id": "32036",
+      "app": {
+        "name": "Ghostty",
+        "pid": 42186,
+        "bundleId": "com.mitchellh.ghostty"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "~/repos-finografic/git-cli-v2.2"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 1418,
+        "w": 1280,
+        "x": -2560,
+        "h": 694
+      },
+      "id": "55462",
+      "app": {
+        "name": "Finder",
+        "pid": 28478,
+        "bundleId": "com.apple.finder"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "/Users/justin/repos-finografic/macos-layouts"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 1418,
+        "w": 1280,
+        "x": -3840,
+        "h": 694
+      },
+      "id": "54667",
+      "app": {
+        "name": "Finder",
+        "pid": 28478,
+        "bundleId": "com.apple.finder"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "/Users/justin/Downloads"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 30,
+        "w": 2487,
+        "x": -3519,
+        "h": 1388
+      },
+      "id": "39822",
+      "app": {
+        "name": "Google Chrome",
+        "pid": 31213,
+        "bundleId": "com.google.Chrome"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "macOS window layout infrastructure as code - Claude – Pinned - Google Chrome"
+    },
+    {
+      "screenId": "4",
+      "frame": {
+        "y": 30,
+        "w": 1920,
+        "x": 0,
+        "h": 2081
+      },
+      "id": "52035",
+      "app": {
+        "name": "Cursor",
+        "pid": 97800,
+        "bundleId": "com.todesktop.230313mzl4w4u92"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "display.types.ts — macos-layouts"
+    },
+    {
+      "screenId": "4",
+      "frame": {
+        "y": 30,
+        "w": 1920,
+        "x": 0,
+        "h": 2081
+      },
+      "id": "54687",
+      "app": {
+        "name": "Cursor",
+        "pid": 97800,
+        "bundleId": "com.todesktop.230313mzl4w4u92"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "Untitled-1"
+    },
+    {
+      "screenId": "4",
+      "frame": {
+        "y": 30,
+        "w": 1920,
+        "x": 1920,
+        "h": 2081
+      },
+      "id": "47152",
+      "app": {
+        "name": "Cursor",
+        "pid": 97800,
+        "bundleId": "com.todesktop.230313mzl4w4u92"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "init.lua — Untitled (Workspace)"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 439,
+        "w": 1329,
+        "x": -3269,
+        "h": 1036
+      },
+      "id": "51676",
+      "app": {
+        "name": "Messages",
+        "pid": 59778,
+        "bundleId": "com.apple.MobileSMS"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "Justin Blair Blair Rankin"
+    },
+    {
+      "screenId": "3",
+      "frame": {
+        "y": 33,
+        "w": 700,
+        "x": -3820,
+        "h": 734
+      },
+      "id": "52353",
+      "app": {
+        "name": "Script Editor",
+        "pid": 54331,
+        "bundleId": "com.apple.ScriptEditor2"
+      },
+      "role": "AXWindow",
+      "isStandard": true,
+      "isFocused": false,
+      "isMinimized": false,
+      "title": "Untitled"
+    }
+  ],
+  "screens": [
+    {
+      "isPrimary": true,
+      "id": "4",
+      "frame": {
+        "y": 30,
+        "w": 3840,
+        "x": 0,
+        "h": 2130
+      },
+      "fullFrame": {
+        "y": 0,
+        "w": 3840,
+        "x": 0,
+        "h": 2160
+      },
+      "isBuiltin": false,
+      "name": "LG HDR 4K",
+      "resolution": {
+        "h": 2160,
+        "w": 3840
+      }
+    },
+    {
+      "isPrimary": false,
+      "id": "3",
+      "frame": {
+        "y": 30,
+        "w": 3840,
+        "x": -3840,
+        "h": 2082
+      },
+      "fullFrame": {
+        "y": 0,
+        "w": 3840,
+        "x": -3840,
+        "h": 2160
+      },
+      "isBuiltin": false,
+      "name": "LG Ultra HD",
+      "resolution": {
+        "h": 2160,
+        "w": 3840
+      }
+    }
+  ],
+  "timestamp": "2026-02-20T23:04:11Z"
+}

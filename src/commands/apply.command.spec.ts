@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import fixture from '../../.claude/assets/dump-home-personal.json';
+import fixture from '../__mocks__/dump-home-personal.json';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { RuntimeDump } from '../types/runtime.types.js';
 import { applyCommand } from './apply.command.js';
