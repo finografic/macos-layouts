@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import fixture from '../../.claude/assets/dump-home-personal.json';
+import fixture from '../__mocks__/dump-home-personal.json';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 import { buildLayout } from './layout-builder.js';
 import { normalizedToAbsolute } from './rect-converter.js';

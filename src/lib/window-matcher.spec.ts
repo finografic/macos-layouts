@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import fixture from '../../.claude/assets/dump-home-personal.json';
+import fixture from '../__mocks__/dump-home-personal.json';
 import type { RuntimeWindow } from '../types/runtime.types.js';
 import type { WindowRule } from '../types/window.types.js';
 import { matchWindows } from './window-matcher.js';
