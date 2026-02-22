@@ -28,10 +28,11 @@ export function generateLua({ layout, generatedAt = new Date() }: GenerateLuaPar
   const date = generatedAt.toISOString().split('T')[0];
   const restoreMinimized = layout.options?.restoreMinimized ?? false;
   const focusAfterApply = layout.options?.focusAfterApply;
+  const dockDisplay = layout.options?.dockDisplay;
 
   const parts: string[] = [
     buildFileHeader(layout.name, date),
-    buildLayoutDataBlock(layout, restoreMinimized, focusAfterApply),
+    buildLayoutDataBlock(layout, restoreMinimized, focusAfterApply, dockDisplay),
     RESOLVE_DISPLAY_ROLES_FN,
     MATCH_WINDOWS_FN,
     APPLY_BLOCK,
@@ -138,11 +139,15 @@ function buildLayoutDataBlock(
   layout: Layout,
   restoreMinimized: boolean,
   focusAfterApply: string | undefined,
+  dockDisplay: string | undefined,
 ): string {
   const displayRolesTable = buildDisplayRolesTable(layout.displayRoles);
   const windowRulesTable = buildWindowRulesTable(layout.windows);
   const focusPart = focusAfterApply !== undefined
     ? `, focusAfterApply = ${luaString(focusAfterApply)}`
+    : '';
+  const dockDisplayPart = dockDisplay !== undefined
+    ? `, dockDisplay = ${luaString(dockDisplay)}`
     : '';
 
   return [
@@ -150,7 +155,7 @@ function buildLayoutDataBlock(
     `  name = ${luaString(layout.name)},`,
     displayRolesTable,
     windowRulesTable,
-    `  options = { restoreMinimized = ${restoreMinimized}${focusPart} },`,
+    `  options = { restoreMinimized = ${restoreMinimized}${focusPart}${dockDisplayPart} },`,
     `}`,
   ].join('\n');
 }
@@ -367,65 +372,123 @@ end`;
 /**
  * Runtime body: collects screens and windows from the live Hammerspoon
  * environment, resolves display roles, matches windows, and moves them.
+ *
+ * If LAYOUT.options.dockDisplay is set:
+ *   1. Mouse is moved to the bottom of that display (activates it as the
+ *      Dock's target display).
+ *   2. Dock autohide is toggled true→false via AppleScript (both calls are
+ *      synchronous), forcing the Dock to reappear on the now-active display.
+ *   3. After 0.1s (for screen:frame() to reflect the new Dock position),
+ *      the layout is applied.
+ *
+ * Prerequisite for minimal latency:
+ *   defaults write com.apple.dock autohide-delay -float 0
+ *   defaults write com.apple.dock autohide-time-modifier -float 0
+ *   killall Dock
  */
 const APPLY_BLOCK = `\
--- [[ Collect current state and apply ]]
-local builtinScreen = hs.screen.find("Built%-in")
-local builtinId = builtinScreen and builtinScreen:id() or nil
-local primaryId = hs.screen.primaryScreen():id()
-local focused = hs.window.focusedWindow()
-
-local currentScreens = {}
-for _, screen in ipairs(hs.screen.allScreens()) do
-  local frame = screen:frame()
-  local fullFrame = screen:fullFrame()
-  table.insert(currentScreens, {
-    _screen = screen,
-    id = tostring(screen:id()),
-    name = screen:name() or "",
-    isBuiltin = (screen:id() == builtinId),
-    isPrimary = (screen:id() == primaryId),
-    frame = { x = frame.x, y = frame.y, w = frame.w, h = frame.h },
-    fullFrame = { x = fullFrame.x, y = fullFrame.y, w = fullFrame.w, h = fullFrame.h },
-  })
-end
-
-local currentWindows = {}
-for _, win in ipairs(hs.window.allWindows()) do
-  local isMinimized = win:isMinimized()
-  if win:isStandard() and (not isMinimized or LAYOUT.options.restoreMinimized) then
-    local app = win:application()
-    local winFrame = win:frame()
-    table.insert(currentWindows, {
-      _window = win,
-      id = tostring(win:id()),
-      app = {
-        name = app and app:name() or "",
-        bundleId = app and app:bundleID() or nil,
-      },
-      title = win:title() or "",
-      isFocused = (win == focused),
-      frame = { x = winFrame.x, y = winFrame.y, w = winFrame.w, h = winFrame.h },
+-- [[ Helpers: collect live state ]]
+local function collectScreens()
+  local builtinScreen = hs.screen.find("Built%-in")
+  local builtinId = builtinScreen and builtinScreen:id() or nil
+  local primaryId = hs.screen.primaryScreen():id()
+  local screens = {}
+  for _, screen in ipairs(hs.screen.allScreens()) do
+    local frame = screen:frame()
+    local fullFrame = screen:fullFrame()
+    table.insert(screens, {
+      _screen = screen,
+      id = tostring(screen:id()),
+      name = screen:name() or "",
+      isBuiltin = (screen:id() == builtinId),
+      isPrimary = (screen:id() == primaryId),
+      frame = { x = frame.x, y = frame.y, w = frame.w, h = frame.h },
+      fullFrame = { x = fullFrame.x, y = fullFrame.y, w = fullFrame.w, h = fullFrame.h },
     })
   end
+  return screens
 end
 
-local resolvedDisplays = resolveDisplayRoles(LAYOUT.displayRoles, currentScreens)
-local moves = matchWindows(LAYOUT.windows, currentWindows, resolvedDisplays)
-
-for _, move in ipairs(moves) do
-  move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h))
+local function collectWindows()
+  local focused = hs.window.focusedWindow()
+  local windows = {}
+  for _, win in ipairs(hs.window.allWindows()) do
+    local isMinimized = win:isMinimized()
+    if win:isStandard() and (not isMinimized or LAYOUT.options.restoreMinimized) then
+      local app = win:application()
+      local winFrame = win:frame()
+      table.insert(windows, {
+        _window = win,
+        id = tostring(win:id()),
+        app = {
+          name = app and app:name() or "",
+          bundleId = app and app:bundleID() or nil,
+        },
+        title = win:title() or "",
+        isFocused = (win == focused),
+        frame = { x = winFrame.x, y = winFrame.y, w = winFrame.w, h = winFrame.h },
+      })
+    end
+  end
+  return windows
 end
 
-if LAYOUT.options.focusAfterApply and LAYOUT.options.focusAfterApply ~= "none" and #moves > 0 then
-  if LAYOUT.options.focusAfterApply == "first" then
-    moves[1].window:focus()
-  else
-    for _, move in ipairs(moves) do
-      if move.ruleId == LAYOUT.options.focusAfterApply then
-        move.window:focus()
-        break
+-- [[ Apply: resolve, match, move ]]
+local function doApply()
+  local screens = collectScreens()
+  local windows = collectWindows()
+  local resolvedDisplays = resolveDisplayRoles(LAYOUT.displayRoles, screens)
+  local moves = matchWindows(LAYOUT.windows, windows, resolvedDisplays)
+
+  for _, move in ipairs(moves) do
+    move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h))
+  end
+
+  if LAYOUT.options.focusAfterApply and LAYOUT.options.focusAfterApply ~= "none" and #moves > 0 then
+    if LAYOUT.options.focusAfterApply == "first" then
+      moves[1].window:focus()
+    else
+      for _, move in ipairs(moves) do
+        if move.ruleId == LAYOUT.options.focusAfterApply then
+          move.window:focus()
+          break
+        end
       end
     end
   end
+end
+
+-- [[ Dock nudge: toggle autohide to force Dock to re-evaluate its display ]]
+local function nudgeDock()
+  hs.osascript.applescript([[
+    tell application "System Events"
+      tell dock preferences
+        set autohide to true
+      end tell
+    end tell
+  ]])
+  hs.osascript.applescript([[
+    tell application "System Events"
+      tell dock preferences
+        set autohide to false
+      end tell
+    end tell
+  ]])
+end
+
+-- [[ Entry: optionally move Dock first, then apply ]]
+if LAYOUT.options.dockDisplay then
+  local screens = collectScreens()
+  local resolved = resolveDisplayRoles(LAYOUT.displayRoles, screens)
+  local dockScreen = resolved[LAYOUT.options.dockDisplay]
+  if dockScreen then
+    local ff = dockScreen.fullFrame
+    hs.mouse.setAbsolutePosition({ x = ff.x + ff.w / 2, y = ff.y + ff.h - 1 })
+    nudgeDock()
+    hs.timer.doAfter(0.1, doApply)
+  else
+    doApply()
+  end
+else
+  doApply()
 end`;

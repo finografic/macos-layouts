@@ -37,6 +37,15 @@ export interface LayoutOptions {
    *   - string: focus the window matching this rule id
    */
   readonly focusAfterApply?: 'none' | 'first' | string;
+
+  /**
+   * Display role name to move the Dock to before applying.
+   * When set, the compiled Lua moves the mouse to the bottom of that
+   * display, waits 500ms for the Dock to follow (which changes frame()),
+   * then re-collects screen frames and applies window positions.
+   * Example: "secondary"
+   */
+  readonly dockDisplay?: string;
 }
 
 // ─── Layout definition ──────────────────────────────────────────────────────

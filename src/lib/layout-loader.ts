@@ -1,11 +1,10 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { DEFAULT_LAYOUTS_DIR } from '../config/defaults.constants.js';
 import type { Layout } from '../types/layout.types.js';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-export const DEFAULT_LAYOUTS_DIR = '~/.config/macos-layouts/layouts';
+export { DEFAULT_LAYOUTS_DIR };
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

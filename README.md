@@ -114,17 +114,52 @@ macos-layouts compile home --output ~/Desktop/home.lua # Write to a custom path
 | `--output <path>`      | Write to a custom path instead of the default |
 | `--layouts-dir <path>` | Use a custom layouts directory                |
 
-After compiling, add a hotkey to `~/.hammerspoon/init.lua`. The `compile` command does this automatically, but here's a complete recommended setup:
+After compiling, the `compile` command automatically appends a snippet to `~/.hammerspoon/init.lua`. The full recommended setup:
 
 ```lua
 hs.window.animationDuration = 0  -- instant window moves (default is 0.2s)
 
-hs.hotkey.bind({"cmd","alt"}, "h", function()
+-- macos-layouts: home  (appended automatically by `compile`)
+local _mlApply_home_lastRun = 0
+local function _mlApply_home()
+  local now = hs.timer.secondsSinceEpoch()
+  if now - _mlApply_home_lastRun < 2.0 then return end
+  _mlApply_home_lastRun = now
   dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/home.lua")
-end)
+end
+hs.hotkey.bind({"cmd","alt"}, "h", _mlApply_home)  -- change key binding as needed
+hs.screen.watcher.new(_mlApply_home):start()         -- re-applies when Dock moves/shows/hides
 ```
 
-> The `compile` command automatically appends the hotkey snippet on first run. `hs.window.animationDuration = 0` must be added manually.
+The 2-second debounce prevents the screen watcher from re-triggering the layout immediately after it runs (the `dockDisplay` nudge fires a screen-change notification that would otherwise cause a snap-back loop).
+
+> `hs.window.animationDuration = 0` must be added manually.
+
+#### `dockDisplay` option
+
+Layouts can specify which display role the Dock should be on before window positions are applied. This matters because `screen:frame()` (the usable area) is smaller on the display that holds the Dock.
+
+```json
+{
+  "options": {
+    "dockDisplay": "secondary"
+  }
+}
+```
+
+When set, `compile` automatically configures instant Dock animation (no sudo required) and the generated Lua will:
+
+1. Move the mouse to the bottom of that display
+2. Toggle Dock autohide (true → false) via AppleScript to force the Dock to reappear on the target display
+3. Wait 0.1s for `screen:frame()` to update, then apply window positions
+
+**One-time setup** (done automatically by `compile` when `dockDisplay` is set):
+
+```bash
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0
+killall Dock
+```
 
 ### `doctor`
 

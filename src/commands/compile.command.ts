@@ -1,17 +1,14 @@
+import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 import pc from 'picocolors';
 
+import { DEFAULT_COMPILE_OUTPUT_DIR, INIT_LUA_PATH } from '../config/defaults.constants.js';
 import { expandHome, loadLayout } from '../lib/layout-loader.js';
 import { generateLua } from '../lib/lua-codegen.js';
 import type { CompileOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const DEFAULT_OUTPUT_DIR = '~/.hammerspoon/layouts';
-const INIT_LUA_PATH = '~/.hammerspoon/init.lua';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,16 +21,40 @@ interface CompileCommandParams {
 
 function buildInitSnippet(name: string): string {
   const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
+  const fn = `_mlApply_${name}`;
   return [
     '',
     `-- macos-layouts: ${name}`,
-    `local function _mlApply_${name}()`,
+    `local ${fn}_lastRun = 0`,
+    `local function ${fn}()`,
+    `  local now = hs.timer.secondsSinceEpoch()`,
+    `  if now - ${fn}_lastRun < 2.0 then return end`,
+    `  ${fn}_lastRun = now`,
     `  dofile(${path})`,
     `end`,
-    `hs.hotkey.bind({"cmd","alt"}, "h", _mlApply_${name})  -- change key binding as needed`,
-    `hs.screen.watcher.new(_mlApply_${name}):start()         -- re-applies when Dock moves/shows/hides`,
+    `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`,
+    `hs.screen.watcher.new(${fn}):start()         -- re-applies when Dock moves/shows/hides`,
     '',
   ].join('\n');
+}
+
+/**
+ * Ensures Dock animation is instant (required for nudgeDock timing).
+ * Writes to the user's own plist — no sudo needed.
+ * Only restarts the Dock if the values weren't already 0.
+ * Returns true if Dock was restarted.
+ */
+function ensureDockAnimationInstant(): boolean {
+  const read = spawnSync('defaults', ['read', 'com.apple.dock', 'autohide-time-modifier'], {
+    encoding: 'utf-8',
+  });
+  const current = read.stdout?.trim();
+  if (current === '0' || current === '0.0') return false;
+
+  spawnSync('defaults', ['write', 'com.apple.dock', 'autohide-delay', '-float', '0']);
+  spawnSync('defaults', ['write', 'com.apple.dock', 'autohide-time-modifier', '-float', '0']);
+  spawnSync('killall', ['Dock']);
+  return true;
 }
 
 async function updateInitLua(name: string): Promise<'added' | 'exists'> {
@@ -69,7 +90,7 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
   // Determine output path
   const outputPath = options.output
     ? resolve(options.output)
-    : resolve(expandHome(DEFAULT_OUTPUT_DIR), `${name}.lua`);
+    : resolve(expandHome(DEFAULT_COMPILE_OUTPUT_DIR), `${name}.lua`);
 
   // Generate Lua source
   const lua = generateLua({ layout: loadResult.layout });
@@ -82,6 +103,19 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
     const message = err instanceof Error ? err.message : String(err);
     console.error(pc.red(`✗ Failed to write ${outputPath}: ${message}`));
     return EXIT_CODE.Error;
+  }
+
+  // If dockDisplay is set, ensure Dock animation is instant (required for nudgeDock timing)
+  if (loadResult.layout.options?.dockDisplay) {
+    const restarted = ensureDockAnimationInstant();
+    if (restarted) {
+      console.log();
+      console.log(
+        `  ${pc.bold(pc.green('✓'))} Dock animation set to instant ${
+          pc.dim('(autohide-delay=0, autohide-time-modifier=0)')
+        }`,
+      );
+    }
   }
 
   // Update init.lua
