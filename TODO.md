@@ -4,6 +4,23 @@ Future work, roughly in priority order.
 
 ---
 
+## Prompt for key shortcut
+
+**Context:** Add one more prompt to the end of the `save` flow - "Enter key shortcut / tigger" (YOU decide the language)
+
+**Result:** User selection is then used to write to init.lua file:
+
+hs.hotkey.bind({"ctrl","shift"}, "pad0", _layoutsApply_home)
+
+**SEE:** for hammerspoon non-traditional keycodes, see:
+src/config/libkeycodes.m
+src/config/libkeycodes.lua
+(feel free to MOVE these files elsewhere)
+
+**Concerns:** Is this possible ?? How to ensure keys are captured??
+
+---
+
 ## Multi-resolution / office display support
 
 **Context:** Current layouts are saved for a specific display setup (Mac Studio + 2× 4K LG externals). The office setup uses 1080p displays with different resolutions.
