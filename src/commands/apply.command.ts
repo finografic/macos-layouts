@@ -97,6 +97,12 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   const plannedMoves: PlannedMove[] = [];
   const displaySkips: ApplySkipResult[] = [];
 
+  // When nudgeDock() has moved the Dock onto a display, that display's frame.h
+  // shrinks by the Dock height (~48px). Windows saved before the Dock was there
+  // used the larger frame. Extend the frame height back to the physical screen
+  // bottom so windows are placed at the same pixel height as at save time.
+  const dockDisplayRole = layout.options?.dockDisplay;
+
   for (const match of matched) {
     const rule = ruleMap.get(match.ruleId);
     if (!rule) continue;
@@ -111,12 +117,19 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
       continue;
     }
 
+    const frameForNorm = rule.place.display === dockDisplayRole
+      ? {
+        ...screen.frame,
+        h: screen.fullFrame.y + screen.fullFrame.h - screen.frame.y,
+      }
+      : screen.frame;
+
     plannedMoves.push({
       ruleId: match.ruleId,
       windowId: match.windowId,
       app: match.window.app.name,
       displayRole: rule.place.display,
-      frame: normalizedToAbsolute(rule.place.rect, screen.frame),
+      frame: normalizedToAbsolute(rule.place.rect, frameForNorm),
       window: match.window,
     });
   }
