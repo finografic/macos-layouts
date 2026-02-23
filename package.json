@@ -69,6 +69,8 @@
     "update.eslint-config": "pnpm update @finografic/eslint-config --latest",
     "update.dprint-config": "pnpm update @finografic/dprint-config --latest",
     "upgrade.deps.all": "pnpm update --latest",
+    "·········· SETUP": "·····················································",
+    "setup:hammerspoon": "bash scripts/install-hammerspoon.sh",
     "·········· UTILS": "·····················································",
     "tsc.debug": "tsc --pretty --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",

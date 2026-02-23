@@ -14,6 +14,23 @@ Or clone and link locally:
 pnpm install && pnpm link --global
 ```
 
+## 🛠️ Hammerspoon Setup
+
+[Hammerspoon](https://www.hammerspoon.org) is required to read screen state and move windows. Run the setup script to install it and wire up the IPC connection:
+
+```bash
+pnpm run setup:hammerspoon
+# or: bash scripts/install-hammerspoon.sh
+```
+
+This will:
+
+- Install Hammerspoon via Homebrew (if not already installed)
+- Link the `hs` CLI into your PATH via `$(brew --prefix)/bin`
+- Create `~/.hammerspoon/init.lua` with the required `require("hs.ipc")` line (or prepend it to an existing file)
+
+After running, **open Hammerspoon** and grant Accessibility permissions when prompted (**System Settings > Privacy & Security > Accessibility**).
+
 ## 🚀 Usage
 
 ```text
@@ -179,9 +196,11 @@ layouts doctor --fix   # Show fix instructions for failed checks
 
 ## 🔧 Prerequisites
 
+Run `pnpm run setup:hammerspoon` (see [Hammerspoon Setup](#️-hammerspoon-setup) above) to handle the first three automatically:
+
 - [Hammerspoon](https://www.hammerspoon.org) installed and running
 - `hs` CLI on your `PATH`
-- `require("hs.ipc")` added to `~/.hammerspoon/init.lua`
+- `require("hs.ipc")` as the first line of `~/.hammerspoon/init.lua`
 - Accessibility permissions granted to Hammerspoon in **System Settings > Privacy & Security > Accessibility**
 
 Run `layouts doctor` to verify your setup.
