@@ -7,7 +7,7 @@ import pc from 'picocolors';
 import { DUMP_LUA } from '../lib/dump-lua.js';
 import * as hs from '../lib/hammerspoon.js';
 import { buildLayout } from '../lib/layout-builder.js';
-import { DEFAULT_LAYOUTS_DIR, expandHome } from '../lib/layout-loader.js';
+import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from '../lib/layout-loader.js';
 import type { SaveOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
@@ -53,6 +53,15 @@ function autoAssignRoles(screens: readonly RuntimeScreen[]): Record<string, Runt
   }
 
   return roles;
+}
+
+function dockIsOnScreen(s: RuntimeScreen): boolean {
+  // Dock shrinks frame relative to fullFrame on whichever side it sits
+  return (
+    s.fullFrame.y + s.fullFrame.h > s.frame.y + s.frame.h + 5 // bottom
+    || s.frame.x > s.fullFrame.x + 5 // left
+    || s.fullFrame.x + s.fullFrame.w > s.frame.x + s.frame.w + 5 // right
+  );
 }
 
 // ─── Command ──────────────────────────────────────────────────────────────────
@@ -197,6 +206,31 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
 
   // 6. Build layout
   const layout = buildLayout({ name, dump, selectedWindows, displayRoleAssignments });
+
+  // 6b. Dock mismatch check — warn if overwriting a layout whose dockDisplay
+  // doesn't match the current Dock position (save-time and apply-time frames must match)
+  if (!options.json) {
+    const existingResult = await loadLayout(name, options.layoutsDir);
+    if (existingResult.ok) {
+      const dockDisplayRole = existingResult.layout.options?.dockDisplay;
+      if (dockDisplayRole) {
+        const currentDockScreen = dump.screens.find(dockIsOnScreen);
+        const targetScreen = displayRoleAssignments[dockDisplayRole];
+        if (currentDockScreen && targetScreen && currentDockScreen.id !== targetScreen.id) {
+          const currentRole = Object.entries(displayRoleAssignments).find(
+            ([, s]) => s.id === currentDockScreen.id,
+          )?.[0] ?? currentDockScreen.name;
+          console.warn(
+            `\n  ${pc.yellow('⚠')} Dock is on ${pc.bold(currentRole)}, but this layout uses`
+              + ` ${pc.bold(`dockDisplay: "${dockDisplayRole}"`)}.`
+              + `\n    Move the Dock to ${
+                pc.bold(dockDisplayRole)
+              } before saving to avoid a 48px gap on apply.\n`,
+          );
+        }
+      }
+    }
+  }
 
   // 7. Write to disk
   const dir = expandHome(options.layoutsDir ?? DEFAULT_LAYOUTS_DIR);
