@@ -21,7 +21,8 @@ interface CompileCommandParams {
 
 function buildInitSnippet(name: string): string {
   const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
-  const fn = `_mlApply_${name}`;
+  const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
+  const fn = `_mlApply_${safeName}`;
   return [
     '',
     `-- layouts: ${name}`,
