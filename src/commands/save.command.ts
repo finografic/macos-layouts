@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { cancel, confirm, intro, isCancel, multiselect, outro, select } from '@clack/prompts';
+import { cancel, confirm, intro, isCancel, multiselect, outro, select, text } from '@clack/prompts';
 import pc from 'picocolors';
 
 import { DUMP_LUA } from '../lib/dump-lua.js';
@@ -64,6 +64,36 @@ function dockIsOnScreen(s: RuntimeScreen): boolean {
   );
 }
 
+// ─── Helpers (hotkey) ─────────────────────────────────────────────────────────
+
+const MOD_SET = new Set(['cmd', 'ctrl', 'shift', 'alt']);
+const MOD_ALIASES: Record<string, string> = { opt: 'alt', option: 'alt', command: 'cmd' };
+
+function parseHotkey(input: string): { mods: string[]; key: string } | null {
+  const parts = input
+    .toLowerCase()
+    .trim()
+    .split('+')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const mods: string[] = [];
+  let key: string | undefined;
+  for (const part of parts) {
+    const normalized = MOD_ALIASES[part] ?? part;
+    if (MOD_SET.has(normalized)) {
+      if (!mods.includes(normalized)) mods.push(normalized);
+    } else {
+      key = part;
+    }
+  }
+  if (!key || mods.length === 0) return null;
+  return { mods, key };
+}
+
+function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string {
+  return [...hotkey.mods, hotkey.key].join('+');
+}
+
 // ─── Command ──────────────────────────────────────────────────────────────────
 
 export async function saveCommand({ name, options }: SaveCommandParams): Promise<number> {
@@ -114,8 +144,13 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
 
   const interactive = options.interactive !== false && process.stdout.isTTY;
 
+  // Load existing layout early — used for hotkey default in prompt and dock mismatch warning
+  const existingLayoutResult = await loadLayout(name, options.layoutsDir);
+  const existingLayout = existingLayoutResult.ok ? existingLayoutResult.layout : undefined;
+
   let displayRoleAssignments: Record<string, RuntimeScreen>;
   let selectedWindows: readonly RuntimeWindow[];
+  let hotkeyResult: { mods: string[]; key: string } | undefined;
 
   if (!interactive) {
     // Non-interactive: auto-assign roles, include all filtered windows
@@ -202,32 +237,54 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
       cancel('Cancelled');
       return EXIT_CODE.Error;
     }
+
+    // 4e. Hotkey trigger
+    const existingHotkey = existingLayout?.options?.hotkey;
+    const hotkeyRaw = await text({
+      message: 'Hotkey trigger — leave blank to skip',
+      placeholder: 'e.g. ctrl+shift+pad0',
+      ...(existingHotkey !== undefined ? { initialValue: formatHotkey(existingHotkey) } : {}),
+    });
+    if (!isCancel(hotkeyRaw) && hotkeyRaw.trim()) {
+      const parsed = parseHotkey(hotkeyRaw.trim());
+      if (parsed) {
+        hotkeyResult = parsed;
+      } else {
+        console.warn(`  ${pc.yellow('⚠')}  Could not parse hotkey — skipping`);
+      }
+    }
   }
 
   // 6. Build layout
-  const layout = buildLayout({ name, dump, selectedWindows, displayRoleAssignments });
+  const baseLayout = buildLayout({ name, dump, selectedWindows, displayRoleAssignments });
 
-  // 6b. Dock mismatch check — warn if overwriting a layout whose dockDisplay
-  // doesn't match the current Dock position (save-time and apply-time frames must match)
+  // 6b. Merge options — carry over existing options (preserves dockDisplay etc.) and apply hotkey
+  const existingOpts = existingLayout?.options ?? {};
+  const mergedOpts = {
+    ...existingOpts,
+    ...(hotkeyResult !== undefined ? { hotkey: hotkeyResult } : {}),
+  };
+  const layout = Object.keys(mergedOpts).length > 0
+    ? { ...baseLayout, options: mergedOpts }
+    : baseLayout;
+
+  // 6c. Dock mismatch check — warn if dockDisplay doesn't match current Dock position
   if (!options.json) {
-    const existingResult = await loadLayout(name, options.layoutsDir);
-    if (existingResult.ok) {
-      const dockDisplayRole = existingResult.layout.options?.dockDisplay;
-      if (dockDisplayRole) {
-        const currentDockScreen = dump.screens.find(dockIsOnScreen);
-        const targetScreen = displayRoleAssignments[dockDisplayRole];
-        if (currentDockScreen && targetScreen && currentDockScreen.id !== targetScreen.id) {
-          const currentRole = Object.entries(displayRoleAssignments).find(
-            ([, s]) => s.id === currentDockScreen.id,
-          )?.[0] ?? currentDockScreen.name;
-          console.warn(
-            `\n  ${pc.yellow('⚠')} Dock is on ${pc.bold(currentRole)}, but this layout uses`
-              + ` ${pc.bold(`dockDisplay: "${dockDisplayRole}"`)}.`
-              + `\n    Move the Dock to ${
-                pc.bold(dockDisplayRole)
-              } before saving to avoid a 48px gap on apply.\n`,
-          );
-        }
+    const dockDisplayRole = existingLayout?.options?.dockDisplay;
+    if (dockDisplayRole) {
+      const currentDockScreen = dump.screens.find(dockIsOnScreen);
+      const targetScreen = displayRoleAssignments[dockDisplayRole];
+      if (currentDockScreen && targetScreen && currentDockScreen.id !== targetScreen.id) {
+        const currentRole = Object.entries(displayRoleAssignments).find(
+          ([, s]) => s.id === currentDockScreen.id,
+        )?.[0] ?? currentDockScreen.name;
+        console.warn(
+          `\n  ${pc.yellow('⚠')} Dock is on ${pc.bold(currentRole)}, but this layout uses`
+            + ` ${pc.bold(`dockDisplay: "${dockDisplayRole}"`)}.`
+            + `\n    Move the Dock to ${
+              pc.bold(dockDisplayRole)
+            } before saving to avoid a 48px gap on apply.\n`,
+        );
       }
     }
   }
@@ -258,11 +315,8 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
     console.log(JSON.stringify(layout, null, 2));
   }
 
-  if (interactive) {
-    const shouldCompile = await confirm({ message: `Compile "${name}" for Hammerspoon hotkey?` });
-    if (!isCancel(shouldCompile) && shouldCompile) {
-      await compileCommand({ name, options: { layoutsDir: options.layoutsDir } });
-    }
+  if (interactive && hotkeyResult) {
+    await compileCommand({ name, options: { layoutsDir: options.layoutsDir } });
   }
 
   return EXIT_CODE.Success;

@@ -19,10 +19,16 @@ interface CompileCommandParams {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildInitSnippet(name: string): string {
+function buildInitSnippet(
+  name: string,
+  hotkey?: { readonly mods: readonly string[]; readonly key: string },
+): string {
   const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
   const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
   const fn = `_mlApply_${safeName}`;
+  const hotkeyLine = hotkey
+    ? `hs.hotkey.bind({${hotkey.mods.map((m) => `"${m}"`).join(', ')}}, "${hotkey.key}", ${fn})`
+    : `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`;
   return [
     '',
     `-- layouts: ${name}`,
@@ -33,7 +39,7 @@ function buildInitSnippet(name: string): string {
     `  ${fn}_lastRun = now`,
     `  dofile(${path})`,
     `end`,
-    `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`,
+    hotkeyLine,
     `hs.screen.watcher.new(${fn}):start()         -- re-applies when Dock moves/shows/hides`,
     '',
   ].join('\n');
@@ -58,7 +64,10 @@ function ensureDockAnimationInstant(): boolean {
   return true;
 }
 
-async function updateInitLua(name: string): Promise<'added' | 'exists'> {
+async function updateInitLua(
+  name: string,
+  hotkey?: { readonly mods: readonly string[]; readonly key: string },
+): Promise<'added' | 'exists'> {
   const initLuaPath = resolve(expandHome(INIT_LUA_PATH));
   const marker = `layouts/${name}.lua`;
 
@@ -74,7 +83,7 @@ async function updateInitLua(name: string): Promise<'added' | 'exists'> {
   }
 
   await mkdir(dirname(initLuaPath), { recursive: true });
-  await writeFile(initLuaPath, existing + buildInitSnippet(name), 'utf-8');
+  await writeFile(initLuaPath, existing + buildInitSnippet(name, hotkey), 'utf-8');
   return 'added';
 }
 
@@ -122,7 +131,7 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
   // Update init.lua
   let initLuaStatus: 'added' | 'exists' | 'failed' = 'failed';
   try {
-    initLuaStatus = await updateInitLua(name);
+    initLuaStatus = await updateInitLua(name, loadResult.layout.options?.hotkey);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(pc.yellow(`  ⚠ Could not update init.lua: ${message}`));

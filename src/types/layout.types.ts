@@ -46,6 +46,17 @@ export interface LayoutOptions {
    * Example: "secondary"
    */
   readonly dockDisplay?: string;
+
+  /**
+   * Hammerspoon hotkey used to trigger this layout.
+   * Set interactively during `save` and used by `compile` to write
+   * the `hs.hotkey.bind()` call in init.lua.
+   * Example: { mods: ["ctrl","shift"], key: "pad0" }
+   */
+  readonly hotkey?: {
+    readonly mods: readonly string[];
+    readonly key: string;
+  };
 }
 
 // ─── Layout definition ──────────────────────────────────────────────────────

@@ -4,20 +4,14 @@ Future work, roughly in priority order.
 
 ---
 
-## Prompt for key shortcut
+## ~~Prompt for key shortcut~~ ✓ Done
 
-**Context:** Add one more prompt to the end of the `save` flow - "Enter key shortcut / tigger" (YOU decide the language)
+Implemented in `save` flow. At the end of an interactive save, the user is prompted:
+`Hotkey trigger — leave blank to skip (e.g. ctrl+shift+pad0)`.
 
-**Result:** User selection is then used to write to init.lua file:
-
-hs.hotkey.bind({"ctrl","shift"}, "pad0", _layoutsApply_home)
-
-**SEE:** for hammerspoon non-traditional keycodes, see:
-src/config/libkeycodes.m
-src/config/libkeycodes.lua
-(feel free to MOVE these files elsewhere)
-
-**Concerns:** Is this possible ?? How to ensure keys are captured??
+If entered, the hotkey is stored in `layout.options.hotkey` in the JSON and `compile`
+automatically uses it for `hs.hotkey.bind(...)` in `init.lua`. Entering a hotkey also
+triggers an automatic compile — no separate "Compile?" confirm needed.
 
 ---
 
