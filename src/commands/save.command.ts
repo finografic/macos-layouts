@@ -1,7 +1,18 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { cancel, confirm, intro, isCancel, multiselect, outro, select, text } from '@clack/prompts';
+import {
+  cancel,
+  confirm,
+  intro,
+  isCancel,
+  multiselect,
+  outro,
+  select,
+  spinner,
+  text,
+} from '@clack/prompts';
 import pc from 'picocolors';
 
 import { DUMP_LUA } from '../lib/dump-lua.js';
@@ -92,6 +103,64 @@ function parseHotkey(input: string): { mods: string[]; key: string } | null {
 
 function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string {
   return [...hotkey.mods, hotkey.key].join('+');
+}
+
+/**
+ * Registers a one-shot Hammerspoon eventtap that captures the next keypress,
+ * writes { key, mods } to a temp file, and consumes the event so no bound
+ * hotkeys fire during capture. Polls the file until it appears (up to 30s).
+ */
+async function captureHotkeyFromHammerspoon(): Promise<
+  {
+    mods: string[];
+    key: string;
+  } | null
+> {
+  const captureFile = join(tmpdir(), 'macos-layouts-hotkey-capture.json');
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+  // Build Lua as a single expression (hs -c cannot span multiple lines).
+  // The eventtap returns true to consume the event — prevents existing
+  // hs.hotkey.bind handlers from firing while the user picks a new combo.
+  const lua = [
+    `local f="${captureFile}"`,
+    `os.remove(f)`,
+    `local t`,
+    `t=hs.eventtap.new({hs.eventtap.event.types.keyDown},function(e)`,
+    `  local k=hs.keycodes.map[e:getKeyCode()] or tostring(e:getKeyCode())`,
+    `  local m={}`,
+    `  for mod,active in pairs(e:getFlags()) do`,
+    `    if active and mod~="fn" and mod~="capslock" then table.insert(m,mod) end`,
+    `  end`,
+    `  table.sort(m)`,
+    `  local out=io.open(f,"w")`,
+    `  if out then out:write(hs.json.encode({key=k,mods=m})) out:close() end`,
+    `  t:stop()`,
+    `  return true`,
+    `end)`,
+    `t:start()`,
+    `hs.timer.doAfter(30,function() t:stop() end)`,
+  ].join(' ');
+
+  const result = await hs.runLua(lua, 5_000);
+  if (!result.ok) return null;
+
+  // Poll for the result file written by the eventtap callback
+  for (let i = 0; i < 300; i++) {
+    await sleep(100);
+    try {
+      const raw = await readFile(captureFile, 'utf-8');
+      await unlink(captureFile).catch(() => {});
+      const data = JSON.parse(raw) as { key: string; mods: string[] };
+      if (typeof data.key === 'string' && Array.isArray(data.mods)) {
+        return { mods: data.mods, key: data.key };
+      }
+    } catch {
+      // File not written yet — keep polling
+    }
+  }
+
+  return null; // Timed out after 30 s
 }
 
 // ─── Command ──────────────────────────────────────────────────────────────────
@@ -238,12 +307,28 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
       return EXIT_CODE.Error;
     }
 
-    // 4e. Hotkey trigger
+    // 4e. Hotkey trigger — listen via Hammerspoon eventtap, then confirm
     const existingHotkey = existingLayout?.options?.hotkey;
+    const s = spinner();
+    s.start('Listening for hotkey — press your combination now...');
+    const detected = await captureHotkeyFromHammerspoon();
+    const validDetection = detected !== null && detected.mods.length > 0;
+    s.stop(
+      validDetection && detected
+        ? `Detected: ${pc.bold(formatHotkey(detected))}`
+        : 'No key detected',
+    );
+
+    const hotkeyDefault = validDetection && detected
+      ? formatHotkey(detected)
+      : existingHotkey
+      ? formatHotkey(existingHotkey)
+      : '';
+
     const hotkeyRaw = await text({
-      message: 'Hotkey trigger — leave blank to skip',
+      message: 'Confirm hotkey — edit if needed, or leave blank to skip',
       placeholder: 'e.g. ctrl+shift+pad0',
-      ...(existingHotkey !== undefined ? { initialValue: formatHotkey(existingHotkey) } : {}),
+      ...(hotkeyDefault ? { initialValue: hotkeyDefault } : {}),
     });
     if (!isCancel(hotkeyRaw) && hotkeyRaw.trim()) {
       const parsed = parseHotkey(hotkeyRaw.trim());
