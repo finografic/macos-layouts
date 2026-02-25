@@ -22,9 +22,6 @@ export const EXIT_CODE = {
 
   /** Accessibility permissions not granted */
   PermissionDenied: 4,
-
-  /** Strict mode: required window rule(s) could not be satisfied */
-  StrictFailure: 5,
 } as const;
 
 export type ExitCode = (typeof EXIT_CODE)[keyof typeof EXIT_CODE];
@@ -32,17 +29,11 @@ export type ExitCode = (typeof EXIT_CODE)[keyof typeof EXIT_CODE];
 // ─── Shared CLI options ──────────────────────────────────────────────────────
 
 export interface SharedCliOptions {
-  /** Path to config file (default: ~/.config/layout/config.json) */
-  readonly config?: string;
-
   /** Path to layouts directory (default: ~/.config/layout/layouts) */
   readonly layoutsDir?: string;
 
   /** Output machine-readable JSON */
   readonly json?: boolean;
-
-  /** Verbose output */
-  readonly verbose?: boolean;
 }
 
 // ─── Command-specific options ────────────────────────────────────────────────
@@ -50,12 +41,6 @@ export interface SharedCliOptions {
 export interface ApplyOptions extends SharedCliOptions {
   /** Print what would happen without moving windows */
   readonly dryRun?: boolean;
-
-  /** Fail if any required rule can't be matched */
-  readonly strict?: boolean;
-
-  /** Timeout for Hammerspoon communication (ms) */
-  readonly timeoutMs?: number;
 
   /** What to focus after apply: "none", "first", or a rule id */
   readonly focus?: 'none' | 'first' | string;
@@ -81,9 +66,6 @@ export interface DumpOptions extends SharedCliOptions {
 
   /** Include minimized windows in dump */
   readonly includeMinimized?: boolean;
-
-  /** Include windows from hidden apps */
-  readonly includeHidden?: boolean;
 }
 
 export interface ListOptions extends SharedCliOptions {}

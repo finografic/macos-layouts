@@ -27,7 +27,6 @@ export function printHelp(): void {
     { cmd: 'list', desc: 'List available layouts' },
     { cmd: 'dump', desc: 'Print current screen and window state from Hammerspoon' },
     { cmd: 'doctor', desc: 'Check environment (Hammerspoon, permissions, layouts directory)' },
-    { cmd: 'compile', desc: 'Compile a saved layout to a standalone Lua file for Hammerspoon' },
   ];
   const cmdWidth = columnMax(commands, (c) => c.cmd);
   for (const command of commands) lines.push(renderCommand(command, cmdWidth));
@@ -42,34 +41,16 @@ export function printHelp(): void {
   const examples: HelpExample[] = [
     { cmd: 'layouts apply work', comment: 'Apply the "work" layout' },
     { cmd: 'layouts apply home --dry-run', comment: 'Preview what would move' },
-    { cmd: 'layouts apply home --strict', comment: 'Fail if any required rule is skipped' },
-    {
-      cmd: 'layouts save work',
-      comment: 'Save current windows as "work" layout (interactive)',
-    },
-    { cmd: 'layouts save home --no-interactive', comment: 'Save without prompts' },
+    { cmd: 'layouts save work', comment: 'Save current windows as "work" layout (interactive)' },
     { cmd: 'layouts list', comment: 'List available layouts' },
-    { cmd: 'layouts list --json', comment: 'List layout names as JSON array' },
     { cmd: 'layouts dump', comment: 'Show current screens and windows (human-readable)' },
     { cmd: 'layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
     {
       cmd: 'layouts dump --json --pretty --include-minimized',
       comment: 'Include minimized windows',
     },
-    {
-      cmd: 'layouts dump --include-hidden',
-      comment: 'Include non-standard windows (panels, popovers)',
-    },
     { cmd: 'layouts doctor', comment: 'Check environment' },
     { cmd: 'layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
-    {
-      cmd: 'layouts compile home',
-      comment: 'Compile "home" layout to ~/.hammerspoon/layouts/home.lua',
-    },
-    {
-      cmd: 'layouts compile home --output ~/Desktop/home.lua',
-      comment: 'Write to a custom path',
-    },
   ];
   const exampleWidth = columnMax(examples, (e) => e.cmd);
   for (const example of examples) lines.push(renderExample(example, exampleWidth));
