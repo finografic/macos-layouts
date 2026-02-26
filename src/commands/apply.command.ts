@@ -12,12 +12,7 @@ import type { ApplyOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { Rect } from '../types/geometry.types.js';
 import type { RuntimeWindow } from '../types/runtime.types.js';
-import type {
-  ApplyError,
-  ApplyMoveResult,
-  ApplyResult,
-  ApplySkipResult,
-} from '../types/runtime.types.js';
+import type { ApplyError, ApplyMoveResult, ApplySkipResult } from '../types/runtime.types.js';
 
 // ─── Internal types ───────────────────────────────────────────────────────────
 
@@ -46,8 +41,6 @@ interface ApplyCommandParams {
 }
 
 export async function applyCommand({ name, options }: ApplyCommandParams): Promise<number> {
-  const startMs = Date.now();
-
   // 1. Load layout
   const loadResult = await loadLayout(name, options.layoutsDir);
   if (!loadResult.ok) {
@@ -57,7 +50,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   const { layout } = loadResult;
 
   // 2. Check HS availability
-  const available = await hs.isAvailable({ timeoutMs: options.timeoutMs });
+  const available = await hs.isAvailable();
   if (!available) {
     console.error(
       `${
@@ -68,7 +61,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   }
 
   // 3. Dump current state
-  const dumpResult = await hs.dump({ lua: DUMP_LUA, timeoutMs: options.timeoutMs });
+  const dumpResult = await hs.dump({ lua: DUMP_LUA });
   if (!dumpResult.ok) {
     console.error(`${pc.red('Error:')} ${dumpResult.error.message}`);
     return EXIT_CODE.Error;
@@ -77,13 +70,6 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
 
   // 4. Resolve display roles
   const resolvedRoles = resolveDisplayRoles(layout.displayRoles, [...dump.screens]);
-  const resolvedDisplays: ApplyResult['resolvedDisplays'] = {};
-  for (const [role, screen] of Object.entries(resolvedRoles)) {
-    resolvedDisplays[role] = screen ? { screenId: screen.id, screenName: screen.name } : null;
-    if (!screen && options.verbose) {
-      console.warn(`${pc.yellow('Warning:')} Display role "${role}" could not be resolved`);
-    }
-  }
 
   // 5. Match windows
   const { matched, skipped: windowSkips } = matchWindows(
@@ -152,7 +138,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
 
   // 8. Send moves to HS
   const moves: ApplyMove[] = plannedMoves.map((m) => ({ windowId: m.windowId, frame: m.frame }));
-  const luaResult = await hs.runLua(buildApplyLua(moves), options.timeoutMs);
+  const luaResult = await hs.runLua(buildApplyLua(moves));
   if (!luaResult.ok) {
     console.error(`${pc.red('Error:')} ${luaResult.error.message}`);
     return EXIT_CODE.Error;
@@ -169,7 +155,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
     return EXIT_CODE.Error;
   }
 
-  // 10. Build ApplyResult
+  // 10. Collect results
   const moved: ApplyMoveResult[] = [];
   const errors: ApplyError[] = [];
 
@@ -192,38 +178,15 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
     }
   }
 
-  const durationMs = Date.now() - startMs;
-  const applyResult: ApplyResult = {
-    ok: errors.length === 0,
-    timestamp: new Date().toISOString(),
-    layoutName: name,
-    resolvedDisplays,
-    moved,
-    skipped: allSkipped,
-    errors,
-    durationMs,
-  };
-
   // 11. Output
-  if (options.json) {
-    console.log(JSON.stringify(applyResult, null, 2));
-  } else {
-    console.log('');
-    console.log(`${pc.bold('Applied:')} ${pc.cyan(name)}`);
-    console.log(`  ${pc.green('✓')} Moved ${moved.length} window(s)`);
-    if (allSkipped.length > 0) console.log(`  Skipped ${allSkipped.length} rule(s)`);
-    if (errors.length > 0) {
-      for (const e of errors) console.error(`  ${pc.red('✗')} ${e.message}`);
-    }
-    console.log('');
+  console.log('');
+  console.log(`${pc.bold('Applied:')} ${pc.cyan(name)}`);
+  console.log(`  ${pc.green('✓')} Moved ${moved.length} window(s)`);
+  if (allSkipped.length > 0) console.log(`  Skipped ${allSkipped.length} rule(s)`);
+  if (errors.length > 0) {
+    for (const e of errors) console.error(`  ${pc.red('✗')} ${e.message}`);
   }
-
-  // 12. Strict mode check
-  if (options.strict) {
-    const requiredIds = new Set(layout.windows.filter((r) => r.required).map((r) => r.id));
-    const hasRequiredSkips = allSkipped.some((s) => requiredIds.has(s.ruleId));
-    if (hasRequiredSkips || errors.length > 0) return EXIT_CODE.StrictFailure;
-  }
+  console.log('');
 
   return EXIT_CODE.Success;
 }

@@ -168,7 +168,7 @@ export interface DumpParams {
 
 export interface ApplyParams {
   readonly layout: Layout;
-  readonly options?: Pick<ApplyOptions, 'dryRun' | 'timeoutMs'>;
+  readonly options?: Pick<ApplyOptions, 'dryRun'>;
 }
 
 /**
@@ -216,7 +216,7 @@ export async function apply({ layout, options }: ApplyParams): Promise<HsResult<
   const expr =
     `return hs.json.encode(require("${HS_MODULE}").apply(hs.json.decode(${luaPayload})))`;
 
-  const raw = await runHs({ expr, timeoutMs: options?.timeoutMs });
+  const raw = await runHs({ expr });
   if (!raw.ok) return raw;
   return parseJson<ApplyResult>(raw.value);
 }

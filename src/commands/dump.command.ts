@@ -91,7 +91,7 @@ export async function dumpCommand({ options }: DumpCommandParams): Promise<numbe
 
   const windows = raw.windows.filter((w) => {
     if (!options.includeMinimized && w.isMinimized) return false;
-    if (!options.includeHidden && !w.isStandard) return false;
+    if (!w.isStandard) return false;
     return true;
   });
 

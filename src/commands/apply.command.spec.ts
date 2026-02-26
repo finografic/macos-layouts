@@ -69,21 +69,6 @@ const UNRESOLVED_ROLE_LAYOUT = {
   ],
 };
 
-const STRICT_LAYOUT = {
-  version: '0.1',
-  name: 'strict',
-  displayRoles: { main: { match: { kind: 'primary' } } },
-  windows: [
-    {
-      id: 'missing-app',
-      app: { bundleId: 'com.nonexistent.app' },
-      match: { kind: 'mainWindow' },
-      place: { display: 'main', rect: { x: 0, y: 0, w: 1, h: 1 } },
-      required: true,
-    },
-  ],
-};
-
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let testDir = '';
@@ -145,14 +130,5 @@ describe('applyCommand', () => {
     const luaArg = vi.mocked(hs.runLua).mock.calls[0]?.[0] ?? '';
     // buildApplyLua([]) embeds JSON.stringify([]) = '[]' via luaLongString
     expect(luaArg).toMatch(/\[\[.*\]\]/s); // contains Lua long-string brackets
-  });
-
-  it('strict mode with missing required app → ExitCode.StrictFailure', async () => {
-    await writeFile(join(testDir, 'strict.json'), JSON.stringify(STRICT_LAYOUT));
-    const code = await applyCommand({
-      name: 'strict',
-      options: { layoutsDir: testDir, strict: true },
-    });
-    expect(code).toBe(EXIT_CODE.StrictFailure);
   });
 });
