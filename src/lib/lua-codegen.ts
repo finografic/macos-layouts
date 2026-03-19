@@ -410,24 +410,34 @@ local function collectScreens()
 end
 
 local function collectWindows()
+  -- Only query apps referenced by the layout — avoids enumerating every open app
+  local targetBundleIds = {}
+  local targetNames = {}
+  for _, rule in ipairs(LAYOUT.windows) do
+    if rule.app.bundleId then targetBundleIds[rule.app.bundleId] = true end
+    if rule.app.name then targetNames[rule.app.name] = true end
+  end
+
   local focused = hs.window.focusedWindow()
   local windows = {}
-  for _, win in ipairs(hs.window.allWindows()) do
-    local isMinimized = win:isMinimized()
-    if win:isStandard() and (not isMinimized or LAYOUT.options.restoreMinimized) then
-      local app = win:application()
-      local winFrame = win:frame()
-      table.insert(windows, {
-        _window = win,
-        id = tostring(win:id()),
-        app = {
-          name = app and app:name() or "",
-          bundleId = app and app:bundleID() or nil,
-        },
-        title = win:title() or "",
-        isFocused = (win == focused),
-        frame = { x = winFrame.x, y = winFrame.y, w = winFrame.w, h = winFrame.h },
-      })
+  for _, app in ipairs(hs.application.runningApplications()) do
+    local bid = app:bundleID()
+    local aname = app:name()
+    if (bid and targetBundleIds[bid]) or (aname and targetNames[aname]) then
+      for _, win in ipairs(app:allWindows()) do
+        local isMinimized = win:isMinimized()
+        if win:isStandard() and (not isMinimized or LAYOUT.options.restoreMinimized) then
+          local winFrame = win:frame()
+          table.insert(windows, {
+            _window = win,
+            id = tostring(win:id()),
+            app = { name = aname or "", bundleId = bid },
+            title = win:title() or "",
+            isFocused = (win == focused),
+            frame = { x = winFrame.x, y = winFrame.y, w = winFrame.w, h = winFrame.h },
+          })
+        end
+      end
     end
   end
   return windows
@@ -441,7 +451,7 @@ local function doApply()
   local moves = matchWindows(LAYOUT.windows, windows, resolvedDisplays)
 
   for _, move in ipairs(moves) do
-    move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h))
+    move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h), 0)
   end
 
   if LAYOUT.options.focusAfterApply and LAYOUT.options.focusAfterApply ~= "none" and #moves > 0 then
