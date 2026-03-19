@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { applyCommand } from './commands/apply.command.js';
+import { compileCommand } from './commands/compile.command.js';
 import { doctorCommand } from './commands/doctor.command.js';
 import { dumpCommand } from './commands/dump.command.js';
 import { listCommand } from './commands/list.command.js';
@@ -8,6 +9,7 @@ import { saveCommand } from './commands/save.command.js';
 import { printHelp } from './layouts.help.js';
 import type {
   ApplyOptions,
+  CompileOptions,
   DoctorOptions,
   DumpOptions,
   ListOptions,
@@ -89,6 +91,19 @@ async function main(): Promise<void> {
       fix: hasFlag(rest, '--fix'),
     };
     const code = await doctorCommand({ options });
+    process.exit(code);
+  }
+
+  if (command === 'compile') {
+    const [layoutName, ...compileRest] = rest;
+    if (!layoutName) {
+      console.error('Error: layout name is required. Usage: layouts compile <name>');
+      process.exit(1);
+    }
+    const layoutsDirIdx = compileRest.indexOf('--layouts-dir');
+    const layoutsDirArg = layoutsDirIdx !== -1 ? compileRest[layoutsDirIdx + 1] : undefined;
+    const options: CompileOptions = { layoutsDir: layoutsDirArg };
+    const code = await compileCommand({ name: layoutName, options });
     process.exit(code);
   }
 

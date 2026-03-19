@@ -110,6 +110,15 @@ layouts doctor --fix   # Show fix instructions for failed checks
 | ------- | --------------------------------------- |
 | `--fix` | Show fix instructions for failed checks |
 
+### `compile`
+
+Recompile a saved layout JSON to its Lua file without re-saving. Use this after updating the CLI to regenerate the Lua with the latest runtime logic.
+
+```bash
+layouts compile home
+layouts compile home-develop
+```
+
 ## 📄 License
 
 MIT &copy; [Justin Rankin](https://github.com/finografic)
