@@ -22,6 +22,7 @@ interface CompileCommandParams {
 function buildInitSnippet(
   name: string,
   hotkey?: { readonly mods: readonly string[]; readonly key: string },
+  hasDockDisplay = false,
 ): string {
   const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
   const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
@@ -29,20 +30,33 @@ function buildInitSnippet(
   const hotkeyLine = hotkey
     ? `hs.hotkey.bind({${hotkey.mods.map((m) => `"${m}"`).join(', ')}}, "${hotkey.key}", ${fn})`
     : `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`;
-  return [
+
+  const lines = [
     '',
     `-- layouts: ${name}`,
-    `local ${fn}_lastRun = 0`,
     `local function ${fn}()`,
-    `  local now = hs.timer.secondsSinceEpoch()`,
-    `  if now - ${fn}_lastRun < 2.0 then return end`,
-    `  ${fn}_lastRun = now`,
     `  dofile(${path})`,
     `end`,
     hotkeyLine,
-    `hs.screen.watcher.new(${fn}):start()         -- re-applies when Dock moves/shows/hides`,
-    '',
-  ].join('\n');
+  ];
+
+  // Screen watcher only needed when dockDisplay is set — it re-applies after the Dock moves.
+  // A debounced wrapper prevents the Dock nudge from immediately re-triggering the layout.
+  // Without dockDisplay, multiple screen watchers would fight each other on any screen event.
+  if (hasDockDisplay) {
+    lines.push(
+      `local ${fn}_lastRun = 0`,
+      `hs.screen.watcher.new(function()`,
+      `  local now = hs.timer.secondsSinceEpoch()`,
+      `  if now - ${fn}_lastRun < 2.0 then return end`,
+      `  ${fn}_lastRun = now`,
+      `  ${fn}()`,
+      `end):start()`,
+    );
+  }
+
+  lines.push('');
+  return lines.join('\n');
 }
 
 /**
@@ -67,6 +81,7 @@ function ensureDockAnimationInstant(): boolean {
 async function updateInitLua(
   name: string,
   hotkey?: { readonly mods: readonly string[]; readonly key: string },
+  hasDockDisplay = false,
 ): Promise<'added' | 'exists'> {
   const initLuaPath = resolve(expandHome(INIT_LUA_PATH));
   const marker = `layouts/${name}.lua`;
@@ -83,7 +98,7 @@ async function updateInitLua(
   }
 
   await mkdir(dirname(initLuaPath), { recursive: true });
-  await writeFile(initLuaPath, existing + buildInitSnippet(name, hotkey), 'utf-8');
+  await writeFile(initLuaPath, existing + buildInitSnippet(name, hotkey, hasDockDisplay), 'utf-8');
   return 'added';
 }
 
@@ -131,7 +146,11 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
   // Update init.lua
   let initLuaStatus: 'added' | 'exists' | 'failed' = 'failed';
   try {
-    initLuaStatus = await updateInitLua(name, loadResult.layout.options?.hotkey);
+    initLuaStatus = await updateInitLua(
+      name,
+      loadResult.layout.options?.hotkey,
+      !!loadResult.layout.options?.dockDisplay,
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(pc.yellow(`  ⚠ Could not update init.lua: ${message}`));
