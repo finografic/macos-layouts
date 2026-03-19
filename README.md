@@ -65,14 +65,16 @@ Save current window positions as a named layout.
 
 ```bash
 layouts save work                     # Save current windows as "work" (interactive)
+layouts save work -y                  # Re-save silently: all windows, existing hotkey
 layouts save work --include Slack     # Only include Slack
 layouts save work --exclude Mail      # Exclude Mail
 ```
 
-| Flag              | Description                        |
-| ----------------- | ---------------------------------- |
-| `--include <app>` | Include only this app (repeatable) |
-| `--exclude <app>` | Exclude this app (repeatable)      |
+| Flag              | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `-y`, `--yes`     | Re-save silently using all windows and existing hotkey |
+| `--include <app>` | Include only this app (repeatable)                     |
+| `--exclude <app>` | Exclude this app (repeatable)                          |
 
 ### `list`
 

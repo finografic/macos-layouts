@@ -50,11 +50,14 @@ async function main(): Promise<void> {
   }
 
   if (command === 'save') {
-    const [layoutName, ...saveRest] = rest;
+    // Support: save -y home  OR  save home -y
+    const nonFlagArgs = rest.filter((a) => !a.startsWith('-'));
+    const layoutName = nonFlagArgs[0];
     if (!layoutName) {
       console.error('Error: layout name is required. Usage: layouts save <name>');
       process.exit(1);
     }
+    const saveRest = rest.filter((a) => a !== layoutName);
     // Collect repeated --include / --exclude values
     const include: string[] = [];
     const exclude: string[] = [];
@@ -65,6 +68,7 @@ async function main(): Promise<void> {
     const options: SaveOptions = {
       include: include.length > 0 ? include : undefined,
       exclude: exclude.length > 0 ? exclude : undefined,
+      yes: hasFlag(rest, '-y', '--yes'),
     };
     const code = await saveCommand({ name: layoutName, options });
     process.exit(code);

@@ -43,6 +43,10 @@ export function printHelp(): void {
     { cmd: 'layouts apply work', comment: 'Apply the "work" layout' },
     { cmd: 'layouts apply home --dry-run', comment: 'Preview what would move' },
     { cmd: 'layouts save work', comment: 'Save current windows as "work" layout (interactive)' },
+    {
+      cmd: 'layouts save home -y',
+      comment: 'Re-save "home" silently (all windows, existing hotkey)',
+    },
     { cmd: 'layouts list', comment: 'List available layouts' },
     { cmd: 'layouts dump', comment: 'Show current screens and windows (human-readable)' },
     { cmd: 'layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },

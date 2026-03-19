@@ -15,6 +15,7 @@ import {
 } from '@clack/prompts';
 import pc from 'picocolors';
 
+import { resolveDisplayRoles } from '../lib/display-resolver.js';
 import { DUMP_LUA } from '../lib/dump-lua.js';
 import * as hs from '../lib/hammerspoon.js';
 import { buildLayout } from '../lib/layout-builder.js';
@@ -221,7 +222,46 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
   let selectedWindows: readonly RuntimeWindow[];
   let hotkeyResult: { mods: string[]; key: string } | undefined;
 
-  if (!interactive) {
+  if (options.yes) {
+    // Yes mode: re-save silently using existing roles/hotkey, or prompt for hotkey if new layout
+    if (existingLayout) {
+      // Resolve existing display roles against current screens
+      const resolved = resolveDisplayRoles(existingLayout.displayRoles, [...dump.screens]);
+      displayRoleAssignments = Object.fromEntries(
+        Object.entries(resolved).filter((e): e is [string, RuntimeScreen] => e[1] !== null),
+      );
+      selectedWindows = windows;
+      hotkeyResult = existingLayout.options?.hotkey
+        ? { mods: [...existingLayout.options.hotkey.mods], key: existingLayout.options.hotkey.key }
+        : undefined;
+    } else {
+      // New layout: auto-assign roles, prompt for hotkey only
+      displayRoleAssignments = autoAssignRoles(dump.screens);
+      selectedWindows = windows;
+
+      intro('Save layout');
+      const s = spinner();
+      s.start('Listening for hotkey — press your combination now...');
+      const detected = await captureHotkeyFromHammerspoon();
+      const validDetection = detected !== null && detected.mods.length > 0;
+      s.stop(
+        validDetection && detected
+          ? `Detected: ${pc.bold(formatHotkey(detected))}`
+          : 'No key detected',
+      );
+      const hotkeyDefault = validDetection && detected ? formatHotkey(detected) : '';
+      const hotkeyRaw = await text({
+        message: 'Confirm hotkey — edit if needed, or leave blank to skip',
+        placeholder: 'e.g. ctrl+shift+pad0',
+        ...(hotkeyDefault ? { initialValue: hotkeyDefault } : {}),
+      });
+      if (!isCancel(hotkeyRaw) && hotkeyRaw.trim()) {
+        const parsed = parseHotkey(hotkeyRaw.trim());
+        if (parsed) hotkeyResult = parsed;
+        else console.warn(`  ${pc.yellow('⚠')}  Could not parse hotkey — skipping`);
+      }
+    }
+  } else if (!interactive) {
     // Non-interactive: auto-assign roles, include all filtered windows
     displayRoleAssignments = autoAssignRoles(dump.screens);
     selectedWindows = windows;
@@ -400,7 +440,7 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
     console.log(JSON.stringify(layout, null, 2));
   }
 
-  if (interactive && hotkeyResult) {
+  if ((interactive || options.yes) && hotkeyResult) {
     await compileCommand({ name, options: { layoutsDir: options.layoutsDir } });
   }
 
