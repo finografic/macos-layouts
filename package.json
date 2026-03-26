@@ -111,11 +111,20 @@
       "dprint fmt --allow-no-files",
       "eslint --fix"
     ],
-    "*.{json,jsonc,md,yml,yaml,toml}": [
+    "*.md": [
+      "dprint fmt --allow-no-files",
+      "eslint --fix"
+    ],
+    "*.{json,jsonc,yml,yaml,toml}": [
       "dprint fmt --allow-no-files"
     ]
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged --allow-empty"
+    "pre-commit": "npx lint-staged --allow-empty && dprint check && pnpm exec eslint \"**/*.md\""
   }
 }

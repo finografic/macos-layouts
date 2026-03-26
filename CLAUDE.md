@@ -1,26 +1,14 @@
-# Claude Code Instructions
+@AGENTS.md
 
-Rules are canonical in `.github/instructions/` and shared across Claude Code, Cursor, and GitHub Copilot.
+# Claude-specific Instructions
 
-## Rule Files
+## Rules - Claude
 
-- [General](/.github/instructions/00-general.instructions.md)
-- [File Naming](/.github/instructions/01-file-naming.instructions.md)
-- [TypeScript Patterns](/.github/instructions/02-typescript-patterns.instructions.md)
-- [Provider & Context Patterns](/.github/instructions/03-provider-context-patterns.instructions.md)
-- [ESLint & Code Style](/.github/instructions/04-eslint-code-style.instructions.md)
-- [Documentation](/.github/instructions/05-documentation.instructions.md)
-- [Modern TypeScript Patterns](/.github/instructions/06-modern-typescript-patterns.instructions.md)
-- [Variable Naming](/.github/instructions/07-variable-naming.instructions.md)
-- [README Standards](/.github/instructions/08-readme-standards.instructions.md)
+- IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages.
 
 ## Project-Specific
 
-- Do not include `Co-Authored-By` lines in commit messages.
-
-<!-- NOTE: CLI projects (genx:type:cli keyword in package.json) only -->
-
-- When adding a command, update the `commands` array in `src/[binary].help.ts` and add a matching entry to the `EXAMPLES` section.
+- When adding a command, update the `commands` array in `src/gli.help.ts` and add a matching entry to the `EXAMPLES` section.
 
 ## Session Memory
 
@@ -48,9 +36,9 @@ This file bridges context between local development (Claude Code CLI) and extern
 
 **Purpose:** Provide a concise, current snapshot of project state — enough for a separate Claude instance (with no repo access) to understand what exists, what was decided, and what's next.
 
-**When to update:** Always after: the first session in a repo, any session that installs dependencies, changes architecture, adds/removes features, resolves open questions, or shifts priorities. Skip only read-only sessions (exploration, research, code review) where nothing was built or decided.
+**When to update:** After any session that changes architecture, adds/removes features, resolves open questions, or shifts priorities. Not every session — only when the project state meaningfully changed.
 
-**What to write:** Update only the sections that changed. Keep the entire file under 150 lines. Write for an audience that knows the project goals but has no repo access, no terminal, and no git history — only this file.
+**What to write:** Update only the sections that changed. Keep the entire file under 150 lines. Write for an audience that is familiar with the project's goals but cannot see the codebase.
 
 **Structure (maintain these sections in order):**
 
@@ -65,7 +53,6 @@ This file bridges context between local development (Claude Code CLI) and extern
 
 **Rules:**
 
-- This file is a bridge, not a sync. It does not need to reflect every change — it needs to be accurate enough that Claude.ai can reason about the project without seeing the repo.
 - Do not duplicate content from `memory.md` — that file tracks session work, this file tracks project state.
 - Do not include code snippets or file contents — describe what exists, not how it's implemented.
 - Write in present tense ("The CLI uses X to do Y") not past tense.
