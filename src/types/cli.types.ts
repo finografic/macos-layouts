@@ -58,9 +58,6 @@ export interface SaveOptions extends SharedCliOptions {
 
   /** How to detect display roles: auto-detect or prompt user */
   readonly detectDisplays?: 'auto' | 'prompt';
-
-  /** Re-save silently using all current windows, existing roles, and existing hotkey */
-  readonly yes?: boolean;
 }
 
 export interface DumpOptions extends SharedCliOptions {

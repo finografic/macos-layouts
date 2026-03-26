@@ -15,6 +15,7 @@ import type {
   ListOptions,
   SaveOptions,
 } from './types/cli.types.js';
+import { createFlowContext } from './utils/flow.utils.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -65,12 +66,14 @@ async function main(): Promise<void> {
       if (saveRest[i] === '--include' && saveRest[i + 1]) include.push(saveRest[++i]!);
       if (saveRest[i] === '--exclude' && saveRest[i + 1]) exclude.push(saveRest[++i]!);
     }
+    const flow = createFlowContext(saveRest, {
+      y: { alias: 'yes', type: 'boolean' },
+    });
     const options: SaveOptions = {
       include: include.length > 0 ? include : undefined,
       exclude: exclude.length > 0 ? exclude : undefined,
-      yes: hasFlag(rest, '-y', '--yes'),
     };
-    const code = await saveCommand({ name: layoutName, options });
+    const code = await saveCommand({ name: layoutName, options, flow });
     process.exit(code);
   }
 

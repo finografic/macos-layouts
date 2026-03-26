@@ -2,17 +2,7 @@ import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import {
-  cancel,
-  confirm,
-  intro,
-  isCancel,
-  multiselect,
-  outro,
-  select,
-  spinner,
-  text,
-} from '@clack/prompts';
+import { intro, isCancel, outro, spinner, text } from '@clack/prompts';
 import pc from 'picocolors';
 
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
@@ -23,6 +13,8 @@ import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from '../lib/layout-loade
 import type { SaveOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
+import type { FlowContext } from '../utils/flow.utils.js';
+import { promptConfirm, promptMultiSelect, promptSelect } from '../utils/flow.utils.js';
 import { compileCommand } from './compile.command.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -30,6 +22,7 @@ import { compileCommand } from './compile.command.js';
 interface SaveCommandParams {
   readonly name: string;
   readonly options: SaveOptions;
+  readonly flow: FlowContext;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -166,7 +159,7 @@ async function captureHotkeyFromHammerspoon(): Promise<
 
 // ─── Command ──────────────────────────────────────────────────────────────────
 
-export async function saveCommand({ name, options }: SaveCommandParams): Promise<number> {
+export async function saveCommand({ name, options, flow }: SaveCommandParams): Promise<number> {
   // 1. Check HS availability
   const available = await hs.isAvailable();
   if (!available) {
@@ -222,7 +215,7 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
   let selectedWindows: readonly RuntimeWindow[];
   let hotkeyResult: { mods: string[]; key: string } | undefined;
 
-  if (options.yes) {
+  if (flow.yesMode) {
     // Yes mode: re-save silently using existing roles/hotkey, or prompt for hotkey if new layout
     if (existingLayout) {
       // Resolve existing display roles against current screens
@@ -295,7 +288,7 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
         ? 'builtin'
         : defaultRoleNames[i] ?? `display-${i}`;
 
-      const result = await select({
+      const result = await promptSelect(flow, {
         message: `Role for "${screen.name}" (${screen.resolution.w}×${screen.resolution.h})?`,
         options: [
           { value: defaultRole, label: defaultRole },
@@ -304,12 +297,8 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
           ) => ({ value: r, label: r })),
           { value: '__skip__', label: 'skip (exclude from layout)' },
         ],
+        default: defaultRole,
       });
-
-      if (isCancel(result)) {
-        cancel('Cancelled');
-        return EXIT_CODE.Error;
-      }
 
       if (result !== '__skip__') {
         displayRoleAssignments[result as string] = screen;
@@ -327,23 +316,21 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
       };
     });
 
-    const selectedIds = await multiselect({
+    const selectedIds = await promptMultiSelect(flow, {
       message: 'Which windows should be included?',
       options: windowOptions,
-      required: false,
+      initialValues: windowOptions.map((w) => w.value),
+      minOne: false,
     });
-
-    if (isCancel(selectedIds)) {
-      cancel('Cancelled');
-      return EXIT_CODE.Error;
-    }
 
     selectedWindows = windows.filter((w) => (selectedIds as string[]).includes(w.id));
 
     // 4d. Confirm
-    const confirmed = await confirm({ message: `Save layout as "${name}"?` });
-    if (isCancel(confirmed) || !confirmed) {
-      cancel('Cancelled');
+    const confirmed = await promptConfirm(flow, {
+      message: `Save layout as "${name}"?`,
+      default: true,
+    });
+    if (!confirmed) {
       return EXIT_CODE.Error;
     }
 
@@ -440,7 +427,7 @@ export async function saveCommand({ name, options }: SaveCommandParams): Promise
     console.log(JSON.stringify(layout, null, 2));
   }
 
-  if ((interactive || options.yes) && hotkeyResult) {
+  if ((interactive || flow.yesMode) && hotkeyResult) {
     await compileCommand({ name, options: { layoutsDir: options.layoutsDir } });
   }
 
