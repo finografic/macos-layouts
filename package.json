@@ -2,7 +2,7 @@
   "name": "@finografic/macos-layouts",
   "type": "module",
   "version": "0.10.0",
-  "packageManager": "pnpm@10.8.0",
+  "packageManager": "pnpm@10.32.1",
   "description": "Trigger perfect window layouts in macOS",
   "homepage": "https://github.com/finografic/macos-layouts",
   "repository": {
@@ -79,7 +79,7 @@
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
-    "@clack/prompts": "^1.0.1",
+    "@clack/prompts": "^1.1.0",
     "@standard-schema/spec": "^1.1.0",
     "execa": "^9.6.1",
     "picocolors": "^1.1.1"
