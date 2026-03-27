@@ -13,6 +13,7 @@ build/
 
 # IDE
 .cursor/chats
+.cursor/hooks/state
 .claude/
 !.claude/settings.json
 .idea/

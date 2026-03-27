@@ -1,3 +1,12 @@
+/**
+ * @file flow.utils.ts — SHARED flow framework for @finografic CLI tools.
+ *
+ * ⚠️  AVOID EDITING THIS FILE DIRECTLY.
+ *
+ * The exported API surface and behaviour must remain identical across all repos.
+ * Minor formatter adjustments (blank lines, trailing commas) are acceptable.
+ */
+
 import * as clack from '@clack/prompts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -5,6 +14,8 @@ import * as clack from '@clack/prompts';
 interface FlagDef {
   alias?: string;
   type: 'boolean' | 'string' | 'number';
+  /** When true, accumulates repeated flags into a string[] (e.g. --include a --include b) */
+  multi?: boolean;
   description?: string;
 }
 
@@ -25,6 +36,8 @@ export interface FlowContext<F extends FlagDefs = FlagDefs> {
 export interface PromptSelectOpts<T> {
   /** Flag key whose value auto-resolves this prompt (skips showing the prompt) */
   flagKey?: string;
+  /** Convert a flag string value to the prompt's return type. Required when Value is non-primitive. */
+  fromFlag?: (flagValue: string) => T | undefined;
   message: string;
   options: { value: T; label: string; hint?: string }[];
   default?: T;
@@ -41,6 +54,8 @@ export interface PromptTextOpts {
   validate?: (value: string | undefined) => string | Error | undefined;
   /** When true, always prompt even in yes-mode */
   required?: boolean;
+  /** 'exit' (default): process.exit(0) on cancel. 'skip': return default or empty string. */
+  cancelBehavior?: 'exit' | 'skip';
 }
 
 export interface PromptConfirmOpts {
@@ -50,6 +65,8 @@ export interface PromptConfirmOpts {
   skipMessage?: string;
   /** When true, always prompt even in yes-mode */
   required?: boolean;
+  /** 'exit' (default): process.exit(0) on cancel. 'skip': return default value. */
+  cancelBehavior?: 'exit' | 'skip';
 }
 
 export interface PromptMultiSelectOpts<T> {
@@ -60,6 +77,15 @@ export interface PromptMultiSelectOpts<T> {
   initialValues?: T[];
   /** When true, at least one option must be selected (passed to clack) */
   minOne?: boolean;
+  /** When true, always prompt even in yes-mode */
+  required?: boolean;
+}
+
+export interface PromptAutocompleteMultiSelectOpts<T> {
+  message: string;
+  options: { value: T; label: string; hint?: string }[];
+  placeholder?: string;
+  initialValues?: T[];
   /** When true, always prompt even in yes-mode */
   required?: boolean;
 }
@@ -97,7 +123,13 @@ export function createFlowContext<F extends FlagDefs>(
         flags[resolvedKey] = true;
       } else if (def && i + 1 < argv.length) {
         i++;
-        flags[resolvedKey] = def.type === 'number' ? Number(argv[i]) : argv[i];
+        const value = def.type === 'number' ? Number(argv[i]) : argv[i];
+        if (def.multi) {
+          if (!Array.isArray(flags[resolvedKey])) flags[resolvedKey] = [];
+          (flags[resolvedKey] as unknown[]).push(value);
+        } else {
+          flags[resolvedKey] = value;
+        }
       }
     } else if (arg.startsWith('-') && arg.length === 2) {
       const alias = arg.slice(1);
@@ -109,7 +141,13 @@ export function createFlowContext<F extends FlagDefs>(
         flags[resolvedKey] = true;
       } else if (def && i + 1 < argv.length) {
         i++;
-        flags[resolvedKey] = def.type === 'number' ? Number(argv[i]) : argv[i];
+        const value = def.type === 'number' ? Number(argv[i]) : argv[i];
+        if (def.multi) {
+          if (!Array.isArray(flags[resolvedKey])) flags[resolvedKey] = [];
+          (flags[resolvedKey] as unknown[]).push(value);
+        } else {
+          flags[resolvedKey] = value;
+        }
       }
     } else {
       args.push(arg);
@@ -131,9 +169,12 @@ export async function promptSelect<T>(
   flow: FlowContext,
   opts: PromptSelectOpts<T>,
 ): Promise<T> {
-  // Resolution chain: 1. explicit flag  2. yes-mode default  3. prompt
+  // Resolution chain: 1. explicit flag (with optional fromFlag resolver)  2. yes-mode default  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey as keyof typeof flow.flags] !== undefined) {
-    return flow.flags[opts.flagKey as keyof typeof flow.flags] as T;
+    const raw = String(flow.flags[opts.flagKey as keyof typeof flow.flags]);
+    const resolved = opts.fromFlag ? opts.fromFlag(raw) : (raw as unknown as T);
+    if (resolved !== undefined) return resolved;
+    // fromFlag returned undefined → unknown flag value, fall through to prompt
   }
 
   if (!opts.required && flow.yesMode && opts.default !== undefined) {
@@ -183,6 +224,10 @@ export async function promptText(
   });
 
   if (clack.isCancel(result)) {
+    if (opts.cancelBehavior === 'skip') {
+      const fallback = typeof opts.default === 'function' ? opts.default() : opts.default;
+      return fallback ?? '';
+    }
     clack.cancel('Cancelled.');
     process.exit(0);
   }
@@ -203,6 +248,9 @@ export async function promptConfirm(
   const result = await clack.confirm({ message: opts.message });
 
   if (clack.isCancel(result)) {
+    if (opts.cancelBehavior === 'skip') {
+      return opts.default ?? false;
+    }
     clack.cancel('Cancelled.');
     process.exit(0);
   }
@@ -229,6 +277,30 @@ export async function promptMultiSelect<T>(
     options: opts.options as clack.Option<T>[],
     initialValues: opts.initialValues,
     required: opts.minOne,
+  });
+
+  if (clack.isCancel(result)) {
+    clack.cancel('Cancelled.');
+    process.exit(0);
+  }
+
+  return result as T[];
+}
+
+export async function promptAutocompleteMultiSelect<T>(
+  flow: FlowContext,
+  opts: PromptAutocompleteMultiSelectOpts<T>,
+): Promise<T[]> {
+  // Resolution chain: 1. yes-mode defaults  2. prompt
+  if (!opts.required && flow.yesMode && opts.initialValues !== undefined) {
+    return opts.initialValues;
+  }
+
+  const result = await clack.autocompleteMultiselect({
+    message: opts.message,
+    options: opts.options as clack.Option<T>[],
+    placeholder: opts.placeholder,
+    initialValues: opts.initialValues,
   });
 
   if (clack.isCancel(result)) {

@@ -2,7 +2,7 @@ import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { intro, isCancel, outro, spinner, text } from '@clack/prompts';
+import { cancel, intro, outro, spinner } from '@clack/prompts';
 import pc from 'picocolors';
 
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
@@ -14,7 +14,7 @@ import type { SaveOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 import type { FlowContext } from '../utils/flow.utils.js';
-import { promptConfirm, promptMultiSelect, promptSelect } from '../utils/flow.utils.js';
+import { promptConfirm, promptMultiSelect, promptSelect, promptText } from '../utils/flow.utils.js';
 import { compileCommand } from './compile.command.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -243,12 +243,13 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
           : 'No key detected',
       );
       const hotkeyDefault = validDetection && detected ? formatHotkey(detected) : '';
-      const hotkeyRaw = await text({
+      const hotkeyRaw = await promptText(flow, {
         message: 'Confirm hotkey — edit if needed, or leave blank to skip',
         placeholder: 'e.g. ctrl+shift+pad0',
-        ...(hotkeyDefault ? { initialValue: hotkeyDefault } : {}),
+        default: hotkeyDefault,
+        cancelBehavior: 'skip',
       });
-      if (!isCancel(hotkeyRaw) && hotkeyRaw.trim()) {
+      if (hotkeyRaw.trim()) {
         const parsed = parseHotkey(hotkeyRaw.trim());
         if (parsed) hotkeyResult = parsed;
         else console.warn(`  ${pc.yellow('⚠')}  Could not parse hotkey — skipping`);
@@ -323,7 +324,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       minOne: false,
     });
 
-    selectedWindows = windows.filter((w) => (selectedIds as string[]).includes(w.id));
+    selectedWindows = windows.filter((w) => selectedIds.includes(w.id));
 
     // 4d. Confirm
     const confirmed = await promptConfirm(flow, {
@@ -331,6 +332,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       default: true,
     });
     if (!confirmed) {
+      cancel('Cancelled');
       return EXIT_CODE.Error;
     }
 
@@ -352,12 +354,13 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       ? formatHotkey(existingHotkey)
       : '';
 
-    const hotkeyRaw = await text({
+    const hotkeyRaw = await promptText(flow, {
       message: 'Confirm hotkey — edit if needed, or leave blank to skip',
       placeholder: 'e.g. ctrl+shift+pad0',
-      ...(hotkeyDefault ? { initialValue: hotkeyDefault } : {}),
+      default: hotkeyDefault,
+      cancelBehavior: 'skip',
     });
-    if (!isCancel(hotkeyRaw) && hotkeyRaw.trim()) {
+    if (hotkeyRaw.trim()) {
       const parsed = parseHotkey(hotkeyRaw.trim());
       if (parsed) {
         hotkeyResult = parsed;

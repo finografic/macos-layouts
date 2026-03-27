@@ -1,8 +1,7 @@
 {
   "name": "@finografic/macos-layouts",
   "type": "module",
-  "version": "0.10.0",
-  "packageManager": "pnpm@10.32.1",
+  "version": "0.11.0",
   "description": "Trigger perfect window layouts in macOS",
   "homepage": "https://github.com/finografic/macos-layouts",
   "repository": {
@@ -42,7 +41,7 @@
     "layouts": "./dist/cli.mjs"
   },
   "scripts": {
-    "------------------": "---------------------------------------------------",
+    "---------- DEV_AND_BUILD": "---------------------------------------------",
     "dev": "tsdown --watch",
     "dev.cli": "NODE_ENV=development tsx src/cli.ts --",
     "build": "tsdown",
@@ -51,7 +50,7 @@
     "·········· LINTING": "···················································",
     "lint": "eslint .",
     "lint.fix": "eslint . --fix",
-    "·········· FORMATTING": "··················································",
+    "·········· FORMATTING": "·················································",
     "format": "dprint fmt --diff",
     "format.check": "dprint check",
     "·········· TESTING": "···················································",
@@ -64,15 +63,14 @@
     "release.github.major": "pnpm run release.check && pnpm version major && git push --follow-tags",
     "release.check": "pnpm format.check && pnpm lint.fix && pnpm typecheck && pnpm test.run",
     "release.publish": "pnpm publish --registry https://npm.pkg.github.com",
-    "·········· REGISTRIES": "··············································",
+    "·········· REGISTRIES": "················································",
     "view.registry.github": "pnpm view @finografic/macos-layouts --registry=https://npm.pkg.github.com",
     "·········· PACKAGES": "··················································",
     "update.eslint-config": "pnpm update @finografic/eslint-config --latest",
     "update.dprint-config": "pnpm update @finografic/dprint-config --latest",
     "upgrade.deps.all": "pnpm update --latest",
-    "·········· SETUP": "·····················································",
-    "setup:hammerspoon": "bash scripts/install-hammerspoon.sh",
     "·········· UTILS": "·····················································",
+    "setup:hammerspoon": "bash scripts/install-hammerspoon.sh",
     "tsc.debug": "tsc --pretty --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "prepack": "pnpm build",
@@ -105,14 +103,15 @@
     "typescript-eslint": "^8.51.0",
     "vitest": "^4.0.18"
   },
+  "packageManager": "pnpm@10.32.1",
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs}": [
-      "dprint fmt --allow-no-files",
-      "eslint --fix"
+      "eslint --fix",
+      "dprint fmt --allow-no-files"
     ],
     "*.md": [
-      "dprint fmt --allow-no-files",
-      "eslint --fix"
+      "eslint --fix",
+      "dprint fmt --allow-no-files"
     ],
     "*.{json,jsonc,yml,yaml,toml}": [
       "dprint fmt --allow-no-files"
@@ -124,6 +123,6 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged --allow-empty && dprint check && pnpm exec eslint \"**/*.md\""
+    "pre-commit": "npx lint-staged --allow-empty && dprint check && pnpm typecheck"
   }
 }

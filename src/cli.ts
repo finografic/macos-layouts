@@ -67,7 +67,8 @@ async function main(): Promise<void> {
       if (saveRest[i] === '--exclude' && saveRest[i + 1]) exclude.push(saveRest[++i]!);
     }
     const flow = createFlowContext(saveRest, {
-      y: { alias: 'yes', type: 'boolean' },
+      y: { type: 'boolean' },
+      yes: { type: 'boolean' },
     });
     const options: SaveOptions = {
       include: include.length > 0 ? include : undefined,
