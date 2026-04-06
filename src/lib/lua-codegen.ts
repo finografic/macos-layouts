@@ -19,10 +19,9 @@ export interface GenerateLuaParams {
  *   - windows sorted by (frame.x, frame.y, id) before matching (window-matcher.ts)
  *   - normalized rects converted to absolute pixels via Math.round (rect-converter.ts)
  *
- * Typical usage in Hammerspoon init.lua:
- *   hs.hotkey.bind({"cmd","alt"}, "h", function()
- *     dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/home.lua")
- *   end)
+ * `layouts compile` appends a debounced init.lua snippet (`_layoutsApply_*` + hotkey +
+ * `hs.screen.watcher`) — see `buildInitSnippet` in compile.command.ts. Manual init.lua can
+ * still call `dofile(...)` directly if you prefer.
  */
 export function generateLua({ layout, generatedAt = new Date() }: GenerateLuaParams): string {
   const date = generatedAt.toISOString().split('T')[0];
@@ -126,13 +125,13 @@ function buildWindowRulesTable(rules: readonly WindowRule[]): string {
 }
 
 function buildFileHeader(name: string, date: string): string {
-  return `-- macos-layouts: compiled layout "${name}"
+  return `-- 🖥️ macos-layouts: ${name}
+-- macos-layouts: compiled layout "${name}"
 -- Generated: ${date}
 --
--- Usage in Hammerspoon init.lua:
---   hs.hotkey.bind({"cmd","alt"}, "h", function()
---     dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua")
---   end)`;
+-- Prefer: layouts compile (adds debounced hotkey + screen watcher in init.lua).
+-- Or bind manually:
+--   dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua")`;
 }
 
 function buildLayoutDataBlock(

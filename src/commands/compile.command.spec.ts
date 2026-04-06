@@ -105,7 +105,7 @@ describe('compileCommand', () => {
     expect(lua).not.toContain('hs.window.allWindows()');
   });
 
-  it('init.lua snippet has no debounce on the hotkey function', async () => {
+  it('init.lua snippet debounces apply inside _layoutsApply_* (hotkey + screen watcher)', async () => {
     await writeFile(
       join(testDir, 'test.json'),
       JSON.stringify({ ...VALID_LAYOUT, options: { hotkey: { mods: ['ctrl'], key: 'pad0' } } }),
@@ -115,32 +115,36 @@ describe('compileCommand', () => {
       options: { layoutsDir: testDir, output: join(testDir, 'test.lua') },
     });
     const snippet = initLuaCapture.content ?? '';
-    // Hotkey function body: only dofile, no debounce vars
-    const fnBlock = snippet.match(/local function _mlApply_test\(\)([\s\S]*?)end/)?.[1] ?? '';
+    // Match through the real function end (not `if ... then return end`)
+    const fnBlock =
+      snippet.match(/local function _layoutsApply_test\(\)([\s\S]*?)\nhs\.hotkey\.bind/)?.[1] ?? '';
     expect(fnBlock).toContain('dofile');
-    expect(fnBlock).not.toContain('lastRun');
-    expect(fnBlock).not.toContain('secondsSinceEpoch');
+    expect(fnBlock).toContain('_layoutsApply_test_lastRun');
+    expect(fnBlock).toContain('secondsSinceEpoch');
+    expect(snippet).toContain('hs.screen.watcher.new(_layoutsApply_test)');
   });
 
-  it('init.lua snippet has no screen watcher when dockDisplay is not set', async () => {
+  it('init.lua snippet always registers hs.screen.watcher (same debounced fn as hotkey)', async () => {
     await writeFile(join(testDir, 'test.json'), JSON.stringify(VALID_LAYOUT));
     await compileCommand({
       name: 'test',
       options: { layoutsDir: testDir, output: join(testDir, 'test.lua') },
     });
-    expect(initLuaCapture.content).not.toContain('hs.screen.watcher');
+    const snippet = initLuaCapture.content ?? '';
+    expect(snippet).toContain('-- 🖥️ macos-layouts: test');
+    expect(snippet).toContain('hs.screen.watcher.new(_layoutsApply_test)');
+    expect(snippet).not.toContain('re-applies when Dock');
   });
 
-  it('init.lua snippet includes debounced screen watcher when dockDisplay is set', async () => {
+  it('init.lua snippet adds Dock hint comment when dockDisplay is set', async () => {
     await writeFile(join(testDir, 'test-dock.json'), JSON.stringify(DOCK_LAYOUT));
     await compileCommand({
       name: 'test-dock',
       options: { layoutsDir: testDir, output: join(testDir, 'test-dock.lua') },
     });
     const snippet = initLuaCapture.content ?? '';
-    expect(snippet).toContain('hs.screen.watcher');
-    expect(snippet).toContain('lastRun');
-    expect(snippet).toContain('secondsSinceEpoch');
+    expect(snippet).toContain('hs.screen.watcher.new(_layoutsApply_test_dock)');
+    expect(snippet).toContain('re-applies when Dock moves/shows/hides');
   });
 
   it('skips init.lua update when marker already exists', async () => {

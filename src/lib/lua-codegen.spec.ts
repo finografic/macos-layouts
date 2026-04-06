@@ -67,6 +67,7 @@ describe('generateLua — dockDisplay', () => {
 describe('generateLua — layout data', () => {
   it('embeds the layout name in the file header', () => {
     const lua = generateLua({ layout: BASE_LAYOUT });
+    expect(lua).toContain('-- 🖥️ macos-layouts: test');
     expect(lua).toContain('"test"');
   });
 
