@@ -1,12 +1,11 @@
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import type { Linter } from 'eslint';
 import markdownlintPlugin from 'eslint-plugin-markdownlint';
 import markdownlintParser from 'eslint-plugin-markdownlint/parser.js';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
-
 import tseslint from 'typescript-eslint';
+import type { Linter } from 'eslint';
 
 const config: Linter.Config[] = [
   {
@@ -43,7 +42,7 @@ const config: Linter.Config[] = [
     plugins: {
       '@typescript-eslint': tseslint.plugin,
       'simple-import-sort': simpleImportSort,
-      stylistic,
+      '@stylistic': stylistic,
     },
     rules: {
       // Disable base rules in favor of TS-aware ones
@@ -65,16 +64,19 @@ const config: Linter.Config[] = [
         },
       ],
       '@typescript-eslint/no-redeclare': 'warn',
-      'stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
-      'stylistic/object-curly-spacing': ['error', 'always'],
-      'stylistic/comma-spacing': ['error', { before: false, after: true }],
-      'stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
-      'stylistic/arrow-spacing': ['error', { before: true, after: true }],
-      'stylistic/type-annotation-spacing': ['error', {
-        before: false,
-        after: true,
-        overrides: { arrow: { before: true, after: true } },
-      }],
+      '@stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
+      '@stylistic/object-curly-spacing': ['error', 'always'],
+      '@stylistic/comma-spacing': ['error', { before: false, after: true }],
+      '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
+      '@stylistic/arrow-spacing': ['error', { before: true, after: true }],
+      '@stylistic/type-annotation-spacing': [
+        'error',
+        {
+          before: false,
+          after: true,
+          overrides: { arrow: { before: true, after: true } },
+        },
+      ],
 
       // Import sorting
       'simple-import-sort/imports': [
@@ -103,18 +105,13 @@ const config: Linter.Config[] = [
 
   {
     files: ['**/*.md'],
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      '.cursor/**',
-      '.github/instructions/**',
-    ],
+    ignores: ['node_modules/**', 'dist/**', '.cursor/**', '.github/instructions/**'],
     languageOptions: {
       parser: markdownlintParser,
     },
     plugins: {
       markdownlint: markdownlintPlugin as Linter.Processor,
-      stylistic,
+      '@stylistic': stylistic,
     },
     rules: {
       ...markdownlintPlugin.configs.recommended.rules,
@@ -130,7 +127,7 @@ const config: Linter.Config[] = [
       'markdownlint/md043': 'off', // Required heading structure
 
       // Formatting consistency
-      'stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
+      '@stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
     },
   },
 ];
