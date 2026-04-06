@@ -1,261 +1,120 @@
 # Developer Workflow
 
-Complete guide to the development, testing, and release workflow for this package.
+Template: day-to-day development for a **pnpm** monorepo or multi-package repo. Adjust script names to match your root `package.json`.
 
 ---
 
-## 🔄 Daily Development
+## Daily development
 
-### Development Mode
+### Code quality
+
+Typical scripts (yours may differ):
 
 ```bash
-pnpm dev           # Watch mode for building
-pnpm test          # Watch mode for testing
+pnpm lint          # ESLint / project lint
+pnpm lint:fix      # Lint with fixes, if defined
+pnpm format:fix    # Formatter (e.g. oxfmt)
+pnpm format:check  # Check formatting without writing
+pnpm typecheck     # TypeScript across packages
+pnpm test          # Tests
 ```
 
-### Code Quality
+### Formatter config
+
+If you use **oxfmt** (or another formatter), keep its config in repo root and run the same commands in CI as locally.
+
+---
+
+## Git workflow
+
+### Commit messages
+
+Use **Conventional Commits** so history and tooling stay consistent. **Commitlint** (see `commitlint.config.mjs` in the repo root) validates the **subject line** on `git commit` when a `commit-msg` hook is installed.
+
+**Subject line:**
 
 ```bash
-pnpm lint          # Check code style
-pnpm lint.fix      # Auto-fix issues
-pnpm typecheck     # Type check without building
+git commit -m "<type>(<scope>): <short summary>"
 ```
 
----
-
-## 🎯 Git Workflow
-
-### What Happens When You Commit
+`scope` is **optional** but useful: package name, layer, or concern. Examples:
 
 ```bash
-git add .
-git commit -m "feat: add new feature"
+docs(agents): refresh skill authoring guide
+feat(skills): add runner timeout
+chore(web): bump Astro dependency
 ```
 
-**Automatic hooks run:**
-
-1. ✅ **pre-commit hook** triggers
-   - Runs `npx lint-staged`
-   - Lints and fixes **only staged files**
-   - Fast (5-10 seconds)
-
-2. ✅ **Commit proceeds** if lint passes
-
-**No pre-push hook** - tests run before releases only
-
----
-
-## 📦 Release Workflow
-
-### The Complete Flow
+**Examples:**
 
 ```bash
-pnpm release.github.patch  # or .minor or .major
+git commit -m "feat(api): add users endpoint"
+git commit -m "fix(core): handle empty input"
+git commit -m "docs(readme): fix install steps"
+git commit -m "test(schemas): cover edge cases"
+git commit -m "deps: bump zod to latest patch"
 ```
 
-**What happens automatically:**
+**Allowed types** (enforced when using this repo’s `commitlint.config.mjs`):
 
-```
-1. release.check runs:
-   ├─ pnpm lint.fix      # Lint entire codebase
-   ├─ pnpm typecheck     # Type check entire codebase
-   └─ pnpm test.run      # Run ALL tests (non-watch mode)
+| Type       | Use for                                                                                 |
+| ---------- | --------------------------------------------------------------------------------------- |
+| `feat`     | New capability                                                                          |
+| `fix`      | Bug fix                                                                                 |
+| `test`     | Adding or changing tests only                                                           |
+| `refactor` | Internal change, same outward behavior                                                  |
+| `docs`     | Documentation only                                                                      |
+| `chore`    | Maintenance, tooling, scaffolding (use `deps` when the commit is only dependency bumps) |
+| `deps`     | Dependency changes only (lockfile, version bumps)                                       |
+| `build`    | Build system, bundler, or compile pipeline (e.g. Vite, tsup, `turbo` build config)      |
+| `ci`       | CI workflows, Actions, automation config                                                |
+| `style`    | Formatting-only or style rules (no logic change)                                        |
+| `revert`   | Reverts a previous commit                                                               |
 
-2. If checks pass:
-   ├─ Version bumps in package.json
-   ├─ Git commit created
-   └─ pre-commit: lint-staged (on package.json only)
+**Scopes:** Prefer a **scope** for the area of the repo: package name (`core`, `web`), topic (`agents`, `skills`, `ci`), or path theme. There is no separate `agents:` / `ai:` **type** in this preset — use `docs(agents):`, `feat(skills):`, etc.
 
-3. Push to GitHub:
-   ├─ Commit pushed
-   ├─ Tag pushed (e.g., v0.5.21)
-   └─ No pre-push hook (already validated)
+**Multiline messages:** use a second `-m`, or `git commit -F message.txt` for bodies. Keep project-specific policies (e.g. no `Co-Authored-By`, body format) in your **AGENTS.md** or team docs.
 
-4. GitHub Actions triggers:
-   ├─ Workflow detects tag
-   ├─ Builds package
-   ├─ Publishes to GitHub Packages
-   └─ Creates GitHub Release
-```
+**What Commitlint does not check:** body must be bullets, no prose, “Verification:” sections — those need **human review** or **AI “commit instructions”** in your editor (e.g. Codex). **Commitizen** (`git cz`) is an optional interactive helper; it does not replace Commitlint.
 
----
+### Pre-commit hook
 
-## ⚙️ Configuration Details
+A typical **pre-commit** hook runs some combination of:
 
-### package.json Scripts
+1. **lint-staged** on staged files
+2. **ESLint** (or similar) on JS/TS
+3. **Formatter** (e.g. oxfmt) on staged paths
+4. **typecheck** (often whole workspace for safety)
 
-```json
-{
-  "scripts": {
-    // Development
-    "dev": "tsdown --watch",
-    "test": "vitest", // Watch mode
-    "test.run": "vitest run", // Run once (CI/releases)
-
-    // Quality checks
-    "lint": "eslint .",
-    "lint.fix": "eslint . --fix",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
-
-    // Releases
-    "release.github.patch": "pnpm run release.check && pnpm version patch && git push --follow-tags",
-    "release.check": "pnpm lint.fix && pnpm typecheck && pnpm test.run"
-  }
-}
-```
-
-### .simple-git-hooks.mjs
-
-```javascript
-export default {
-  'pre-commit': 'npx lint-staged',
-  // No pre-push - tests run in release.check
-};
-```
-
-**Why no pre-push?**
-
-- Tests already run in `release.check` before version bump
-- Avoids redundancy (tests run twice)
-- Faster pushes
-- Developers can push WIP branches
-
-### lint-staged Configuration
-
-```json
-{
-  "lint-staged": {
-    "*.{ts,tsx,js,mjs,cjs}": [
-      "eslint --fix"
-    ]
-  }
-}
-```
-
-**Key points:**
-
-- ✅ Uses `eslint` directly (not `pnpm exec eslint`)
-- ✅ Runs on staged files only
-- ✅ Auto-fixes issues
-- ✅ Blocks commit if errors remain
-
----
-
-## 🧪 Testing Strategy
-
-### Test Scripts Explained
+**To bypass** (not recommended):
 
 ```bash
-pnpm test          # vitest (watch mode for dev)
-pnpm test.run      # vitest run (run once and exit)
-pnpm test.coverage # vitest run --coverage
+git commit --no-verify -m "message"
 ```
 
-**Why the distinction?**
+### Commit-msg hook
 
-| Context     | Command         | Behavior                               |
-| ----------- | --------------- | -------------------------------------- |
-| Development | `pnpm test`     | ⏱️ Watch mode - re-runs on file changes |
-| Releases    | `pnpm test.run` | ✅ Runs once and exits - doesn't block |
-| CI/CD       | `pnpm test.run` | ✅ Runs once and exits                 |
+A **commit-msg** hook runs **Commitlint** on the message file so invalid types or malformed headers are rejected.
 
-**Important:** `vitest` alone enters watch mode when run from terminal, but `vitest run` always runs once and exits. Use `test.run` in scripts that need to continue after tests complete.
+Install hooks with your chosen tool (e.g. **simple-git-hooks**, **husky**).
 
 ---
 
-## Git Hooks Generated
+## Release workflow
 
-**Automatic Setup:** Git hooks are automatically generated when you run `pnpm install` (which triggers the `prepare` script that runs `simple-git-hooks`).
+See [Release Process](./RELEASE_PROCESS.md) if this template includes release automation.
 
-The following hooks are created in `.git/hooks/`:
-
-### pre-commit
+**Example** (adjust script names to your repo):
 
 ```bash
-#!/bin/sh
-npx lint-staged
-```
-
-**Purpose:** Lint and fix staged files before commit
-**Speed:** Fast (only processes changed files)
-**Blocking:** Yes (commit fails if lint fails)
-
-### No pre-push Hook
-
-**Deliberately omitted** to avoid redundancy. All checks run in `release.check` before version bump.
-
----
-
-## 🚨 Troubleshooting
-
-### Tests Hang in Watch Mode
-
-**Problem:** `pnpm release.github.patch` hangs after tests
-
-**Cause:** Using `pnpm test` instead of `pnpm test.run`
-
-**Solution:** Ensure `release.check` uses `test.run`:
-
-```json
-"release.check": "pnpm lint.fix && pnpm typecheck && pnpm test.run"
-```
-
-### Commits Blocked by Lint
-
-**Problem:** Can't commit because lint fails
-
-**Solution:**
-
-```bash
-pnpm lint.fix       # Auto-fix issues
-git add .           # Re-stage fixed files
-git commit -m "..."
-```
-
-### Release Fails
-
-**Problem:** `release.check` fails
-
-**Solution:** Fix issues before trying again:
-
-```bash
-pnpm lint.fix       # Fix lint issues
-pnpm typecheck      # Check types
-pnpm test.run       # Verify tests pass
+pnpm release.patch   # or release:github:patch, changeset publish, etc.
 ```
 
 ---
 
-## 📋 Checklist: Before Release
+## Related documentation
 
-- [ ] All changes committed
-- [ ] On `master` branch
-- [ ] `pnpm lint.fix` passes
-- [ ] `pnpm typecheck` passes
-- [ ] `pnpm test.run` passes
-- [ ] Ready to publish
-
-Then run:
-
-```bash
-pnpm release.github.patch
-```
-
----
-
-## 🎯 Philosophy
-
-This workflow is designed for:
-
-1. **Fast commits** - Only lint changed files
-2. **Thorough releases** - Full validation before publishing
-3. **No redundancy** - Each check runs once, not multiple times
-4. **Developer friendly** - Can commit WIP, validation happens before release
-5. **CI/CD ready** - Same commands work locally and in GitHub Actions
-
----
-
-## Related Documentation
-
-- [Release Process](./RELEASES.md) - Release commands and verification
-- [GitHub Packages Setup](./GITHUB_PACKAGES_SETUP.md) - Initial configuration (if applicable)
+| Doc                                                 | Purpose                              |
+| --------------------------------------------------- | ------------------------------------ |
+| [Release Process](./RELEASE_PROCESS.md)             | Versioning and publishing (template) |
+| [GitHub Packages Setup](./GITHUB_PACKAGES_SETUP.md) | Registry and token setup (template)  |

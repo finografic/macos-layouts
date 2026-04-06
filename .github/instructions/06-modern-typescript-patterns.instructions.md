@@ -19,9 +19,7 @@ Encourage Copilot to propose modern TS patterns when they add clear value.
 ## Examples
 
 ```typescript
-type Result<T, E = Error> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+type Result<T, E = Error> = { ok: true; value: T } | { ok: false; error: E };
 
 type State =
   | { status: 'idle' }

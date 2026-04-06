@@ -1,20 +1,9 @@
 # AGENTS.md - AI Assistant Guide
 
-Rules are canonical in `.github/instructions/` and shared across Claude Code, Cursor, and GitHub Copilot.
-
 ## Rules - General
 
-- IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages.
-
-## Rules - Markdown Tables
-
-- Padded pipes: one space on each side of every `|`, including the separator row.
-- Align column widths so all cells in the same column are equal width.
-
-## Rule Files
-
-> Note: the full `.github/instructions/` rule set from the monorepo has not been copied here yet.
-> Until it is, follow general TypeScript, ESLint, and naming conventions from prior context.
+Rules are canonical in `.github/instructions/` and shared across Claude Code, Cursor, and GitHub Copilot.
+Follow general TypeScript, ESLint, and naming conventions from prior context.
 
 - [General](/.github/instructions/00-general.instructions.md)
 - [File Naming](/.github/instructions/01-file-naming.instructions.md)
@@ -25,10 +14,12 @@ Rules are canonical in `.github/instructions/` and shared across Claude Code, Cu
 - [Modern TypeScript Patterns](/.github/instructions/06-modern-typescript-patterns.instructions.md)
 - [Variable Naming](/.github/instructions/07-variable-naming.instructions.md)
 - [README Standards](/.github/instructions/08-readme-standards.instructions.md)
+- [Picocolors CLI styling](/.github/instructions/09-picocolors-cli-styling.instructions.md)
+- [Git Policy](/.github/instructions/10-git-policy.instructions.md)
 
-## Project-Specific
+## Rules - Project-Specific
 
-Project-specific rules live in `.github/instructions/project/`. Add `*.instructions.md` files there and link them here.
+Project-specific rules live in `.github/instructions/project/*.instructions.md`.
 
 <!-- NOTE: CLI projects (genx:type:cli keyword in package.json) only -->
 
@@ -36,10 +27,20 @@ Project-specific rules live in `.github/instructions/project/`. Add `*.instructi
 
 - This is a **standalone installable package** (`@finografic/design-system`), not a monorepo workspace.
 - Published to GitHub Packages (`https://npm.pkg.github.com`).
-- Do not include `Co-Authored-By` lines in commit messages.
 - Do not reference `@workspace/*` — all imports and deps must use published package names.
 - The `panda.preset` entry must always build with `platform: 'node'` in tsdown.
 - Never add `watch: true` to `panda.config.ts` — it causes `panda codegen` to hang.
+
+## Rules - Markdown Tables
+
+- Padded pipes: one space on each side of every `|`, including the separator row.
+- Align column widths so all cells in the same column are equal width.
+
+## Git Policy
+
+- IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages. Not ever, not for any reason.
+- [Git — Commits](/.github/instructions/10-git-policy.instructions.md#commits)
+- [Git — Releases](/.github/instructions/10-git-policy.instructions.md#releases)
 
 ## Learned User Preferences
 

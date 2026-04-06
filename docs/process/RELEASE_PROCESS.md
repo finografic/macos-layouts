@@ -1,144 +1,74 @@
-# Release Process
+# Release process
 
-This repository uses automated releases via GitHub Actions.
+Template for **automated or scripted releases** (e.g. GitHub Actions + GitHub Packages). Replace placeholders with your org, repo, and script names.
 
 ## Prerequisites
 
-Before releasing, ensure:
+Before releasing:
 
-- ✅ All changes committed and pushed
-- ✅ On `master` branch
-- ✅ Tests passing (`pnpm test.run`)
-- ✅ Linting passing (`pnpm lint`)
-- ✅ Type-checking passing (`pnpm typecheck`)
+- Changes are committed and pushed
+- Default branch is ready (often `main` or `master`)
+- Tests pass: `pnpm test` (or your project’s test script)
+- Lint passes: `pnpm lint`
+- Typecheck passes: `pnpm typecheck`
 
-## Quick Release Commands
+## Release commands
 
-### Patch Release
+Define scripts in root `package.json`, for example:
 
-Bug fixes and minor changes.
+| Goal  | Example script (name varies by repo)                |
+| ----- | --------------------------------------------------- |
+| Patch | `pnpm release:patch` or `pnpm release:github:patch` |
+| Minor | `pnpm release:minor` or `pnpm release:github:minor` |
+| Major | `pnpm release:major` or `pnpm release:github:major` |
 
-```bash
-pnpm release.github.patch
-```
+Use whatever your scaffold or generator created.
 
-### Minor Release
+## What often happens automatically
 
-New features, backward compatible.
+1. **Local checks** — lint, typecheck, tests (as defined in your release script).
+2. **Version bump** — `package.json` / changelog tooling / workspace versions.
+3. **Git commit and tag** — e.g. `v1.2.3`.
+4. **Push** — branch and tags to GitHub.
+5. **CI** — workflow builds and publishes packages (npm, GitHub Packages, etc.).
+6. **GitHub Release** — optional release notes from tags or changelog.
 
-```bash
-pnpm release.github.minor
-```
+## Verification after release
 
-### Major Release
+1. **Releases** — `https://github.com/<ORG>/<REPO>/releases`
+2. **Packages** — registry URL for your scope (npm, GitHub Packages, etc.)
+3. **Actions** — `https://github.com/<ORG>/<REPO>/actions`
 
-Breaking changes.
+## Manual recovery
 
-```bash
-pnpm release.github.major
-```
-
-## What Happens Automatically
-
-When you run a release command:
-
-1. **Local checks run** (`release.check`)
-   - Linting
-   - Type checking
-   - Tests
-
-2. **Version bump** in `package.json`
-   - Creates a commit
-   - Creates a git tag (e.g., `v0.1.0`)
-
-3. **Push to GitHub**
-   - Commits and tag pushed with `--follow-tags`
-
-4. **GitHub Actions workflow triggers**
-   - Workflow detects the tag push
-   - Installs dependencies
-   - Builds the package
-   - Publishes to GitHub Packages
-   - Creates GitHub Release with auto-generated notes
-
-5. **GitHub Release appears**
-   - View at: `https://github.com/finografic/macos-layouts/releases`
-
-## Verification
-
-After releasing, verify:
-
-1. **GitHub Release created**
-   - `https://github.com/finografic/macos-layouts/releases`
-
-2. **Package published**
-   - `https://github.com/finografic/macos-layouts/packages`
-
-3. **Workflow succeeded**
-   - `https://github.com/finografic/macos-layouts/actions`
-
-## Manual Steps
-
-**⚠️ Important:** The `release.publish` command is only for manual recovery if the automated GitHub Actions workflow fails. It will check if the current version is already published and prevent duplicate publishes.
-
-If the automated release fails, you can manually publish:
-
-```bash
-pnpm release.publish
-```
-
-**Note:** This command will fail if the version is already published. Use `release.github.patch/minor/major` to bump the version first.
+If your repo exposes a **manual publish** script, use it only when automation failed — and ensure you do not publish the same version twice.
 
 ## Troubleshooting
 
 ### Version already published
 
-If you see `npm error You cannot publish over the previously published versions: X.Y.Z`:
-
-**This means the version is already published.** You have two options:
-
-1. **Use the release scripts (recommended):** These automatically bump the version before publishing:
-
-   ```bash
-   pnpm release.github.patch  # Bumps to next patch version
-   ```
-
-2. **Manual publish (only if GitHub Actions failed):** If you need to republish the same version (e.g., after fixing a build issue), you'll need to:
-   - Delete the existing tag (if it exists)
-   - Manually publish (but this is rare and not recommended)
-
-**The release scripts (`release.github.patch/minor/major`) will never have this problem** because they bump the version before pushing.
+Bump the version with your normal release script, then publish again. Do not republish the same version to the same registry.
 
 ### Tag already exists
 
 ```bash
-# Delete local tag
-git tag -d v0.1.0
-
-# Delete remote tag (if pushed)
-git push origin :refs/tags/v0.1.0
-
-# Try again
-pnpm release.github.patch
+git tag -d vX.Y.Z
+git push origin :refs/tags/vX.Y.Z
 ```
 
-### release.check fails
+Then run your release flow again after fixing the underlying issue.
 
-Run the checks manually to see what failed:
+### Release checks fail
+
+Run the same commands locally as in the release script, for example:
 
 ```bash
-pnpm lint.fix
+pnpm lint
 pnpm typecheck
-pnpm test.run
+pnpm test
 ```
 
-### Workflow fails
+## Related documentation
 
-- Check Actions tab for error details
-- Ensure `NPM_TOKEN` secret is configured (see `GITHUB_PACKAGES_SETUP.md`)
-- Verify workflow permissions are correct
-
-## Related Documentation
-
-- [Developer Workflow](./DEVELOPER_WORKFLOW.md) - Daily development and git workflow
-- [GitHub Packages Setup Guide](./GITHUB_PACKAGES_SETUP.md) - Initial configuration
+- [Developer Workflow](./DEVELOPER_WORKFLOW.md)
+- [GitHub Packages Setup](./GITHUB_PACKAGES_SETUP.md)

@@ -1,16 +1,27 @@
-# GitHub Packages Setup Guide (Canonical)
+# GitHub Packages setup (template)
 
-This repository follows the **@finografic “locked” GitHub Packages flow** (PAT-based `NPM_TOKEN`, workflow permissions, `.npmrc` scope config).
+Use this as a **checklist pointer** when publishing to **GitHub Packages** (`npm.pkg.github.com`). Your org may keep a **single canonical guide** (e.g. in an internal generator or docs repo) — follow that source of truth when it exists.
 
-To avoid duplicating and drifting instructions, the canonical, fully detailed guide lives in `@finografic/genx`:
+## Typical requirements
 
-- `@finografic/genx/docs/GITHUB_PACKAGES_SETUP.md`
+| Item                     | Notes                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| **Authentication**       | PAT or `GITHUB_TOKEN` with `read:packages` / `write:packages` as needed          |
+| **Repo secret**          | Often `NPM_TOKEN` for workflows that publish                                     |
+| **`.npmrc`**             | Scope → registry mapping, e.g. `@your-scope:registry=https://npm.pkg.github.com` |
+| **Workflow permissions** | `packages: write`, `contents: write` (exact needs depend on workflow)            |
 
-If you’re setting up a new machine or a new repo, open that doc and follow it exactly.
+## Do not commit secrets
 
-## Quick reminders
+Use GitHub Actions secrets and `NODE_AUTH_TOKEN` (or documented env vars) in CI — never commit tokens.
 
-- **Secret name**: `NPM_TOKEN` (PAT with `repo`, `read:packages`, `write:packages`, `workflow`)
-- **Workflow permissions**: `contents: write`, `packages: write`, `actions: write`
-- **Registry**: `@finografic:registry=https://npm.pkg.github.com`
-- **Do not** commit auth tokens; use `NODE_AUTH_TOKEN` in workflows
+## Org-specific docs
+
+If your team maintains a full walkthrough (machine setup, PAT scopes, first publish), link it here in your fork:
+
+- _`<link to canonical doc>`_
+
+## Related documentation
+
+- [Developer Workflow](./DEVELOPER_WORKFLOW.md)
+- [Release Process](./RELEASE_PROCESS.md)
