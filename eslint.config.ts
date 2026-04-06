@@ -62,19 +62,21 @@ const config: Linter.Config[] = [
         },
       ],
       '@typescript-eslint/no-redeclare': 'warn',
-      '@stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
-      '@stylistic/object-curly-spacing': ['error', 'always'],
-      '@stylistic/comma-spacing': ['error', { before: false, after: true }],
-      '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
-      '@stylistic/arrow-spacing': ['error', { before: true, after: true }],
-      '@stylistic/type-annotation-spacing': [
+      '@typescript-eslint/consistent-type-imports': [
         'error',
         {
-          before: false,
-          after: true,
-          overrides: { arrow: { before: true, after: true } },
+          prefer: 'type-imports',
+          fixStyle: 'separate-type-imports',
         },
       ],
+
+      '@stylistic/indent': ['warn', 2, { SwitchCase: 1, ignoredNodes: ['ConditionalExpression'] }],
+      '@stylistic/operator-linebreak': [
+        'warn',
+        'after',
+        { overrides: { '?': 'ignore', ':': 'ignore', '|': 'ignore' } },
+      ],
+      '@stylistic/multiline-ternary': ['warn', 'always-multiline'],
     },
   },
 
