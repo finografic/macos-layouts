@@ -69,11 +69,7 @@ export interface WindowMatchByTitle {
   readonly pattern: string;
 }
 
-export type WindowMatch =
-  | WindowMatchMain
-  | WindowMatchByIndex
-  | WindowMatchAll
-  | WindowMatchByTitle;
+export type WindowMatch = WindowMatchMain | WindowMatchByIndex | WindowMatchAll | WindowMatchByTitle;
 
 // ─── Window placement ────────────────────────────────────────────────────────
 

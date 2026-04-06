@@ -1,7 +1,6 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { expandHome, listLayouts, loadLayout } from './layout-loader.js';
@@ -55,10 +54,7 @@ describe('loadLayout', () => {
   });
 
   it('returns error for JSON missing required fields', async () => {
-    await writeFile(
-      join(testDir, 'partial.json'),
-      JSON.stringify({ version: '0.1', name: 'partial' }),
-    );
+    await writeFile(join(testDir, 'partial.json'), JSON.stringify({ version: '0.1', name: 'partial' }));
     const result = await loadLayout('partial', testDir);
     expect(result.ok).toBe(false);
     if (!result.ok) {

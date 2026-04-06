@@ -1,7 +1,7 @@
 import pc from 'picocolors';
+import type { ListOptions } from '../types/cli.types.js';
 
 import { listLayouts, loadLayout } from '../lib/layout-loader.js';
-import type { ListOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

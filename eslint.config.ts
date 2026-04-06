@@ -67,10 +67,10 @@ const config: Linter.Config[] = [
         {
           prefer: 'type-imports',
           fixStyle: 'separate-type-imports',
+          disallowTypeAnnotations: false,
         },
       ],
 
-      '@stylistic/indent': ['warn', 2, { SwitchCase: 1, ignoredNodes: ['ConditionalExpression'] }],
       '@stylistic/operator-linebreak': [
         'warn',
         'after',

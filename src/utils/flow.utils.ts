@@ -22,13 +22,13 @@ interface FlagDef {
 type FlagDefs = Record<string, FlagDef>;
 
 export interface FlowContext<F extends FlagDefs = FlagDefs> {
-  flags:
-    & {
-      [K in keyof F]: F[K]['type'] extends 'boolean' ? boolean
-        : F[K]['type'] extends 'number' ? number
+  flags: {
+    [K in keyof F]: F[K]['type'] extends 'boolean'
+      ? boolean
+      : F[K]['type'] extends 'number'
+        ? number
         : string;
-    }
-    & { y?: boolean; yes?: boolean };
+  } & { y?: boolean; yes?: boolean };
   yesMode: boolean;
   args: string[];
 }
@@ -92,10 +92,7 @@ export interface PromptAutocompleteMultiSelectOpts<T> {
 
 // ─── Flag Parsing ─────────────────────────────────────────────────────────────
 
-export function createFlowContext<F extends FlagDefs>(
-  argv: string[],
-  flagDefs: F,
-): FlowContext<F> {
+export function createFlowContext<F extends FlagDefs>(argv: string[], flagDefs: F): FlowContext<F> {
   const flags: Record<string, unknown> = {};
   const args: string[] = [];
 
@@ -134,8 +131,7 @@ export function createFlowContext<F extends FlagDefs>(
     } else if (arg.startsWith('-') && arg.length === 2) {
       const alias = arg.slice(1);
       const resolvedKey = aliasMap[alias] ?? alias;
-      const def = flagDefs[resolvedKey]
-        ?? Object.values(flagDefs).find((d) => d.alias === alias);
+      const def = flagDefs[resolvedKey] ?? Object.values(flagDefs).find((d) => d.alias === alias);
 
       if (def?.type === 'boolean' || alias === 'y') {
         flags[resolvedKey] = true;
@@ -165,10 +161,7 @@ export function createFlowContext<F extends FlagDefs>(
 
 // ─── Prompt Helpers ───────────────────────────────────────────────────────────
 
-export async function promptSelect<T>(
-  flow: FlowContext,
-  opts: PromptSelectOpts<T>,
-): Promise<T> {
+export async function promptSelect<T>(flow: FlowContext, opts: PromptSelectOpts<T>): Promise<T> {
   // Resolution chain: 1. explicit flag (with optional fromFlag resolver)  2. yes-mode default  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey as keyof typeof flow.flags] !== undefined) {
     const raw = String(flow.flags[opts.flagKey as keyof typeof flow.flags]);
@@ -194,19 +187,14 @@ export async function promptSelect<T>(
   return result as T;
 }
 
-export async function promptText(
-  flow: FlowContext,
-  opts: PromptTextOpts,
-): Promise<string> {
+export async function promptText(flow: FlowContext, opts: PromptTextOpts): Promise<string> {
   // Resolution chain: 1. explicit flag  2. yes-mode default  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey as keyof typeof flow.flags] !== undefined) {
     const value = String(flow.flags[opts.flagKey as keyof typeof flow.flags]);
     if (opts.validate) {
       const error = opts.validate(value);
       if (error) {
-        throw error instanceof Error
-          ? error
-          : new Error(`Invalid --${opts.flagKey}: ${error}`);
+        throw error instanceof Error ? error : new Error(`Invalid --${opts.flagKey}: ${error}`);
       }
     }
     return value;
@@ -235,10 +223,7 @@ export async function promptText(
   return result as string;
 }
 
-export async function promptConfirm(
-  flow: FlowContext,
-  opts: PromptConfirmOpts,
-): Promise<boolean> {
+export async function promptConfirm(flow: FlowContext, opts: PromptConfirmOpts): Promise<boolean> {
   // Resolution chain: 1. yes-mode default  2. prompt
   if (!opts.required && flow.yesMode) {
     if (opts.skipMessage) console.log(opts.skipMessage);
@@ -258,10 +243,7 @@ export async function promptConfirm(
   return result as boolean;
 }
 
-export async function promptMultiSelect<T>(
-  flow: FlowContext,
-  opts: PromptMultiSelectOpts<T>,
-): Promise<T[]> {
+export async function promptMultiSelect<T>(flow: FlowContext, opts: PromptMultiSelectOpts<T>): Promise<T[]> {
   // Resolution chain: 1. explicit flag  2. yes-mode defaults  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey as keyof typeof flow.flags] !== undefined) {
     const raw = String(flow.flags[opts.flagKey as keyof typeof flow.flags]);

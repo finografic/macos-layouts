@@ -1,6 +1,10 @@
 import pc from 'picocolors';
-
 import type { ApplyMove } from '../lib/apply-lua.js';
+import type { ApplyOptions } from '../types/cli.types.js';
+import type { Rect } from '../types/geometry.types.js';
+import type { RuntimeWindow } from '../types/runtime.types.js';
+import type { ApplyError, ApplyMoveResult, ApplySkipResult } from '../types/runtime.types.js';
+
 import { buildApplyLua } from '../lib/apply-lua.js';
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
 import { DUMP_LUA } from '../lib/dump-lua.js';
@@ -8,11 +12,7 @@ import * as hs from '../lib/hammerspoon.js';
 import { loadLayout } from '../lib/layout-loader.js';
 import { normalizedToAbsolute } from '../lib/rect-converter.js';
 import { matchWindows } from '../lib/window-matcher.js';
-import type { ApplyOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
-import type { Rect } from '../types/geometry.types.js';
-import type { RuntimeWindow } from '../types/runtime.types.js';
-import type { ApplyError, ApplyMoveResult, ApplySkipResult } from '../types/runtime.types.js';
 
 // ─── Internal types ───────────────────────────────────────────────────────────
 
@@ -53,9 +53,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   const available = await hs.isAvailable();
   if (!available) {
     console.error(
-      `${
-        pc.red('Error:')
-      } Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
+      `${pc.red('Error:')} Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
     );
     return EXIT_CODE.RuntimeUnavailable;
   }
@@ -72,11 +70,9 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   const resolvedRoles = resolveDisplayRoles(layout.displayRoles, [...dump.screens]);
 
   // 5. Match windows
-  const { matched, skipped: windowSkips } = matchWindows(
-    layout.windows,
-    [...dump.windows],
-    { restoreMinimized: layout.options?.restoreMinimized },
-  );
+  const { matched, skipped: windowSkips } = matchWindows(layout.windows, [...dump.windows], {
+    restoreMinimized: layout.options?.restoreMinimized,
+  });
 
   // 6. Build planned moves; collect display-unresolved skips
   const ruleMap = new Map(layout.windows.map((r) => [r.id, r]));
@@ -103,12 +99,13 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
       continue;
     }
 
-    const frameForNorm = rule.place.display === dockDisplayRole
-      ? {
-        ...screen.frame,
-        h: screen.fullFrame.y + screen.fullFrame.h - screen.frame.y,
-      }
-      : screen.frame;
+    const frameForNorm =
+      rule.place.display === dockDisplayRole
+        ? {
+            ...screen.frame,
+            h: screen.fullFrame.y + screen.fullFrame.h - screen.frame.y,
+          }
+        : screen.frame;
 
     plannedMoves.push({
       ruleId: match.ruleId,
@@ -149,9 +146,7 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   try {
     hsResults = JSON.parse(luaResult.value) as HsMoveResult[];
   } catch {
-    console.error(
-      `${pc.red('Error:')} Hammerspoon returned invalid JSON: ${luaResult.value.slice(0, 200)}`,
-    );
+    console.error(`${pc.red('Error:')} Hammerspoon returned invalid JSON: ${luaResult.value.slice(0, 200)}`);
     return EXIT_CODE.Error;
   }
 

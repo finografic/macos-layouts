@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-
-import fixture from '../__mocks__/dump-home-personal.json';
 import type { RuntimeWindow } from '../types/runtime.types.js';
 import type { WindowRule } from '../types/window.types.js';
+
+import fixture from '../__mocks__/dump-home-personal.json';
 import { matchWindows } from './window-matcher.js';
 
 const windows = fixture.windows as unknown as RuntimeWindow[];
@@ -51,15 +51,13 @@ const minimizedGhostty: RuntimeWindow = {
 
 // Ghostty windows with no focused window (all isFocused: false)
 const ghosttyNoFocus = windows
-  .filter(w => w.app.bundleId === 'com.mitchellh.ghostty')
-  .map(w => ({ ...w, isFocused: false }));
+  .filter((w) => w.app.bundleId === 'com.mitchellh.ghostty')
+  .map((w) => ({ ...w, isFocused: false }));
 
 describe('matchWindows', () => {
   describe('app matching', () => {
     it('matches by bundleId', () => {
-      const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 0 }),
-      ];
+      const rules = [rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 0 })];
       const { matched, skipped } = matchWindows(rules, windows);
       expect(skipped).toHaveLength(0);
       expect(matched).toHaveLength(1);
@@ -90,25 +88,19 @@ describe('matchWindows', () => {
 
   describe('byIndex', () => {
     it('byIndex 0 returns leftmost Ghostty window', () => {
-      const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 0 }),
-      ];
+      const rules = [rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 0 })];
       const { matched } = matchWindows(rules, windows);
       expect(matched[0]?.windowId).toBe('51385');
     });
 
     it('byIndex 4 returns rightmost Ghostty window', () => {
-      const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 4 }),
-      ];
+      const rules = [rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 4 })];
       const { matched } = matchWindows(rules, windows);
       expect(matched[0]?.windowId).toBe('51890');
     });
 
     it('byIndex out of range → noMatch', () => {
-      const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 10 }),
-      ];
+      const rules = [rule('r', { bundleId: 'com.mitchellh.ghostty' }, { kind: 'byIndex', index: 10 })];
       const { matched, skipped } = matchWindows(rules, windows);
       expect(matched).toHaveLength(0);
       expect(skipped[0]?.reason).toBe('noMatch');
@@ -170,10 +162,14 @@ describe('matchWindows', () => {
   describe('byTitle', () => {
     it('matches Ghostty window by title regex /macos-layouts/', () => {
       const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, {
-          kind: 'byTitle',
-          pattern: 'macos-layouts',
-        }),
+        rule(
+          'r',
+          { bundleId: 'com.mitchellh.ghostty' },
+          {
+            kind: 'byTitle',
+            pattern: 'macos-layouts',
+          },
+        ),
       ];
       const { matched } = matchWindows(rules, windows);
       expect(matched[0]?.windowId).toBe('51890');
@@ -189,10 +185,14 @@ describe('matchWindows', () => {
 
     it('no match → noMatch skip', () => {
       const rules = [
-        rule('r', { bundleId: 'com.mitchellh.ghostty' }, {
-          kind: 'byTitle',
-          pattern: 'nonexistent-app',
-        }),
+        rule(
+          'r',
+          { bundleId: 'com.mitchellh.ghostty' },
+          {
+            kind: 'byTitle',
+            pattern: 'nonexistent-app',
+          },
+        ),
       ];
       const { matched, skipped } = matchWindows(rules, windows);
       expect(matched).toHaveLength(0);
@@ -206,13 +206,11 @@ describe('matchWindows', () => {
       const { matched, skipped } = matchWindows(rules, windows);
       expect(skipped).toHaveLength(0);
       expect(matched).toHaveLength(3);
-      expect(matched.map(m => m.windowId)).toEqual(['52035', '54687', '47152']);
+      expect(matched.map((m) => m.windowId)).toEqual(['52035', '54687', '47152']);
     });
 
     it('all with limit:1 returns only 1 match', () => {
-      const rules = [
-        rule('r', { bundleId: 'com.todesktop.230313mzl4w4u92' }, { kind: 'all' }, { limit: 1 }),
-      ];
+      const rules = [rule('r', { bundleId: 'com.todesktop.230313mzl4w4u92' }, { kind: 'all' }, { limit: 1 })];
       const { matched } = matchWindows(rules, windows);
       expect(matched).toHaveLength(1);
       expect(matched[0]?.windowId).toBe('52035');
@@ -224,9 +222,9 @@ describe('matchWindows', () => {
         rule('rest', { bundleId: 'com.todesktop.230313mzl4w4u92' }, { kind: 'all' }),
       ];
       const { matched } = matchWindows(rules, windows);
-      const restMatches = matched.filter(m => m.ruleId === 'rest');
+      const restMatches = matched.filter((m) => m.ruleId === 'rest');
       expect(restMatches).toHaveLength(2);
-      expect(restMatches.map(m => m.windowId)).toEqual(['54687', '47152']);
+      expect(restMatches.map((m) => m.windowId)).toEqual(['54687', '47152']);
     });
   });
 
@@ -238,7 +236,7 @@ describe('matchWindows', () => {
       ];
       const { matched, skipped } = matchWindows(rules, windows);
       expect(skipped).toHaveLength(0);
-      const cursorMatch = matched.find(m => m.ruleId === 'c0');
+      const cursorMatch = matched.find((m) => m.ruleId === 'c0');
       expect(cursorMatch?.windowId).toBe('52035');
     });
   });

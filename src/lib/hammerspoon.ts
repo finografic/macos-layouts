@@ -13,7 +13,6 @@
  */
 
 import { execa, ExecaError } from 'execa';
-
 import type { ApplyOptions } from '../types/cli.types.js';
 import type { Layout } from '../types/layout.types.js';
 import type { ApplyResult, RuntimeDump } from '../types/runtime.types.js';
@@ -63,9 +62,7 @@ interface RunHsParams {
 }
 
 /** Run a Lua expression in the running Hammerspoon instance via `hs -c`. */
-async function runHs(
-  { expr, timeoutMs = DEFAULT_TIMEOUT_MS }: RunHsParams,
-): Promise<HsResult<string>> {
+async function runHs({ expr, timeoutMs = DEFAULT_TIMEOUT_MS }: RunHsParams): Promise<HsResult<string>> {
   try {
     const { stdout } = await execa(HS_BINARY, ['-c', expr], {
       timeout: timeoutMs,
@@ -74,7 +71,10 @@ async function runHs(
     });
     // Strip Hammerspoon info lines (e.g. "-- Loading extension: json")
     // that prefix the actual return value on first use.
-    const value = stdout.split('\n').filter((l) => !l.startsWith('--')).join('\n');
+    const value = stdout
+      .split('\n')
+      .filter((l) => !l.startsWith('--'))
+      .join('\n');
     return { ok: true, value };
   } catch (err) {
     if (!(err instanceof Error)) {
@@ -213,8 +213,7 @@ export async function runLua(lua: string, timeoutMs?: number): Promise<HsResult<
 export async function apply({ layout, options }: ApplyParams): Promise<HsResult<ApplyResult>> {
   const payload = JSON.stringify({ layout, options: options ?? {} });
   const luaPayload = luaLongString(payload);
-  const expr =
-    `return hs.json.encode(require("${HS_MODULE}").apply(hs.json.decode(${luaPayload})))`;
+  const expr = `return hs.json.encode(require("${HS_MODULE}").apply(hs.json.decode(${luaPayload})))`;
 
   const raw = await runHs({ expr });
   if (!raw.ok) return raw;

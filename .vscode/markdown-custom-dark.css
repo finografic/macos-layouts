@@ -20,7 +20,8 @@
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-family:
+    "SF Mono", "Fira Code", "JetBrains Mono", "Cascadia Code", monospace;
   font-size: 14px;
   line-height: 1.6;
   max-width: 900px;
@@ -29,16 +30,28 @@ body {
 }
 
 /* Headings */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   color: var(--accent);
   border-bottom: 1px solid var(--border);
   padding-bottom: 0.3em;
   margin-top: 2em;
 }
 
-h1 { font-size: 1.6em; }
-h2 { font-size: 1.3em; color: var(--cyan); }
-h3 { font-size: 1.1em; color: var(--magenta); border-bottom: none; }
+h1 {
+  font-size: 1.6em;
+}
+h2 {
+  font-size: 1.3em;
+  color: var(--cyan);
+}
+h3 {
+  font-size: 1.1em;
+  color: var(--magenta);
+  border-bottom: none;
+}
 
 /* User prompts */
 blockquote {
@@ -97,8 +110,12 @@ pre code {
 }
 
 /* Style diff lines via CSS when using a markdown renderer that adds classes */
-.language-diff .line:has(+) { color: var(--green); }
-.language-diff .line:has(-) { color: var(--red); }
+.language-diff .line:has(+) {
+  color: var(--green);
+}
+.language-diff .line:has(-) {
+  color: var(--red);
+}
 
 /* Bold */
 strong {
@@ -119,7 +136,8 @@ table {
   margin: 1em 0;
 }
 
-th, td {
+th,
+td {
   border: 1px solid var(--border);
   padding: 0.4em 0.8em;
   text-align: left;
@@ -170,7 +188,8 @@ hr {
 }
 
 /* Lists */
-ul, ol {
+ul,
+ol {
   padding-left: 1.5em;
 }
 

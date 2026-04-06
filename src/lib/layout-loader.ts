@@ -1,8 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import type { Layout } from '../types/layout.types.js';
 
 import { DEFAULT_LAYOUTS_DIR } from '../config/defaults.constants.js';
-import type { Layout } from '../types/layout.types.js';
 
 export { DEFAULT_LAYOUTS_DIR };
 
@@ -27,11 +27,12 @@ function isValidLayout(parsed: unknown): parsed is Layout {
   if (obj['version'] !== '0.1') return false;
   if (typeof obj['name'] !== 'string') return false;
   if (
-    typeof obj['displayRoles'] !== 'object'
-    || obj['displayRoles'] === null
-    || Array.isArray(obj['displayRoles'])
-    || Object.keys(obj['displayRoles'] as object).length === 0
-  ) return false;
+    typeof obj['displayRoles'] !== 'object' ||
+    obj['displayRoles'] === null ||
+    Array.isArray(obj['displayRoles']) ||
+    Object.keys(obj['displayRoles'] as object).length === 0
+  )
+    return false;
   if (!Array.isArray(obj['windows'])) return false;
   return true;
 }
@@ -59,8 +60,7 @@ export async function loadLayout(name: string, layoutsDir?: string): Promise<Loa
   if (!isValidLayout(parsed)) {
     return {
       ok: false,
-      error:
-        `Layout "${name}" is missing required fields (version "0.1", name, displayRoles, windows)`,
+      error: `Layout "${name}" is missing required fields (version "0.1", name, displayRoles, windows)`,
     };
   }
 

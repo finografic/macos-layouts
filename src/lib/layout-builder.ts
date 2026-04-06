@@ -3,6 +3,7 @@ import type { NormalizedRect } from '../types/geometry.types.js';
 import type { Layout } from '../types/layout.types.js';
 import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 import type { WindowRule } from '../types/window.types.js';
+
 import { absoluteToNormalized } from './rect-converter.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -113,9 +114,7 @@ export function buildLayout({
     const appSlug = toKebab(w.app.name || 'unknown');
     const ruleId = `${appSlug}-${idIndex}`;
 
-    const normalizedRect = roundedNormalizedRect(
-      absoluteToNormalized(w.frame, screen.frame),
-    );
+    const normalizedRect = roundedNormalizedRect(absoluteToNormalized(w.frame, screen.frame));
 
     const rule: WindowRule = {
       id: ruleId,

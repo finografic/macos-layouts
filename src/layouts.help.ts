@@ -64,9 +64,9 @@ export function printHelp(): void {
 
   lines.push(pc.bold('GET HELP'));
   lines.push(
-    `  ${renderUsage('layouts', '<command>', '--help')}       ${
-      pc.dim('# Show detailed help for a command')
-    }`,
+    `  ${renderUsage('layouts', '<command>', '--help')}       ${pc.dim(
+      '# Show detailed help for a command',
+    )}`,
   );
   lines.push('');
 

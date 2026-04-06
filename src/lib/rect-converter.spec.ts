@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
 import type { Rect } from '../types/geometry.types.js';
+
 import { absoluteToNormalized, normalizedToAbsolute } from './rect-converter.js';
 
 // Fixture screen frames (usable, excluding menu bar):

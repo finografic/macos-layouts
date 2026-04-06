@@ -1,12 +1,11 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { RuntimeDump } from '../types/runtime.types.js';
 
 import fixture from '../__mocks__/dump-home-personal.json';
 import { EXIT_CODE } from '../types/cli.types.js';
-import type { RuntimeDump } from '../types/runtime.types.js';
 import { applyCommand } from './apply.command.js';
 
 // ─── Mock hammerspoon ─────────────────────────────────────────────────────────

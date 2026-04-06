@@ -103,8 +103,9 @@ export function matchWindows(
     }
 
     if (pool === undefined) {
-      const known = (rule.app.bundleId !== undefined && knownBundleIds.has(rule.app.bundleId))
-        || (rule.app.name !== undefined && knownNames.has(rule.app.name));
+      const known =
+        (rule.app.bundleId !== undefined && knownBundleIds.has(rule.app.bundleId)) ||
+        (rule.app.name !== undefined && knownNames.has(rule.app.name));
       skipped.push({ ruleId: rule.id, app: label, reason: known ? 'noWindows' : 'appNotRunning' });
       continue;
     }
@@ -117,7 +118,7 @@ export function matchWindows(
     const { match } = rule;
 
     if (match.kind === 'all') {
-      const unclaimed = pool.filter(w => !claimed.has(w.id));
+      const unclaimed = pool.filter((w) => !claimed.has(w.id));
       const limited = rule.limit !== undefined ? unclaimed.slice(0, rule.limit) : unclaimed;
       for (const w of limited) {
         claimed.add(w.id);
@@ -132,11 +133,11 @@ export function matchWindows(
     let candidate: RuntimeWindow | null = null;
 
     if (match.kind === 'mainWindow') {
-      const focused = pool.find(w => w.isFocused && !claimed.has(w.id));
+      const focused = pool.find((w) => w.isFocused && !claimed.has(w.id));
       if (focused) {
         candidate = focused;
       } else {
-        const first = pool.find(w => !claimed.has(w.id));
+        const first = pool.find((w) => !claimed.has(w.id));
         candidate = first ?? null;
       }
     } else if (match.kind === 'byIndex') {
@@ -146,7 +147,7 @@ export function matchWindows(
       }
     } else if (match.kind === 'byTitle') {
       const re = new RegExp(match.pattern);
-      candidate = pool.find(w => !claimed.has(w.id) && re.test(w.title)) ?? null;
+      candidate = pool.find((w) => !claimed.has(w.id) && re.test(w.title)) ?? null;
     }
 
     if (candidate !== null) {

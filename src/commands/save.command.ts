@@ -1,19 +1,18 @@
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-
 import { cancel, intro, outro, spinner } from '@clack/prompts';
 import pc from 'picocolors';
+import type { SaveOptions } from '../types/cli.types.js';
+import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
+import type { FlowContext } from '../utils/flow.utils.js';
 
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
 import { DUMP_LUA } from '../lib/dump-lua.js';
 import * as hs from '../lib/hammerspoon.js';
 import { buildLayout } from '../lib/layout-builder.js';
 import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from '../lib/layout-loader.js';
-import type { SaveOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
-import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
-import type { FlowContext } from '../utils/flow.utils.js';
 import { promptConfirm, promptMultiSelect, promptSelect, promptText } from '../utils/flow.utils.js';
 import { compileCommand } from './compile.command.js';
 
@@ -50,9 +49,7 @@ function autoAssignRoles(screens: readonly RuntimeScreen[]): Record<string, Runt
   }
 
   const roleNames = ['secondary', 'tertiary', 'quaternary'];
-  const sorted = [...remaining].sort(
-    (a, b) => b.fullFrame.w * b.fullFrame.h - a.fullFrame.w * a.fullFrame.h,
-  );
+  const sorted = [...remaining].sort((a, b) => b.fullFrame.w * b.fullFrame.h - a.fullFrame.w * a.fullFrame.h);
   for (let i = 0; i < sorted.length; i++) {
     roles[roleNames[i] ?? `display-${i}`] = sorted[i]!;
   }
@@ -63,9 +60,9 @@ function autoAssignRoles(screens: readonly RuntimeScreen[]): Record<string, Runt
 function dockIsOnScreen(s: RuntimeScreen): boolean {
   // Dock shrinks frame relative to fullFrame on whichever side it sits
   return (
-    s.fullFrame.y + s.fullFrame.h > s.frame.y + s.frame.h + 5 // bottom
-    || s.frame.x > s.fullFrame.x + 5 // left
-    || s.fullFrame.x + s.fullFrame.w > s.frame.x + s.frame.w + 5 // right
+    s.fullFrame.y + s.fullFrame.h > s.frame.y + s.frame.h + 5 || // bottom
+    s.frame.x > s.fullFrame.x + 5 || // left
+    s.fullFrame.x + s.fullFrame.w > s.frame.x + s.frame.w + 5 // right
   );
 }
 
@@ -104,12 +101,10 @@ function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string 
  * writes { key, mods } to a temp file, and consumes the event so no bound
  * hotkeys fire during capture. Polls the file until it appears (up to 30s).
  */
-async function captureHotkeyFromHammerspoon(): Promise<
-  {
-    mods: string[];
-    key: string;
-  } | null
-> {
+async function captureHotkeyFromHammerspoon(): Promise<{
+  mods: string[];
+  key: string;
+} | null> {
   const captureFile = join(tmpdir(), 'macos-layouts-hotkey-capture.json');
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -164,9 +159,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
   const available = await hs.isAvailable();
   if (!available) {
     console.error(
-      `${
-        pc.red('Error:')
-      } Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
+      `${pc.red('Error:')} Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
     );
     return EXIT_CODE.RuntimeUnavailable;
   }
@@ -187,9 +180,9 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     windows = windows.filter((w) =>
       include.some(
         (f) =>
-          w.app.name.toLowerCase().includes(f.toLowerCase())
-          || w.app.bundleId?.toLowerCase().includes(f.toLowerCase()),
-      )
+          w.app.name.toLowerCase().includes(f.toLowerCase()) ||
+          w.app.bundleId?.toLowerCase().includes(f.toLowerCase()),
+      ),
     );
   }
 
@@ -199,8 +192,8 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       (w) =>
         !exclude.some(
           (f) =>
-            w.app.name.toLowerCase().includes(f.toLowerCase())
-            || w.app.bundleId?.toLowerCase().includes(f.toLowerCase()),
+            w.app.name.toLowerCase().includes(f.toLowerCase()) ||
+            w.app.bundleId?.toLowerCase().includes(f.toLowerCase()),
         ),
     );
   }
@@ -237,11 +230,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       s.start('Listening for hotkey — press your combination now...');
       const detected = await captureHotkeyFromHammerspoon();
       const validDetection = detected !== null && detected.mods.length > 0;
-      s.stop(
-        validDetection && detected
-          ? `Detected: ${pc.bold(formatHotkey(detected))}`
-          : 'No key detected',
-      );
+      s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
       const hotkeyDefault = validDetection && detected ? formatHotkey(detected) : '';
       const hotkeyRaw = await promptText(flow, {
         message: 'Confirm hotkey — edit if needed, or leave blank to skip',
@@ -270,9 +259,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
         .filter(Boolean)
         .join(', ');
       console.log(
-        `  ${pc.cyan(s.name)}  ${s.resolution.w}×${s.resolution.h}${
-          tags ? pc.dim(` [${tags}]`) : ''
-        }`,
+        `  ${pc.cyan(s.name)}  ${s.resolution.w}×${s.resolution.h}${tags ? pc.dim(` [${tags}]`) : ''}`,
       );
     }
     console.log('');
@@ -286,16 +273,16 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       const defaultRole = screen.isPrimary
         ? 'primary'
         : screen.isBuiltin
-        ? 'builtin'
-        : defaultRoleNames[i] ?? `display-${i}`;
+          ? 'builtin'
+          : (defaultRoleNames[i] ?? `display-${i}`);
 
       const result = await promptSelect(flow, {
         message: `Role for "${screen.name}" (${screen.resolution.w}×${screen.resolution.h})?`,
         options: [
           { value: defaultRole, label: defaultRole },
-          ...['primary', 'secondary', 'builtin', 'tertiary'].filter((r) => r !== defaultRole).map((
-            r,
-          ) => ({ value: r, label: r })),
+          ...['primary', 'secondary', 'builtin', 'tertiary']
+            .filter((r) => r !== defaultRole)
+            .map((r) => ({ value: r, label: r })),
           { value: '__skip__', label: 'skip (exclude from layout)' },
         ],
         default: defaultRole,
@@ -342,17 +329,14 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     s.start('Listening for hotkey — press your combination now...');
     const detected = await captureHotkeyFromHammerspoon();
     const validDetection = detected !== null && detected.mods.length > 0;
-    s.stop(
-      validDetection && detected
-        ? `Detected: ${pc.bold(formatHotkey(detected))}`
-        : 'No key detected',
-    );
+    s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
 
-    const hotkeyDefault = validDetection && detected
-      ? formatHotkey(detected)
-      : existingHotkey
-      ? formatHotkey(existingHotkey)
-      : '';
+    const hotkeyDefault =
+      validDetection && detected
+        ? formatHotkey(detected)
+        : existingHotkey
+          ? formatHotkey(existingHotkey)
+          : '';
 
     const hotkeyRaw = await promptText(flow, {
       message: 'Confirm hotkey — edit if needed, or leave blank to skip',
@@ -379,9 +363,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     ...existingOpts,
     ...(hotkeyResult !== undefined ? { hotkey: hotkeyResult } : {}),
   };
-  const layout = Object.keys(mergedOpts).length > 0
-    ? { ...baseLayout, options: mergedOpts }
-    : baseLayout;
+  const layout = Object.keys(mergedOpts).length > 0 ? { ...baseLayout, options: mergedOpts } : baseLayout;
 
   // 6c. Dock mismatch check — warn if dockDisplay doesn't match current Dock position
   if (!options.json) {
@@ -390,15 +372,15 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       const currentDockScreen = dump.screens.find(dockIsOnScreen);
       const targetScreen = displayRoleAssignments[dockDisplayRole];
       if (currentDockScreen && targetScreen && currentDockScreen.id !== targetScreen.id) {
-        const currentRole = Object.entries(displayRoleAssignments).find(
-          ([, s]) => s.id === currentDockScreen.id,
-        )?.[0] ?? currentDockScreen.name;
+        const currentRole =
+          Object.entries(displayRoleAssignments).find(([, s]) => s.id === currentDockScreen.id)?.[0] ??
+          currentDockScreen.name;
         console.warn(
-          `\n  ${pc.yellow('⚠')} Dock is on ${pc.bold(currentRole)}, but this layout uses`
-            + ` ${pc.bold(`dockDisplay: "${dockDisplayRole}"`)}.`
-            + `\n    Move the Dock to ${
-              pc.bold(dockDisplayRole)
-            } before saving to avoid a 48px gap on apply.\n`,
+          `\n  ${pc.yellow('⚠')} Dock is on ${pc.bold(currentRole)}, but this layout uses` +
+            ` ${pc.bold(`dockDisplay: "${dockDisplayRole}"`)}.` +
+            `\n    Move the Dock to ${pc.bold(
+              dockDisplayRole,
+            )} before saving to avoid a 48px gap on apply.\n`,
         );
       }
     }

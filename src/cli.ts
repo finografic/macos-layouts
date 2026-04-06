@@ -1,12 +1,6 @@
 #!/usr/bin/env node
 
-import { applyCommand } from './commands/apply.command.js';
-import { compileCommand } from './commands/compile.command.js';
-import { doctorCommand } from './commands/doctor.command.js';
-import { dumpCommand } from './commands/dump.command.js';
-import { listCommand } from './commands/list.command.js';
-import { saveCommand } from './commands/save.command.js';
-import { printHelp } from './layouts.help.js';
+import { createFlowContext } from './utils/flow.utils.js';
 import type {
   ApplyOptions,
   CompileOptions,
@@ -15,7 +9,13 @@ import type {
   ListOptions,
   SaveOptions,
 } from './types/cli.types.js';
-import { createFlowContext } from './utils/flow.utils.js';
+import { applyCommand } from './commands/apply.command.js';
+import { compileCommand } from './commands/compile.command.js';
+import { doctorCommand } from './commands/doctor.command.js';
+import { dumpCommand } from './commands/dump.command.js';
+import { listCommand } from './commands/list.command.js';
+import { saveCommand } from './commands/save.command.js';
+import { printHelp } from './layouts.help.js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

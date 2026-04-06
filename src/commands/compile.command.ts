@@ -1,13 +1,12 @@
 import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-
 import pc from 'picocolors';
+import type { CompileOptions } from '../types/cli.types.js';
 
 import { DEFAULT_COMPILE_OUTPUT_DIR, INIT_LUA_PATH } from '../config/defaults.constants.js';
 import { expandHome, loadLayout } from '../lib/layout-loader.js';
 import { generateLua } from '../lib/lua-codegen.js';
-import type { CompileOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -37,9 +36,7 @@ function buildInitSnippet(
     ? `hs.hotkey.bind({${hotkey.mods.map((m) => `"${m}"`).join(', ')}}, "${hotkey.key}", ${fn})`
     : `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`;
 
-  const watcherSuffix = dockScreenWatcherComment
-    ? '  -- re-applies when Dock moves/shows/hides'
-    : '';
+  const watcherSuffix = dockScreenWatcherComment ? '  -- re-applies when Dock moves/shows/hides' : '';
 
   const lines = [
     '',
@@ -98,11 +95,7 @@ async function updateInitLua(
   }
 
   await mkdir(dirname(initLuaPath), { recursive: true });
-  await writeFile(
-    initLuaPath,
-    existing + buildInitSnippet(name, hotkey, dockScreenWatcherComment),
-    'utf-8',
-  );
+  await writeFile(initLuaPath, existing + buildInitSnippet(name, hotkey, dockScreenWatcherComment), 'utf-8');
   return 'added';
 }
 
@@ -140,9 +133,9 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
     if (restarted) {
       console.log();
       console.log(
-        `  ${pc.bold(pc.green('✓'))} Dock animation set to instant ${
-          pc.dim('(autohide-delay=0, autohide-time-modifier=0)')
-        }`,
+        `  ${pc.bold(pc.green('✓'))} Dock animation set to instant ${pc.dim(
+          '(autohide-delay=0, autohide-time-modifier=0)',
+        )}`,
       );
     }
   }
@@ -161,21 +154,15 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
   }
 
   console.log();
-  console.log(
-    `  ${pc.bold(pc.green('✓'))} Compiled ${pc.bold(pc.cyan(name))} → ${pc.white(outputPath)}`,
-  );
+  console.log(`  ${pc.bold(pc.green('✓'))} Compiled ${pc.bold(pc.cyan(name))} → ${pc.white(outputPath)}`);
 
   if (initLuaStatus === 'added') {
     console.log(
       `  ${pc.bold(pc.green('✓'))} Added hotkey to ${pc.white(resolve(expandHome(INIT_LUA_PATH)))}`,
     );
-    console.log(
-      `    ${pc.dim('(change the key binding as needed, then reload Hammerspoon config)')}`,
-    );
+    console.log(`    ${pc.dim('(change the key binding as needed, then reload Hammerspoon config)')}`);
   } else if (initLuaStatus === 'exists') {
-    console.log(
-      `  ${pc.dim(`~ init.lua already contains a hotkey for "${name}"`)}`,
-    );
+    console.log(`  ${pc.dim(`~ init.lua already contains a hotkey for "${name}"`)}`);
   }
 
   console.log();

@@ -267,7 +267,8 @@ body {
   background-color: var(--code-inline-bg);
   color: var(--code-inline-fg);
   border-radius: 3px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 .markdown-body pre {
@@ -291,7 +292,8 @@ body {
   line-height: 1.45;
   background-color: var(--code-bg);
   border-radius: 3px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-family:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 .markdown-body pre code {

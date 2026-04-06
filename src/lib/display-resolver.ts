@@ -8,31 +8,31 @@ function area(rect: { readonly w: number; readonly h: number }): number {
 function matchScreen(match: DisplayMatch, pool: RuntimeScreen[]): RuntimeScreen | null {
   switch (match.kind) {
     case 'builtin':
-      return pool.find(s => s.isBuiltin) ?? null;
+      return pool.find((s) => s.isBuiltin) ?? null;
 
     case 'primary':
-      return pool.find(s => s.isPrimary) ?? null;
+      return pool.find((s) => s.isPrimary) ?? null;
 
     case 'largestExternal': {
-      const externals = pool.filter(s => !s.isBuiltin);
+      const externals = pool.filter((s) => !s.isBuiltin);
       if (externals.length === 0) return null;
       return externals.reduce((best, s) => (area(s.fullFrame) > area(best.fullFrame) ? s : best));
     }
 
     case 'smallestExternal': {
-      const externals = pool.filter(s => !s.isBuiltin);
+      const externals = pool.filter((s) => !s.isBuiltin);
       if (externals.length === 0) return null;
       return externals.reduce((best, s) => (area(s.fullFrame) <= area(best.fullFrame) ? s : best));
     }
 
     case 'externalByIndex': {
-      const externals = pool.filter(s => !s.isBuiltin);
+      const externals = pool.filter((s) => !s.isBuiltin);
       const sorted = [...externals].sort((a, b) => area(b.fullFrame) - area(a.fullFrame));
       return sorted[match.index] ?? null;
     }
 
     case 'byName':
-      return pool.find(s => s.name.includes(match.name)) ?? null;
+      return pool.find((s) => s.name.includes(match.name)) ?? null;
   }
 }
 

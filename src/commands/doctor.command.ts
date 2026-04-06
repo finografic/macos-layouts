@@ -1,14 +1,13 @@
 import { access } from 'node:fs/promises';
-
 import { execa } from 'execa';
 import pc from 'picocolors';
+import type { DoctorOptions } from '../types/cli.types.js';
+import type { RuntimeDump } from '../types/runtime.types.js';
 
 import { DUMP_LUA } from '../lib/dump-lua.js';
 import * as hs from '../lib/hammerspoon.js';
 import { DEFAULT_LAYOUTS_DIR, expandHome, listLayouts } from '../lib/layout-loader.js';
-import type { DoctorOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
-import type { RuntimeDump } from '../types/runtime.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,11 +66,11 @@ export async function doctorCommand({ options }: DoctorCommandParams): Promise<n
       hsRunning
         ? { name: 'hs-running', status: 'pass', message: 'Hammerspoon is running' }
         : {
-          name: 'hs-running',
-          status: 'fail',
-          message: 'Hammerspoon is not running',
-          fix: 'Open Hammerspoon.app',
-        },
+            name: 'hs-running',
+            status: 'fail',
+            message: 'Hammerspoon is not running',
+            fix: 'Open Hammerspoon.app',
+          },
     );
   }
 
@@ -83,11 +82,11 @@ export async function doctorCommand({ options }: DoctorCommandParams): Promise<n
       ipcOk
         ? { name: 'hs-ipc', status: 'pass', message: 'IPC module loaded' }
         : {
-          name: 'hs-ipc',
-          status: 'fail',
-          message: 'IPC not available',
-          fix: 'Add `require("hs.ipc")` to ~/.hammerspoon/init.lua and reload Hammerspoon',
-        },
+            name: 'hs-ipc',
+            status: 'fail',
+            message: 'IPC not available',
+            fix: 'Add `require("hs.ipc")` to ~/.hammerspoon/init.lua and reload Hammerspoon',
+          },
     );
 
     // 4. Accessibility permissions
@@ -98,11 +97,11 @@ export async function doctorCommand({ options }: DoctorCommandParams): Promise<n
         axGranted
           ? { name: 'accessibility', status: 'pass', message: 'Accessibility permissions granted' }
           : {
-            name: 'accessibility',
-            status: 'fail',
-            message: 'Accessibility not enabled',
-            fix: 'Enable in System Settings > Privacy & Security > Accessibility → Hammerspoon',
-          },
+              name: 'accessibility',
+              status: 'fail',
+              message: 'Accessibility not enabled',
+              fix: 'Enable in System Settings > Privacy & Security > Accessibility → Hammerspoon',
+            },
       );
 
       // 6. Display detection (requires IPC)
@@ -174,9 +173,7 @@ export async function doctorCommand({ options }: DoctorCommandParams): Promise<n
           .filter(Boolean)
           .join(', ');
         console.log(
-          `    ${pc.cyan(s.name)}  ${s.resolution.w}×${s.resolution.h}${
-            tags ? pc.dim(` [${tags}]`) : ''
-          }`,
+          `    ${pc.cyan(s.name)}  ${s.resolution.w}×${s.resolution.h}${tags ? pc.dim(` [${tags}]`) : ''}`,
         );
       }
     }
@@ -185,9 +182,7 @@ export async function doctorCommand({ options }: DoctorCommandParams): Promise<n
 
   // Exit: critical failures are checks 1–4 (hs-binary, hs-running, hs-ipc, accessibility)
   const criticalNames = new Set(['hs-binary', 'hs-running', 'hs-ipc', 'accessibility']);
-  const hasCriticalFailure = checks.some(
-    (c) => criticalNames.has(c.name) && c.status === 'fail',
-  );
+  const hasCriticalFailure = checks.some((c) => criticalNames.has(c.name) && c.status === 'fail');
 
   return hasCriticalFailure ? EXIT_CODE.Error : EXIT_CODE.Success;
 }

@@ -6,12 +6,12 @@
  */
 
 import pc from 'picocolors';
+import type { DumpOptions } from '../types/cli.types.js';
+import type { RuntimeDump, RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 
 import { DUMP_LUA } from '../lib/dump-lua.js';
 import * as hs from '../lib/hammerspoon.js';
-import type { DumpOptions } from '../types/cli.types.js';
 import { EXIT_CODE } from '../types/cli.types.js';
-import type { RuntimeDump, RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -59,9 +59,7 @@ function printHumanReadable(dump: RuntimeDump): void {
       const focusTag = w.isFocused ? pc.yellow(' [focused]') : '';
       const minimizedTag = w.isMinimized ? pc.dim(' [minimized]') : '';
       console.log(`    ${pc.dim(`[${w.id}]`)} ${title}${focusTag}${minimizedTag}`);
-      console.log(
-        `      screen: ${w.screenId}  frame: ${w.frame.x},${w.frame.y}  ${w.frame.w}×${w.frame.h}`,
-      );
+      console.log(`      screen: ${w.screenId}  frame: ${w.frame.x},${w.frame.y}  ${w.frame.w}×${w.frame.h}`);
     }
   }
 
@@ -74,9 +72,7 @@ export async function dumpCommand({ options }: DumpCommandParams): Promise<numbe
   const available = await hs.isAvailable();
   if (!available) {
     console.error(
-      `${
-        pc.red('Error:')
-      } Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
+      `${pc.red('Error:')} Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
     );
     return EXIT_CODE.RuntimeUnavailable;
   }

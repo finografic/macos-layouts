@@ -44,13 +44,7 @@ export function generateLua({ layout, generatedAt = new Date() }: GenerateLuaPar
 
 function luaString(s: string): string {
   return (
-    '"'
-    + s
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-    + '"'
+    '"' + s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r') + '"'
   );
 }
 
@@ -90,9 +84,7 @@ function buildDisplayRolesTable(displayRoles: DisplayRoleMap): string {
   const lines: string[] = ['  displayRoles = {'];
   for (const [roleName, role] of Object.entries(displayRoles)) {
     const matchPart = serializeDisplayMatch(role.match);
-    const fallbackPart = role.fallback !== undefined
-      ? `, fallback = ${luaString(role.fallback)}`
-      : '';
+    const fallbackPart = role.fallback !== undefined ? `, fallback = ${luaString(role.fallback)}` : '';
     lines.push(`    { role = ${luaString(roleName)}, match = ${matchPart}${fallbackPart} },`);
   }
   lines.push('  },');
@@ -113,9 +105,9 @@ function buildWindowRulesTable(rules: readonly WindowRule[]): string {
     lines.push(`      app = { ${appParts.join(', ')} },`);
     lines.push(`      match = ${serializeWindowMatch(rule.match)},`);
     lines.push(
-      `      place = { display = ${
-        luaString(rule.place.display)
-      }, rect = { x = ${rect.x}, y = ${rect.y}, w = ${rect.w}, h = ${rect.h} } },`,
+      `      place = { display = ${luaString(
+        rule.place.display,
+      )}, rect = { x = ${rect.x}, y = ${rect.y}, w = ${rect.w}, h = ${rect.h} } },`,
     );
     if (rule.limit !== undefined) lines.push(`      limit = ${rule.limit},`);
     lines.push('    },');
@@ -142,12 +134,8 @@ function buildLayoutDataBlock(
 ): string {
   const displayRolesTable = buildDisplayRolesTable(layout.displayRoles);
   const windowRulesTable = buildWindowRulesTable(layout.windows);
-  const focusPart = focusAfterApply !== undefined
-    ? `, focusAfterApply = ${luaString(focusAfterApply)}`
-    : '';
-  const dockDisplayPart = dockDisplay !== undefined
-    ? `, dockDisplay = ${luaString(dockDisplay)}`
-    : '';
+  const focusPart = focusAfterApply !== undefined ? `, focusAfterApply = ${luaString(focusAfterApply)}` : '';
+  const dockDisplayPart = dockDisplay !== undefined ? `, dockDisplay = ${luaString(dockDisplay)}` : '';
 
   return [
     `local LAYOUT = {`,
