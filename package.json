@@ -116,11 +116,6 @@
       "oxfmt --no-error-on-unmatched-pattern"
     ]
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged --allow-empty && dprint check && pnpm typecheck"
   }
