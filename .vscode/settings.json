@@ -8,33 +8,31 @@
 
   "eslint.enable": true,
   "eslint.useFlatConfig": true,
+  "oxc.typeAware": true,
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSaveMode": "file",
   "prettier.enable": false,
-
-  "dprint.experimentalLsp": true,
-  "dprint.verbose": true,
-
   "[javascript]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[json]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[yaml]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[toml]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-
   "markdownlint.config": {
     "default": true,
     "MD013": { "line_length": 120, "tables": false, "code_blocks": false }, // Allow line length
@@ -45,7 +43,5 @@
     "MD041": false, // Don't require first line to be a top-level heading
     "MD060": { "style": "aligned" } // Allow heading indentation
   },
-  "markdown.styles": [
-    ".vscode/markdown-github-light.css"
-  ]
+  "markdown.styles": [".vscode/markdown-github-light.css"]
 }

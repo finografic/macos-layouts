@@ -2,7 +2,6 @@ import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import markdownlintPlugin from 'eslint-plugin-markdownlint';
 import markdownlintParser from 'eslint-plugin-markdownlint/parser.js';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import type { Linter } from 'eslint';
@@ -41,7 +40,6 @@ const config: Linter.Config[] = [
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
-      'simple-import-sort': simpleImportSort,
       '@stylistic': stylistic,
     },
     rules: {
@@ -77,29 +75,6 @@ const config: Linter.Config[] = [
           overrides: { arrow: { before: true, after: true } },
         },
       ],
-
-      // Import sorting
-      'simple-import-sort/imports': [
-        'error',
-        {
-          groups: [
-            ['^node:'],
-            ['^@finografic', '^@workspace'],
-            ['^\\u0000'],
-            ['^(?!@finografic)(?!@workspace)@?[a-z]'],
-            [
-              '^(lib|utils)',
-              '^(types|constants|config)',
-              '^\\.\\.(?!/?$)',
-              '^\\.\\./?$',
-              '^\\.\\./(?=.*/)(?!/?$)',
-              '^\\.(?!/?$)',
-              '^\\./?$',
-            ],
-          ],
-        },
-      ],
-      'simple-import-sort/exports': 'error',
     },
   },
 

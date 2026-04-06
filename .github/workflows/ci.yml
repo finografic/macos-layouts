@@ -40,4 +40,4 @@ jobs:
       - name: Type check
         run: pnpm typecheck
       - name: Format check
-        run: pnpm dprint check
+        run: pnpm format:check
