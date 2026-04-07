@@ -9,6 +9,7 @@ import type { FlowContext } from '../utils/flow.utils.js';
 
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
 import { DUMP_LUA } from '../lib/dump-lua.js';
+import { fetchFinderWindows } from '../lib/finder-bridge.js';
 import * as hs from '../lib/hammerspoon.js';
 import { buildLayout } from '../lib/layout-builder.js';
 import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from '../lib/layout-loader.js';
@@ -170,7 +171,10 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     console.error(`${pc.red('Error:')} ${dumpResult.error.message}`);
     return EXIT_CODE.Error;
   }
-  const dump = dumpResult.value;
+  const baseDump = dumpResult.value;
+  const finderWindows = await fetchFinderWindows(baseDump.screens);
+  const dump =
+    finderWindows.length > 0 ? { ...baseDump, windows: [...baseDump.windows, ...finderWindows] } : baseDump;
 
   // 3. Filter windows
   let windows = dump.windows.filter((w) => w.isStandard && !w.isMinimized);

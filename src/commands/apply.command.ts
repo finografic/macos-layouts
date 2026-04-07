@@ -8,6 +8,7 @@ import type { ApplyError, ApplyMoveResult, ApplySkipResult } from '../types/runt
 import { buildApplyLua } from '../lib/apply-lua.js';
 import { resolveDisplayRoles } from '../lib/display-resolver.js';
 import { DUMP_LUA } from '../lib/dump-lua.js';
+import { applyFinderMove, FINDER_BUNDLE_ID, fetchFinderWindows } from '../lib/finder-bridge.js';
 import * as hs from '../lib/hammerspoon.js';
 import { loadLayout } from '../lib/layout-loader.js';
 import { normalizedToAbsolute } from '../lib/rect-converter.js';
@@ -64,7 +65,10 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
     console.error(`${pc.red('Error:')} ${dumpResult.error.message}`);
     return EXIT_CODE.Error;
   }
-  const dump = dumpResult.value;
+  const baseDump = dumpResult.value;
+  const finderWindows = await fetchFinderWindows(baseDump.screens);
+  const dump =
+    finderWindows.length > 0 ? { ...baseDump, windows: [...baseDump.windows, ...finderWindows] } : baseDump;
 
   // 4. Resolve display roles
   const resolvedRoles = resolveDisplayRoles(layout.displayRoles, [...dump.screens]);
@@ -133,22 +137,36 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
     return EXIT_CODE.Success;
   }
 
-  // 8. Send moves to HS
-  const moves: ApplyMove[] = plannedMoves.map((m) => ({ windowId: m.windowId, frame: m.frame }));
-  const luaResult = await hs.runLua(buildApplyLua(moves));
+  // 8. Dispatch moves — Finder via AppleScript, all others via Hammerspoon
+  const finderPlanned = plannedMoves.filter((m) => m.window.app.bundleId === FINDER_BUNDLE_ID);
+  const hsPlanned = plannedMoves.filter((m) => m.window.app.bundleId !== FINDER_BUNDLE_ID);
+
+  const hsMoves: ApplyMove[] = hsPlanned.map((m) => ({ windowId: m.windowId, frame: m.frame }));
+  const allMoveResults: HsMoveResult[] = [];
+
+  // Hammerspoon path
+  const luaResult = await hs.runLua(buildApplyLua(hsMoves));
   if (!luaResult.ok) {
     console.error(`${pc.red('Error:')} ${luaResult.error.message}`);
     return EXIT_CODE.Error;
   }
-
-  // 9. Parse HS response
-  let hsResults: HsMoveResult[];
+  let parsed: HsMoveResult[];
   try {
-    hsResults = JSON.parse(luaResult.value) as HsMoveResult[];
+    parsed = JSON.parse(luaResult.value) as HsMoveResult[];
   } catch {
     console.error(`${pc.red('Error:')} Hammerspoon returned invalid JSON: ${luaResult.value.slice(0, 200)}`);
     return EXIT_CODE.Error;
   }
+  allMoveResults.push(...parsed);
+
+  // AppleScript path for Finder
+  for (const m of finderPlanned) {
+    const result = await applyFinderMove(m.windowId, m.frame, m.window.frame);
+    allMoveResults.push(result);
+  }
+
+  // 9. (merged above)
+  const hsResults = allMoveResults;
 
   // 10. Collect results
   const moved: ApplyMoveResult[] = [];
