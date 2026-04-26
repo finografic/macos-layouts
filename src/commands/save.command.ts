@@ -1,7 +1,7 @@
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { cancel, intro, outro, spinner } from '@clack/prompts';
+import { intro, outro, spinner } from '@clack/prompts';
 import pc from 'picocolors';
 
 import { resolveDisplayRoles } from 'lib/display-resolver.js';
@@ -11,7 +11,7 @@ import * as hs from 'lib/hammerspoon.js';
 import { buildLayout } from 'lib/layout-builder.js';
 import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from 'lib/layout-loader.js';
 import type { FlowContext } from 'utils/flow.utils.js';
-import { promptConfirm, promptMultiSelect, promptSelect, promptText } from 'utils/flow.utils.js';
+import { promptMultiSelect, promptSelect } from 'utils/flow.utils.js';
 
 import type { SaveOptions } from 'types/cli.types.js';
 import { EXIT_CODE } from 'types/cli.types.js';
@@ -70,30 +70,6 @@ function dockIsOnScreen(s: RuntimeScreen): boolean {
 }
 
 // ─── Helpers (hotkey) ─────────────────────────────────────────────────────────
-
-const MOD_SET = new Set(['cmd', 'ctrl', 'shift', 'alt']);
-const MOD_ALIASES: Record<string, string> = { opt: 'alt', option: 'alt', command: 'cmd' };
-
-function parseHotkey(input: string): { mods: string[]; key: string } | null {
-  const parts = input
-    .toLowerCase()
-    .trim()
-    .split('+')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const mods: string[] = [];
-  let key: string | undefined;
-  for (const part of parts) {
-    const normalized = MOD_ALIASES[part] ?? part;
-    if (MOD_SET.has(normalized)) {
-      if (!mods.includes(normalized)) mods.push(normalized);
-    } else {
-      key = part;
-    }
-  }
-  if (!key || mods.length === 0) return null;
-  return { mods, key };
-}
 
 function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string {
   return [...hotkey.mods, hotkey.key].join('+');
@@ -173,6 +149,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     console.error(`${pc.red('Error:')} ${dumpResult.error.message}`);
     return EXIT_CODE.Error;
   }
+
   const baseDump = dumpResult.value;
   const finderWindows = await fetchFinderWindows(baseDump.screens);
   const dump =
@@ -206,7 +183,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
 
   const interactive = options.interactive !== false && process.stdout.isTTY;
 
-  // Load existing layout early — used for hotkey default in prompt and dock mismatch warning
+  // Load existing layout early — merge options / dock mismatch warning, and hotkey when re-saving in -y
   const existingLayoutResult = await loadLayout(name, options.layoutsDir);
   const existingLayout = existingLayoutResult.ok ? existingLayoutResult.layout : undefined;
 
@@ -231,23 +208,14 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       displayRoleAssignments = autoAssignRoles(dump.screens);
       selectedWindows = windows;
 
-      intro('Save layout');
+      intro(`Save windows layout: ${pc.bold(pc.cyan(name))}`);
       const s = spinner();
       s.start('Listening for hotkey — press your combination now...');
       const detected = await captureHotkeyFromHammerspoon();
       const validDetection = detected !== null && detected.mods.length > 0;
       s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
-      const hotkeyDefault = validDetection && detected ? formatHotkey(detected) : '';
-      const hotkeyRaw = await promptText(flow, {
-        message: 'Confirm hotkey — edit if needed, or leave blank to skip',
-        placeholder: 'e.g. ctrl+shift+pad0',
-        default: hotkeyDefault,
-        cancelBehavior: 'skip',
-      });
-      if (hotkeyRaw.trim()) {
-        const parsed = parseHotkey(hotkeyRaw.trim());
-        if (parsed) hotkeyResult = parsed;
-        else console.warn(`  ${pc.yellow('⚠')}  Could not parse hotkey — skipping`);
+      if (validDetection && detected) {
+        hotkeyResult = { mods: [...detected.mods], key: detected.key };
       }
     }
   } else if (!interactive) {
@@ -256,7 +224,8 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     selectedWindows = windows;
   } else {
     // Interactive flow
-    intro('Save layout');
+    console.log();
+    intro(`Save windows layout: ${pc.bold(pc.cyan(name))}`);
 
     // 4a. Show screen summary
     console.log(pc.dim('\nDetected screens:'));
@@ -319,44 +288,15 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
 
     selectedWindows = windows.filter((w) => selectedIds.includes(w.id));
 
-    // 4d. Confirm
-    const confirmed = await promptConfirm(flow, {
-      message: `Save layout as "${name}"?`,
-      default: true,
-    });
-    if (!confirmed) {
-      cancel('Cancelled');
-      return EXIT_CODE.Error;
-    }
-
-    // 4e. Hotkey trigger — listen via Hammerspoon eventtap, then confirm
-    const existingHotkey = existingLayout?.options?.hotkey;
+    // 4d. Hotkey — Hammerspoon eventtap; on failed capture, existing layout hotkey is kept if re-saving
     const s = spinner();
     s.start('Listening for hotkey — press your combination now...');
     const detected = await captureHotkeyFromHammerspoon();
     const validDetection = detected !== null && detected.mods.length > 0;
     s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
 
-    const hotkeyDefault =
-      validDetection && detected
-        ? formatHotkey(detected)
-        : existingHotkey
-          ? formatHotkey(existingHotkey)
-          : '';
-
-    const hotkeyRaw = await promptText(flow, {
-      message: 'Confirm hotkey — edit if needed, or leave blank to skip',
-      placeholder: 'e.g. ctrl+shift+pad0',
-      default: hotkeyDefault,
-      cancelBehavior: 'skip',
-    });
-    if (hotkeyRaw.trim()) {
-      const parsed = parseHotkey(hotkeyRaw.trim());
-      if (parsed) {
-        hotkeyResult = parsed;
-      } else {
-        console.warn(`  ${pc.yellow('⚠')}  Could not parse hotkey — skipping`);
-      }
+    if (validDetection && detected) {
+      hotkeyResult = { mods: [...detected.mods], key: detected.key };
     }
   }
 

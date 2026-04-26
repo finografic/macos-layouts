@@ -72,3 +72,11 @@ Shared across Claude Code, Cursor, and GitHub Copilot.
 - Use @stylistic/stylelint-plugin for Stylelint 17; stylelint-stylistic is deprecated and incompatible
 - Ignore .cursor/chats and .cursor/hooks; commit .cursor/mcp.json
 - Use Panda MCP for design-system questions (breakpoints, tokens, recipes) when relevant without explicit user ask
+- When updating handoff or other agent state docs, merge and reconcile sections when the user indicates the result should not be a simple append
+
+## Learned Workspace Facts
+
+- `flow.utils.ts` lives only under each Finografic CLI repo (`src/utils/`); it is not sourced from a single out-of-repo canonical tree—cross-repo work is copy alignment, and docs should not claim an external-only path
+- `eslint.config.ts` and `oxlint.config.ts`: on `consistent-type-imports`, set `disallowTypeAnnotations: false` so Vitest mocks can use `importOriginal<typeof import('…')>()` while keeping `prefer: 'type-imports'` for real imports
+- In unit tests, mock `../lib/finder-bridge.js` (or avoid real AppleScript) where the code path would run `osascript`; a real subprocess can hit Vitest’s default timeout
+- `layouts compile` / `lua-codegen` use `-- 🖥️ macos-layouts: {layoutName}` in init.lua and generated layout headers for a consistent on-disk marker
