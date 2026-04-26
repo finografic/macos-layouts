@@ -9,6 +9,46 @@ import { generateLua } from 'lib/lua-codegen.js';
 import { DEFAULT_COMPILE_OUTPUT_DIR, INIT_LUA_PATH } from 'config/defaults.constants.js';
 import type { CompileOptions } from 'types/cli.types.js';
 import { EXIT_CODE } from 'types/cli.types.js';
+import type { DisplayRoleMap } from 'types/display.types.js';
+import type { Layout } from 'types/layout.types.js';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Swap display role match definitions before compiling.
+ *
+ * - 3-role layout (has "secondary" + "tertiary"): swaps those two.
+ * - 2-role layout (has "primary" + "secondary"): swaps those two.
+ *
+ * Only the `match` (and `fallback`) of each role is exchanged — window rules are unchanged. They still
+ * reference the same role names; the names now resolve to different screens.
+ */
+function applyRoleSwap(layout: Layout): Layout {
+  const roles = layout.displayRoles;
+
+  let a: string | undefined;
+  let b: string | undefined;
+
+  if (roles['secondary'] !== undefined && roles['tertiary'] !== undefined) {
+    a = 'secondary';
+    b = 'tertiary';
+  } else if (roles['primary'] !== undefined && roles['secondary'] !== undefined) {
+    a = 'primary';
+    b = 'secondary';
+  }
+
+  if (a === undefined || b === undefined) return layout;
+
+  const newRoles: DisplayRoleMap = Object.fromEntries(
+    Object.entries(roles).map(([k, v]) => {
+      if (k === a) return [k, roles[b!]!];
+      if (k === b) return [k, roles[a!]!];
+      return [k, v];
+    }),
+  );
+
+  return { ...layout, displayRoles: newRoles };
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -113,8 +153,9 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
     ? resolve(options.output)
     : resolve(expandHome(DEFAULT_COMPILE_OUTPUT_DIR), `${name}.lua`);
 
-  // Generate Lua source
-  const lua = generateLua({ layout: loadResult.layout });
+  // Generate Lua source (optionally with swapped display roles)
+  const layout = options.swap ? applyRoleSwap(loadResult.layout) : loadResult.layout;
+  const lua = generateLua({ layout });
 
   // Write compiled Lua to disk (create directory if needed)
   try {
@@ -154,6 +195,14 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
 
   console.log();
   console.log(`  ${pc.bold(pc.green('✓'))} Compiled ${pc.bold(pc.cyan(name))} → ${pc.white(outputPath)}`);
+  if (options.swap && layout !== loadResult.layout) {
+    const roles = layout.displayRoles;
+    const [a, b] =
+      roles['secondary'] !== undefined && roles['tertiary'] !== undefined
+        ? ['secondary', 'tertiary']
+        : ['primary', 'secondary'];
+    console.log(`  ${pc.bold(pc.yellow('⇄'))} Roles swapped: ${pc.cyan(a)} ↔ ${pc.cyan(b)}`);
+  }
 
   if (initLuaStatus === 'added') {
     console.log(

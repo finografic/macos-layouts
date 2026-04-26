@@ -118,7 +118,29 @@ Recompile a saved layout JSON to its Lua file without re-saving. Use this after 
 ```bash
 layouts compile home
 layouts compile home-develop
+layouts compile home --swap          # swap secondary ↔ tertiary (3 screens)
+layouts compile home --swap          # swap primary ↔ secondary (2 screens)
+layouts compile home --swap --output ~/.hammerspoon/layouts/home-swap.lua
 ```
+
+| Flag       | Description                                     |
+| ---------- | ----------------------------------------------- |
+| `--swap`   | Swap display roles before compiling (see below) |
+| `--output` | Write to a custom path instead of the default   |
+
+#### `--swap`: display role swapping
+
+Exchanges the `match` definitions of two display roles so windows land on the
+opposite screens — without changing the layout JSON or window rules.
+
+| Layout has these roles       | `--swap` exchanges       |
+| ---------------------------- | ------------------------ |
+| `secondary` + `tertiary`     | `secondary` ↔ `tertiary` |
+| `primary` + `secondary` only | `primary` ↔ `secondary`  |
+
+Window rules are unchanged — they still reference the same role names. Only
+what those names _resolve to_ changes. Useful for generating a mirrored variant
+(e.g. `home-swap.lua`) to bind to a separate hotkey.
 
 ## 📄 License
 

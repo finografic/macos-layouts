@@ -78,4 +78,11 @@ export interface DoctorOptions extends SharedCliOptions {
 export interface CompileOptions extends SharedCliOptions {
   /** Write the compiled Lua to this path instead of ~/.hammerspoon/layouts/<name>.lua */
   readonly output?: string;
+
+  /**
+   * Swap display roles before compiling: - If the layout has both "secondary" and "tertiary" roles, swap
+   * their match definitions. - Otherwise, if it has "primary" and "secondary", swap those. Window rules are
+   * unchanged — they still reference the same role names, which now resolve to different screens.
+   */
+  readonly swap?: boolean;
 }

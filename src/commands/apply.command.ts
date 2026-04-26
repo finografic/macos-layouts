@@ -159,7 +159,8 @@ export async function applyCommand({ name, options }: ApplyCommandParams): Promi
   }
   allMoveResults.push(...parsed);
 
-  // AppleScript path for Finder
+  // AppleScript for Finder: uses Finder-native `set the bounds of window N ...` with 1-based synthetic
+  // ids (`finder-1`, `finder-2`, ...); buildApplyLua still handles only numeric AX ids for non-Finder apps
   for (const m of finderPlanned) {
     const result = await applyFinderMove(m.windowId, m.frame, m.window.frame);
     allMoveResults.push(result);

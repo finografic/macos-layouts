@@ -89,7 +89,8 @@ function screenForFrame(frame: Rect, screens: readonly RuntimeScreen[]): string 
 
 /**
  * Fetch all open (non-minimized) Finder windows via AppleScript. Returns an empty array if Finder is not
- * running or has no windows. Window IDs are synthetic: `finder-0`, `finder-1`, etc. (0-based).
+ * running or has no windows. Window IDs are synthetic: `finder-1`, `finder-2`, etc. (1-based, matches
+ * AppleScript `window N`).
  */
 export async function fetchFinderWindows(screens: readonly RuntimeScreen[]): Promise<RuntimeWindow[]> {
   let raw: string;
@@ -108,7 +109,7 @@ export async function fetchFinderWindows(screens: readonly RuntimeScreen[]): Pro
   return bounds.map((b, i) => {
     const frame: Rect = { x: b.left, y: b.top, w: b.right - b.left, h: b.bottom - b.top };
     return {
-      id: `finder-${i}`,
+      id: `finder-${i + 1}`,
       app: { name: 'Finder', bundleId: FINDER_BUNDLE_ID, pid: 0 },
       title: '',
       role: 'AXWindow',
@@ -134,8 +135,12 @@ export interface FinderMoveResult {
 /**
  * Move a Finder window via AppleScript.
  *
- * `windowId` must be a synthetic `finder-N` ID (0-based). AppleScript uses 1-based window indexing. `before`
- * is the frame captured during dump, used for the result record.
+ * `windowId` must be a synthetic `finder-N` ID (1-based, same as Finder AppleScript window indexing).
+ *
+ * Uses the exact syntax validated in manual testing: tell application "Finder" to set the bounds of window N
+ * to {left, top, right, bottom}
+ *
+ * `before` is the frame we matched against; used only for the result record.
  */
 export async function applyFinderMove(
   windowId: string,
@@ -147,13 +152,24 @@ export async function applyFinderMove(
     return { windowId, applied: false, error: `Invalid Finder window ID: ${windowId}` };
   }
 
-  const n = parseInt(match[1]!, 10) + 1; // AppleScript is 1-based
+  const index = parseInt(match[1]!, 10);
   const { x, y, w, h } = frame;
+  const left = Math.round(x);
+  const top = Math.round(y);
+  const right = Math.round(x + w);
+  const bottom = Math.round(y + h);
 
   try {
+    console.log(
+      `tell application "Finder" to set the bounds of window ${index} to {${left}, ${top}, ${right}, ${bottom}}`,
+    );
+
     await execa(
       'osascript',
-      ['-e', `tell application "Finder" to set bounds of window ${n} to {${x}, ${y}, ${x + w}, ${y + h}}`],
+      [
+        '-e',
+        `tell application "Finder" to set the bounds of window ${index} to {${left}, ${top}, ${right}, ${bottom}}`,
+      ],
       { timeout: 5_000 },
     );
     return { windowId, applied: true, before, after: frame };

@@ -11,21 +11,27 @@ build/
 .env.local
 .env.*.local
 
-# IDE
-.cursor/chats
-.cursor/hooks/state
+# Agents
+.agents/
+!.agents/handoff.md
+.codex/
 .claude/
+!.claude/handoff.md
 !.claude/settings.json
+.worktrees/
+**/worktrees/
+
+# IDE
+**/.cursor/**
+!**/.cursor/.gitkeep
+!.cursor/rules/
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
-**/Icon?
-!./Icon?
-
+# Docs
+docs/drafts/
 
 # Logs
 *.log
@@ -44,3 +50,16 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# macOS
+**/.DS_Store
+**Thumbs.db
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~

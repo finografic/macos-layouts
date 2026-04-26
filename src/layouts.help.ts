@@ -47,6 +47,10 @@ export function printHelp(): void {
     { cmd: 'layouts doctor', comment: 'Check environment' },
     { cmd: 'layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
     { cmd: 'layouts compile home', comment: 'Recompile "home" layout to Lua' },
+    {
+      cmd: 'layouts compile home --swap',
+      comment: 'Compile with secondary ↔ tertiary (or primary ↔ secondary) swapped',
+    },
   ];
   const exampleWidth = columnMax(examples, (e) => e.cmd);
   for (const example of examples) lines.push(renderExample(example, exampleWidth));

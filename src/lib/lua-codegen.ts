@@ -299,6 +299,8 @@ local function matchWindows(rules, windows, resolvedDisplays)
               claimed[w.id] = true
               table.insert(moves, {
                 window = w._window,
+                finderIndex = w.finderIndex,
+                finderWindowId = w.finderWindowId,
                 frame = normalizedToAbsolute(rule.place.rect, screen.frame),
                 ruleId = rule.id,
               })
@@ -320,6 +322,8 @@ local function matchWindows(rules, windows, resolvedDisplays)
             claimed[candidate.id] = true
             table.insert(moves, {
               window = candidate._window,
+              finderIndex = candidate.finderIndex,
+              finderWindowId = candidate.finderWindowId,
               frame = normalizedToAbsolute(rule.place.rect, screen.frame),
               ruleId = rule.id,
             })
@@ -331,6 +335,8 @@ local function matchWindows(rules, windows, resolvedDisplays)
             claimed[w.id] = true
             table.insert(moves, {
               window = w._window,
+              finderIndex = w.finderIndex,
+              finderWindowId = w.finderWindowId,
               frame = normalizedToAbsolute(rule.place.rect, screen.frame),
               ruleId = rule.id,
             })
@@ -342,6 +348,8 @@ local function matchWindows(rules, windows, resolvedDisplays)
               claimed[w.id] = true
               table.insert(moves, {
                 window = w._window,
+                finderIndex = w.finderIndex,
+                finderWindowId = w.finderWindowId,
                 frame = normalizedToAbsolute(rule.place.rect, screen.frame),
                 ruleId = rule.id,
               })
@@ -370,6 +378,8 @@ end`;
  */
 const APPLY_BLOCK = `\
 -- [[ Helpers: collect live state ]]
+local FINDER_DEBUG_PREFIX = "[macos-layouts][finder]"
+
 local function collectScreens()
   local builtinScreen = hs.screen.find("Built%-in")
   local builtinId = builtinScreen and builtinScreen:id() or nil
@@ -391,7 +401,7 @@ local function collectScreens()
   return screens
 end
 
-local function collectWindows()
+local function collectWindows(screens)
   -- Only query apps referenced by the layout — avoids enumerating every open app
   local targetBundleIds = {}
   local targetNames = {}
@@ -422,26 +432,196 @@ local function collectWindows()
       end
     end
   end
+
+  -- Finder windows are not exposed via hs.application/allWindows in many macOS setups.
+  -- Capture and apply them via AppleScript so hotkey/dofile() can place Finder too.
+  if targetBundleIds["com.apple.finder"] or targetNames["Finder"] then
+    local ok, raw = hs.osascript.applescript([[
+      tell application "Finder"
+        get bounds of every window
+      end tell
+    ]])
+
+    if ok and raw ~= nil and raw ~= "" then
+      local nums = {}
+      if type(raw) == "string" then
+        print(FINDER_DEBUG_PREFIX .. " bounds raw (string): " .. raw)
+        for n in raw:gmatch("-?%d+") do
+          table.insert(nums, tonumber(n))
+        end
+      elseif type(raw) == "table" then
+        -- hs.osascript.applescript returns native Lua types; a list-of-bounds becomes a table
+        print(FINDER_DEBUG_PREFIX .. " bounds raw (table, #=" .. tostring(#raw) .. ")")
+        if type(raw[1]) == "table" then
+          for _, quad in ipairs(raw) do
+            for _, v in ipairs(quad) do table.insert(nums, tonumber(v)) end
+          end
+        else
+          for _, v in ipairs(raw) do table.insert(nums, tonumber(v)) end
+        end
+      else
+        print(FINDER_DEBUG_PREFIX .. " unexpected raw type: " .. type(raw))
+      end
+      print(FINDER_DEBUG_PREFIX .. " parsed numbers: " .. tostring(#nums))
+
+      local function screenIdForFrame(frame)
+        local cx = frame.x + frame.w / 2
+        local cy = frame.y + frame.h / 2
+        for _, screen in ipairs(screens) do
+          local ff = screen.fullFrame
+          if cx >= ff.x and cx < ff.x + ff.w and cy >= ff.y and cy < ff.y + ff.h then
+            return screen.id
+          end
+        end
+        for _, screen in ipairs(screens) do
+          if screen.isPrimary then return screen.id end
+        end
+        return screens[1] and screens[1].id or ""
+      end
+
+      local index = 1 -- Finder AppleScript indexing is 1-based
+      for i = 1, #nums - 3, 4 do
+        local left = nums[i]
+        local top = nums[i + 1]
+        local right = nums[i + 2]
+        local bottom = nums[i + 3]
+        local frame = { x = left, y = top, w = right - left, h = bottom - top }
+        local wid = nil
+        local okId, rawId = hs.osascript.applescript('tell application "Finder" to get id of window ' .. tostring(index))
+        if okId and rawId ~= nil then
+          local n = tonumber(tostring(rawId):match("-?%d+"))
+          if n then wid = n end
+        else
+          print(
+            FINDER_DEBUG_PREFIX
+              .. " could not read finder window id for index "
+              .. tostring(index)
+              .. " (ok="
+              .. tostring(okId)
+              .. ", raw="
+              .. tostring(rawId)
+              .. ")"
+          )
+        end
+        table.insert(windows, {
+          id = "finder-" .. tostring(index),
+          finderIndex = index,
+          finderWindowId = wid,
+          app = { name = "Finder", bundleId = "com.apple.finder" },
+          title = "",
+          isFocused = false,
+          frame = frame,
+          screenId = screenIdForFrame(frame),
+        })
+        print(
+          FINDER_DEBUG_PREFIX
+            .. " captured finder window index="
+            .. tostring(index)
+            .. " id="
+            .. tostring(wid)
+            .. " frame={"
+            .. tostring(left)
+            .. ","
+            .. tostring(top)
+            .. ","
+            .. tostring(right)
+            .. ","
+            .. tostring(bottom)
+            .. "}"
+        )
+        index = index + 1
+      end
+    else
+      print(
+        FINDER_DEBUG_PREFIX
+          .. " get bounds failed/empty (ok="
+          .. tostring(ok)
+          .. ", raw="
+          .. tostring(raw)
+          .. ")"
+      )
+    end
+  end
+
   return windows
 end
 
 -- [[ Apply: resolve, match, move ]]
 local function doApply()
   local screens = collectScreens()
-  local windows = collectWindows()
+  local windows = collectWindows(screens)
   local resolvedDisplays = resolveDisplayRoles(LAYOUT.displayRoles, screens)
   local moves = matchWindows(LAYOUT.windows, windows, resolvedDisplays)
 
   for _, move in ipairs(moves) do
-    move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h), 0)
+    if move.finderIndex then
+      local left = math.floor(move.frame.x + 0.5)
+      local top = math.floor(move.frame.y + 0.5)
+      local right = math.floor(move.frame.x + move.frame.w + 0.5)
+      local bottom = math.floor(move.frame.y + move.frame.h + 0.5)
+      if move.finderWindowId then
+        local okSet, rawSet = hs.osascript.applescript(
+          'tell application "Finder" to set the bounds of (first window whose id is '
+            .. tostring(move.finderWindowId)
+            .. ") to {"
+            .. tostring(left)
+            .. ", "
+            .. tostring(top)
+            .. ", "
+            .. tostring(right)
+            .. ", "
+            .. tostring(bottom)
+            .. "}"
+        )
+        print(
+          FINDER_DEBUG_PREFIX
+            .. " move by id="
+            .. tostring(move.finderWindowId)
+            .. " -> ok="
+            .. tostring(okSet)
+            .. " raw="
+            .. tostring(rawSet)
+        )
+      else
+        local okSet, rawSet = hs.osascript.applescript(
+          'tell application "Finder" to set the bounds of window '
+            .. tostring(move.finderIndex)
+            .. " to {"
+            .. tostring(left)
+            .. ", "
+            .. tostring(top)
+            .. ", "
+            .. tostring(right)
+            .. ", "
+            .. tostring(bottom)
+            .. "}"
+        )
+        print(
+          FINDER_DEBUG_PREFIX
+            .. " move by index="
+            .. tostring(move.finderIndex)
+            .. " -> ok="
+            .. tostring(okSet)
+            .. " raw="
+            .. tostring(rawSet)
+        )
+      end
+    elseif move.window then
+      move.window:setFrame(hs.geometry.rect(move.frame.x, move.frame.y, move.frame.w, move.frame.h), 0)
+    end
   end
 
   if LAYOUT.options.focusAfterApply and LAYOUT.options.focusAfterApply ~= "none" and #moves > 0 then
     if LAYOUT.options.focusAfterApply == "first" then
-      moves[1].window:focus()
+      for _, move in ipairs(moves) do
+        if move.window then
+          move.window:focus()
+          break
+        end
+      end
     else
       for _, move in ipairs(moves) do
-        if move.ruleId == LAYOUT.options.focusAfterApply then
+        if move.ruleId == LAYOUT.options.focusAfterApply and move.window then
           move.window:focus()
           break
         end

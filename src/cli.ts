@@ -110,7 +110,13 @@ async function main(): Promise<void> {
     }
     const layoutsDirIdx = compileRest.indexOf('--layouts-dir');
     const layoutsDirArg = layoutsDirIdx !== -1 ? compileRest[layoutsDirIdx + 1] : undefined;
-    const options: CompileOptions = { layoutsDir: layoutsDirArg };
+    const outputIdx = compileRest.indexOf('--output');
+    const outputArg = outputIdx !== -1 ? compileRest[outputIdx + 1] : undefined;
+    const options: CompileOptions = {
+      layoutsDir: layoutsDirArg,
+      output: outputArg,
+      swap: hasFlag(compileRest, '--swap'),
+    };
     const code = await compileCommand({ name: layoutName, options });
     process.exit(code);
   }

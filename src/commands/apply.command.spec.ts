@@ -14,7 +14,7 @@ import { applyCommand } from './apply.command.js';
 vi.mock('../lib/finder-bridge.js', () => ({
   FINDER_BUNDLE_ID: 'com.apple.finder',
   fetchFinderWindows: vi.fn().mockResolvedValue([]),
-  applyFinderMove: vi.fn().mockResolvedValue({ windowId: 'finder-0', applied: true }),
+  applyFinderMove: vi.fn().mockResolvedValue({ windowId: 'finder-1', applied: true }),
 }));
 
 // ─── Mock hammerspoon ─────────────────────────────────────────────────────────
