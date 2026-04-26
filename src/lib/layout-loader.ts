@@ -1,8 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Layout } from '../types/layout.types.js';
 
-import { DEFAULT_LAYOUTS_DIR } from '../config/defaults.constants.js';
+import { DEFAULT_LAYOUTS_DIR } from 'config/defaults.constants.js';
+import type { Layout } from 'types/layout.types.js';
 
 export { DEFAULT_LAYOUTS_DIR };
 

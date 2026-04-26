@@ -1,4 +1,4 @@
-import type { Rect } from '../types/geometry.types.js';
+import type { Rect } from 'types/geometry.types.js';
 
 import { luaLongString } from './hammerspoon.js';
 

@@ -1,8 +1,9 @@
+import fixture from '__mocks__/dump-home-personal.json';
 import { describe, expect, it } from 'vitest';
-import type { RuntimeWindow } from '../types/runtime.types.js';
-import type { WindowRule } from '../types/window.types.js';
 
-import fixture from '../__mocks__/dump-home-personal.json';
+import type { RuntimeWindow } from 'types/runtime.types.js';
+import type { WindowRule } from 'types/window.types.js';
+
 import { matchWindows } from './window-matcher.js';
 
 const windows = fixture.windows as unknown as RuntimeWindow[];

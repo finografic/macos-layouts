@@ -1,5 +1,5 @@
-import type { DisplayMatch, DisplayRoleMap } from '../types/display.types.js';
-import type { RuntimeScreen } from '../types/runtime.types.js';
+import type { DisplayMatch, DisplayRoleMap } from 'types/display.types.js';
+import type { RuntimeScreen } from 'types/runtime.types.js';
 
 function area(rect: { readonly w: number; readonly h: number }): number {
   return rect.w * rect.h;

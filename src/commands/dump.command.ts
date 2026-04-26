@@ -6,13 +6,14 @@
  */
 
 import pc from 'picocolors';
-import type { DumpOptions } from '../types/cli.types.js';
-import type { RuntimeDump, RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 
-import { DUMP_LUA } from '../lib/dump-lua.js';
-import { fetchFinderWindows } from '../lib/finder-bridge.js';
-import * as hs from '../lib/hammerspoon.js';
-import { EXIT_CODE } from '../types/cli.types.js';
+import { DUMP_LUA } from 'lib/dump-lua.js';
+import { fetchFinderWindows } from 'lib/finder-bridge.js';
+import * as hs from 'lib/hammerspoon.js';
+
+import type { DumpOptions } from 'types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+import type { RuntimeDump, RuntimeScreen, RuntimeWindow } from 'types/runtime.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -71,7 +72,6 @@ function printHumanReadable(dump: RuntimeDump): void {
 export async function dumpCommand({ options }: DumpCommandParams): Promise<number> {
   // 1. Check HS availability
   const available = await hs.isAvailable();
-  console.log('>>>>>>>>>>', { TEST: true });
   if (!available) {
     console.error(
       `${pc.red('Error:')} Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,

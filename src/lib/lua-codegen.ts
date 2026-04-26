@@ -1,6 +1,6 @@
-import type { DisplayMatch, DisplayRoleMap } from '../types/display.types.js';
-import type { Layout } from '../types/layout.types.js';
-import type { WindowMatch, WindowRule } from '../types/window.types.js';
+import type { DisplayMatch, DisplayRoleMap } from 'types/display.types.js';
+import type { Layout } from 'types/layout.types.js';
+import type { WindowMatch, WindowRule } from 'types/window.types.js';
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 

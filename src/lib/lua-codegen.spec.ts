@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Layout } from '../types/layout.types.js';
+
+import type { Layout } from 'types/layout.types.js';
 
 import { generateLua } from './lua-codegen.js';
 

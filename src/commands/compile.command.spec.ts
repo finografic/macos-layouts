@@ -4,7 +4,8 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PathLike } from 'node:fs';
 
-import { EXIT_CODE } from '../types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+
 import { compileCommand } from './compile.command.js';
 
 function pathLikeToString(p: PathLike): string {

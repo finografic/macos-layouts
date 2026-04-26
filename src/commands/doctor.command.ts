@@ -1,13 +1,14 @@
 import { access } from 'node:fs/promises';
 import { execa } from 'execa';
 import pc from 'picocolors';
-import type { DoctorOptions } from '../types/cli.types.js';
-import type { RuntimeDump } from '../types/runtime.types.js';
 
-import { DUMP_LUA } from '../lib/dump-lua.js';
-import * as hs from '../lib/hammerspoon.js';
-import { DEFAULT_LAYOUTS_DIR, expandHome, listLayouts } from '../lib/layout-loader.js';
-import { EXIT_CODE } from '../types/cli.types.js';
+import { DUMP_LUA } from 'lib/dump-lua.js';
+import * as hs from 'lib/hammerspoon.js';
+import { DEFAULT_LAYOUTS_DIR, expandHome, listLayouts } from 'lib/layout-loader.js';
+
+import type { DoctorOptions } from 'types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+import type { RuntimeDump } from 'types/runtime.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

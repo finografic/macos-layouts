@@ -1,18 +1,19 @@
 import pc from 'picocolors';
-import type { ApplyMove } from '../lib/apply-lua.js';
-import type { ApplyOptions } from '../types/cli.types.js';
-import type { Rect } from '../types/geometry.types.js';
-import type { ApplyError, ApplyMoveResult, ApplySkipResult, RuntimeWindow } from '../types/runtime.types.js';
 
-import { buildApplyLua } from '../lib/apply-lua.js';
-import { resolveDisplayRoles } from '../lib/display-resolver.js';
-import { DUMP_LUA } from '../lib/dump-lua.js';
-import { applyFinderMove, FINDER_BUNDLE_ID, fetchFinderWindows } from '../lib/finder-bridge.js';
-import * as hs from '../lib/hammerspoon.js';
-import { loadLayout } from '../lib/layout-loader.js';
-import { normalizedToAbsolute } from '../lib/rect-converter.js';
-import { matchWindows } from '../lib/window-matcher.js';
-import { EXIT_CODE } from '../types/cli.types.js';
+import type { ApplyMove } from 'lib/apply-lua.js';
+import { buildApplyLua } from 'lib/apply-lua.js';
+import { resolveDisplayRoles } from 'lib/display-resolver.js';
+import { DUMP_LUA } from 'lib/dump-lua.js';
+import { applyFinderMove, fetchFinderWindows, FINDER_BUNDLE_ID } from 'lib/finder-bridge.js';
+import * as hs from 'lib/hammerspoon.js';
+import { loadLayout } from 'lib/layout-loader.js';
+import { normalizedToAbsolute } from 'lib/rect-converter.js';
+import { matchWindows } from 'lib/window-matcher.js';
+
+import type { ApplyOptions } from 'types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+import type { Rect } from 'types/geometry.types.js';
+import type { ApplyError, ApplyMoveResult, ApplySkipResult, RuntimeWindow } from 'types/runtime.types.js';
 
 // ─── Internal types ───────────────────────────────────────────────────────────
 

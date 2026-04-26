@@ -1,4 +1,4 @@
-import type { NormalizedRect, Rect } from '../types/geometry.types.js';
+import type { NormalizedRect, Rect } from 'types/geometry.types.js';
 
 export function normalizedToAbsolute(normalized: NormalizedRect, screenFrame: Rect): Rect {
   return {

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EXIT_CODE } from '../types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
 
 // ─── Mock execa ───────────────────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ vi.mock('../lib/hammerspoon.js', async (importOriginal) => {
   };
 });
 
-import * as hs from '../lib/hammerspoon.js';
+import * as hs from 'lib/hammerspoon.js';
 
 // ─── Mock node:fs/promises ────────────────────────────────────────────────────
 

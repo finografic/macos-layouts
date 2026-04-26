@@ -3,18 +3,20 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { cancel, intro, outro, spinner } from '@clack/prompts';
 import pc from 'picocolors';
-import type { SaveOptions } from '../types/cli.types.js';
-import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
-import type { FlowContext } from '../utils/flow.utils.js';
 
-import { resolveDisplayRoles } from '../lib/display-resolver.js';
-import { DUMP_LUA } from '../lib/dump-lua.js';
-import { fetchFinderWindows } from '../lib/finder-bridge.js';
-import * as hs from '../lib/hammerspoon.js';
-import { buildLayout } from '../lib/layout-builder.js';
-import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from '../lib/layout-loader.js';
-import { EXIT_CODE } from '../types/cli.types.js';
-import { promptConfirm, promptMultiSelect, promptSelect, promptText } from '../utils/flow.utils.js';
+import { resolveDisplayRoles } from 'lib/display-resolver.js';
+import { DUMP_LUA } from 'lib/dump-lua.js';
+import { fetchFinderWindows } from 'lib/finder-bridge.js';
+import * as hs from 'lib/hammerspoon.js';
+import { buildLayout } from 'lib/layout-builder.js';
+import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from 'lib/layout-loader.js';
+import type { FlowContext } from 'utils/flow.utils.js';
+import { promptConfirm, promptMultiSelect, promptSelect, promptText } from 'utils/flow.utils.js';
+
+import type { SaveOptions } from 'types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+import type { RuntimeScreen, RuntimeWindow } from 'types/runtime.types.js';
+
 import { compileCommand } from './compile.command.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

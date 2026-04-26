@@ -3,7 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EXIT_CODE } from '../types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+
 import { listCommand } from './list.command.js';
 
 // ─── Test layouts ─────────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
-import type { DisplayMatch, DisplayRoleMap } from '../types/display.types.js';
-import type { NormalizedRect } from '../types/geometry.types.js';
-import type { Layout } from '../types/layout.types.js';
-import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
-import type { WindowRule } from '../types/window.types.js';
+import type { DisplayMatch, DisplayRoleMap } from 'types/display.types.js';
+import type { NormalizedRect } from 'types/geometry.types.js';
+import type { Layout } from 'types/layout.types.js';
+import type { RuntimeScreen, RuntimeWindow } from 'types/runtime.types.js';
+import type { WindowRule } from 'types/window.types.js';
 
 import { absoluteToNormalized } from './rect-converter.js';
 

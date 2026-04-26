@@ -9,8 +9,9 @@
  */
 
 import { execa } from 'execa';
-import type { Rect } from '../types/geometry.types.js';
-import type { RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
+
+import type { Rect } from 'types/geometry.types.js';
+import type { RuntimeScreen, RuntimeWindow } from 'types/runtime.types.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

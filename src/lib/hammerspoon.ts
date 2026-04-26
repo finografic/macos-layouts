@@ -12,9 +12,10 @@
  */
 
 import { execa, ExecaError } from 'execa';
-import type { ApplyOptions } from '../types/cli.types.js';
-import type { Layout } from '../types/layout.types.js';
-import type { ApplyResult, RuntimeDump } from '../types/runtime.types.js';
+
+import type { ApplyOptions } from 'types/cli.types.js';
+import type { Layout } from 'types/layout.types.js';
+import type { ApplyResult, RuntimeDump } from 'types/runtime.types.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

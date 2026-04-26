@@ -1,8 +1,9 @@
+import fixture from '__mocks__/dump-home-personal.json';
 import { describe, expect, it } from 'vitest';
-import type { DisplayMatch, DisplayRoleMap } from '../types/display.types.js';
-import type { RuntimeScreen } from '../types/runtime.types.js';
 
-import fixture from '../__mocks__/dump-home-personal.json';
+import type { DisplayMatch, DisplayRoleMap } from 'types/display.types.js';
+import type { RuntimeScreen } from 'types/runtime.types.js';
+
 import { resolveDisplayRoles } from './display-resolver.js';
 
 const screens = fixture.screens as unknown as RuntimeScreen[];

@@ -1,11 +1,12 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import fixture from '__mocks__/dump-home-personal.json';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { RuntimeDump } from '../types/runtime.types.js';
 
-import fixture from '../__mocks__/dump-home-personal.json';
-import { EXIT_CODE } from '../types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
+import type { RuntimeDump } from 'types/runtime.types.js';
+
 import { applyCommand } from './apply.command.js';
 
 // ─── Mock finder bridge (avoid real osascript / 5s execa timeout in CI) ───────
@@ -28,7 +29,7 @@ vi.mock('../lib/hammerspoon.js', async (importOriginal) => {
   };
 });
 
-import * as hs from '../lib/hammerspoon.js';
+import * as hs from 'lib/hammerspoon.js';
 
 // ─── Fixture data ─────────────────────────────────────────────────────────────
 

@@ -2,12 +2,13 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import pc from 'picocolors';
-import type { CompileOptions } from '../types/cli.types.js';
 
-import { DEFAULT_COMPILE_OUTPUT_DIR, INIT_LUA_PATH } from '../config/defaults.constants.js';
-import { expandHome, loadLayout } from '../lib/layout-loader.js';
-import { generateLua } from '../lib/lua-codegen.js';
-import { EXIT_CODE } from '../types/cli.types.js';
+import { expandHome, loadLayout } from 'lib/layout-loader.js';
+import { generateLua } from 'lib/lua-codegen.js';
+
+import { DEFAULT_COMPILE_OUTPUT_DIR, INIT_LUA_PATH } from 'config/defaults.constants.js';
+import type { CompileOptions } from 'types/cli.types.js';
+import { EXIT_CODE } from 'types/cli.types.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

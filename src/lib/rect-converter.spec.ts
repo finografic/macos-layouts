@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Rect } from '../types/geometry.types.js';
+
+import type { Rect } from 'types/geometry.types.js';
 
 import { absoluteToNormalized, normalizedToAbsolute } from './rect-converter.js';
 
