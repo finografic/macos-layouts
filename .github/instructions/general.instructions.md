@@ -1,6 +1,6 @@
 # General Development Rules
 
-These rules guide Copilot’s code suggestions and refactors. Apply them consistently across the project.
+These rules guide code suggestions and refactors. Apply them consistently across the project.
 
 ## Code Quality
 

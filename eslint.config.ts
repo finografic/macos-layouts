@@ -6,7 +6,16 @@ import type { Linter } from 'eslint';
 
 const config: Linter.Config[] = [
   {
-    ignores: ['**/node_modules/**', '**/dist/**', '**/.cursor/**', '**/*.min.*', '**/*.map', '**/.claude/**'],
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.cursor/**',
+      '**/*.min.*',
+      '**/*.map',
+      '**/.claude/**',
+      '**/.cursor/hooks/**',
+      '**/.cursor/chats/**',
+    ],
   },
 
   js.configs.recommended,

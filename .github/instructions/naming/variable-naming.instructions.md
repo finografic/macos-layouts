@@ -6,7 +6,7 @@
 
 ## ❌ Avoid Short-Form Variables
 
-### Examples of What NOT to Use
+### Examples of What NOT to Use:
 
 ```typescript
 // ❌ BAD: Abbreviated names
@@ -18,7 +18,7 @@ const idx = 0; // Use 'index' instead
 const pkgRoot = findPackageRoot(...);
 ```
 
-### ✅ Use Full Words Instead
+### ✅ Use Full Words Instead:
 
 ```typescript
 // ✅ GOOD: Full, descriptive names

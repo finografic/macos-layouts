@@ -13,7 +13,10 @@ Use this format for all commits unless the user explicitly says otherwise.
 
 ## Releases
 
-Releases are a **human-only operation**. Do not initiate, trigger, or assist with a release unless the user gives an explicit instruction in the current message.
+- Published to GitHub Packages (`https://npm.pkg.github.com`).
+
+Releases are a **human-only operation**.
+Do not initiate, trigger, or assist with a release unless the user gives an explicit instruction in the current message.
 
 - Do not bump versions (`pnpm version`, `npm version`, direct edits to `package.json` version field).
 - Do not push tags or `--follow-tags`.

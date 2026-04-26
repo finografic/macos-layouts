@@ -1,4 +1,4 @@
-# AGENTS.md - AI Assistant Guide
+# AGENTS.md — AI Assistant Guide
 
 ## Rules — Project-Specific
 
@@ -52,6 +52,15 @@ Shared across Claude Code, Cursor, and GitHub Copilot.
 
 - IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages. Non-negotiable.
 - `.github/instructions/git/git-policy.instructions.md` (see Commits and Releases sections)
+
+---
+
+## Claude Code — Session Memory and Handoff
+
+> This section applies to Claude Code only. Other agents can ignore it.
+
+- **Session log:** `.claude/memory.md` (gitignored) — maintenance rules are in that file.
+- **Project state snapshot:** `.agents/handoff.md` (git-tracked) — maintenance rules are in that file.
 
 ---
 
