@@ -49,7 +49,7 @@ vi.mock('node:fs/promises', async (importOriginal) => {
       return actual.writeFile(...args);
     }),
     mkdir: vi.fn(async (...args: Parameters<typeof actual.mkdir>) => {
-      if (pathLikeToString(args[0] as PathLike).includes('.hammerspoon')) return undefined;
+      if (pathLikeToString(args[0]).includes('.hammerspoon')) return undefined;
       return actual.mkdir(...args);
     }),
   };
@@ -79,6 +79,24 @@ const VALID_LAYOUT = {
 };
 
 const DOCK_LAYOUT = { ...VALID_LAYOUT, name: 'test-dock', options: { dockDisplay: 'main' } };
+
+/** Has `primary` + `secondary` display roles so `applyRoleSwap` (compile `--swap`) exchanges their matches. */
+const ROLE_SWAP_LAYOUT = {
+  version: '0.1',
+  name: 'role-swap',
+  displayRoles: {
+    primary: { match: { kind: 'externalByIndex' as const, index: 0 } },
+    secondary: { match: { kind: 'externalByIndex' as const, index: 1 } },
+  },
+  windows: [
+    {
+      id: 'cursor-0',
+      app: { bundleId: 'com.todesktop.230313mzl4w4u92', name: 'Cursor' },
+      match: { kind: 'mainWindow' as const },
+      place: { display: 'primary', rect: { x: 0, y: 0, w: 1, h: 1 } },
+    },
+  ],
+};
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
@@ -165,6 +183,26 @@ describe('compileCommand', () => {
     const snippet = initLuaCapture.content ?? '';
     expect(snippet).toContain('hs.screen.watcher.new(_layoutsApply_test_dock)');
     expect(snippet).toContain('re-applies when Dock moves/shows/hides');
+  });
+
+  it('with swap, exchanges primary and secondary display match definitions in generated Lua', async () => {
+    await writeFile(join(testDir, 'role-swap.json'), JSON.stringify(ROLE_SWAP_LAYOUT));
+    const out1 = join(testDir, 'no-swap.lua');
+    const out2 = join(testDir, 'swapped.lua');
+    await compileCommand({
+      name: 'role-swap',
+      options: { layoutsDir: testDir, output: out1, swap: false },
+    });
+    await compileCommand({
+      name: 'role-swap',
+      options: { layoutsDir: testDir, output: out2, swap: true },
+    });
+    const noSwap = await readFile(out1, 'utf-8');
+    const swapped = await readFile(out2, 'utf-8');
+    expect(noSwap).toContain('role = "primary", match = { kind = "externalByIndex", index = 0 }');
+    expect(noSwap).toContain('role = "secondary", match = { kind = "externalByIndex", index = 1 }');
+    expect(swapped).toContain('role = "primary", match = { kind = "externalByIndex", index = 1 }');
+    expect(swapped).toContain('role = "secondary", match = { kind = "externalByIndex", index = 0 }');
   });
 
   it('skips init.lua update when marker already exists', async () => {

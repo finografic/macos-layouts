@@ -5,7 +5,7 @@ import fixture from '__mocks__/dump-home-personal.json';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EXIT_CODE } from 'types/cli.types.js';
-import type { RuntimeDump } from 'types/runtime.types.js';
+import type { RuntimeDump, RuntimeWindow } from 'types/runtime.types.js';
 
 import { applyCommand } from './apply.command.js';
 
@@ -29,6 +29,7 @@ vi.mock('../lib/hammerspoon.js', async (importOriginal) => {
   };
 });
 
+import { applyFinderMove, FINDER_BUNDLE_ID, fetchFinderWindows } from 'lib/finder-bridge.js';
 import * as hs from 'lib/hammerspoon.js';
 
 // ─── Fixture data ─────────────────────────────────────────────────────────────
@@ -77,6 +78,33 @@ const UNRESOLVED_ROLE_LAYOUT = {
   ],
 };
 
+/** Finder on external screen 3; role matches fixture `dump-home-personal` (LG Ultra HD = id "3") */
+const FINDER_LAYOUT = {
+  version: '0.1' as const,
+  name: 'finder-only',
+  displayRoles: { ext: { match: { kind: 'byName' as const, name: 'LG Ultra HD' } } },
+  windows: [
+    {
+      id: 'finder-win',
+      app: { bundleId: FINDER_BUNDLE_ID },
+      match: { kind: 'mainWindow' as const },
+      place: { display: 'ext', rect: { x: 0, y: 0, w: 1, h: 1 } },
+    },
+  ],
+};
+
+const FINDER_MOCK_WINDOW: RuntimeWindow = {
+  id: 'finder-1',
+  app: { name: 'Finder', bundleId: FINDER_BUNDLE_ID, pid: 0 },
+  title: '',
+  role: 'AXWindow',
+  isStandard: true,
+  isMinimized: false,
+  isFocused: false,
+  screenId: '3',
+  frame: { x: -3840, y: 30, w: 800, h: 600 },
+};
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let testDir = '';
@@ -110,6 +138,17 @@ describe('applyCommand', () => {
     const code = await applyCommand({ name: 'test', options: { layoutsDir: testDir } });
     expect(code).toBe(EXIT_CODE.Success);
     expect(hs.runLua).toHaveBeenCalledOnce();
+  });
+
+  it('moves Finder via applyFinderMove; Hammerspoon runLua gets no Finder window in moves', async () => {
+    vi.mocked(fetchFinderWindows).mockResolvedValue([FINDER_MOCK_WINDOW]);
+    await writeFile(join(testDir, 'finder-only.json'), JSON.stringify(FINDER_LAYOUT));
+    vi.mocked(hs.runLua).mockResolvedValue({ ok: true, value: '[]' });
+    const code = await applyCommand({ name: 'finder-only', options: { layoutsDir: testDir } });
+    expect(code).toBe(EXIT_CODE.Success);
+    expect(applyFinderMove).toHaveBeenCalledOnce();
+    const lua = vi.mocked(hs.runLua).mock.calls[0]?.[0] ?? '';
+    expect(lua).toContain('[]'); // `buildApplyLua` embeds an empty move list; Finder is AppleScript only
   });
 
   it('dry-run returns ExitCode.Success without calling runLua', async () => {
