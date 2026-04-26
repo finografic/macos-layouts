@@ -86,18 +86,17 @@ layouts list
 
 ### `dump`
 
-Print current screen and window state from Hammerspoon.
+Print current screen and window state. Uses the same Hammerspoon + Finder capture as `layouts save` (minimized and non-standard windows are omitted).
 
 ```bash
 layouts dump                          # Show screens and windows
 layouts dump --json --pretty          # Pretty-print full JSON snapshot
 ```
 
-| Flag                  | Description                           |
-| --------------------- | ------------------------------------- |
-| `--json`              | Output as JSON                        |
-| `--pretty`            | Pretty-print JSON (requires `--json`) |
-| `--include-minimized` | Include minimized windows             |
+| Flag       | Description                           |
+| ---------- | ------------------------------------- |
+| `--json`   | Output as JSON                        |
+| `--pretty` | Pretty-print JSON (requires `--json`) |
 
 ### `doctor`
 

@@ -66,9 +66,6 @@ export interface SaveOptions extends SharedCliOptions {
 export interface DumpOptions extends SharedCliOptions {
   /** Pretty-print JSON output */
   readonly pretty?: boolean;
-
-  /** Include minimized windows in dump */
-  readonly includeMinimized?: boolean;
 }
 
 export interface ListOptions extends SharedCliOptions {}

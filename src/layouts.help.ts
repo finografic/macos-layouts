@@ -44,10 +44,6 @@ export function printHelp(): void {
     { cmd: 'layouts list', comment: 'List available layouts' },
     { cmd: 'layouts dump', comment: 'Show current screens and windows (human-readable)' },
     { cmd: 'layouts dump --json --pretty', comment: 'Pretty-print full JSON snapshot' },
-    {
-      cmd: 'layouts dump --json --pretty --include-minimized',
-      comment: 'Include minimized windows',
-    },
     { cmd: 'layouts doctor', comment: 'Check environment' },
     { cmd: 'layouts doctor --fix', comment: 'Show fix instructions for failed checks' },
     { cmd: 'layouts compile home', comment: 'Recompile "home" layout to Lua' },

@@ -1,8 +1,8 @@
 /**
  * Finografic/macos-layouts — dump command
  *
- * Queries Hammerspoon for current screen and window state, then outputs structured JSON or human-readable
- * text.
+ * Queries Hammerspoon for current screen and window state, merges Finder windows from AppleScript (same
+ * pipeline as `save`), then outputs structured JSON or human-readable text.
  */
 
 import pc from 'picocolors';
@@ -10,6 +10,7 @@ import type { DumpOptions } from '../types/cli.types.js';
 import type { RuntimeDump, RuntimeScreen, RuntimeWindow } from '../types/runtime.types.js';
 
 import { DUMP_LUA } from '../lib/dump-lua.js';
+import { fetchFinderWindows } from '../lib/finder-bridge.js';
 import * as hs from '../lib/hammerspoon.js';
 import { EXIT_CODE } from '../types/cli.types.js';
 
@@ -57,8 +58,7 @@ function printHumanReadable(dump: RuntimeDump): void {
     for (const w of windows) {
       const title = truncate(w.title, MAX_TITLE_LENGTH);
       const focusTag = w.isFocused ? pc.yellow(' [focused]') : '';
-      const minimizedTag = w.isMinimized ? pc.dim(' [minimized]') : '';
-      console.log(`    ${pc.dim(`[${w.id}]`)} ${title}${focusTag}${minimizedTag}`);
+      console.log(`    ${pc.dim(`[${w.id}]`)} ${title}${focusTag}`);
       console.log(`      screen: ${w.screenId}  frame: ${w.frame.x},${w.frame.y}  ${w.frame.w}×${w.frame.h}`);
     }
   }
@@ -69,7 +69,9 @@ function printHumanReadable(dump: RuntimeDump): void {
 // ─── Command ──────────────────────────────────────────────────────────────────
 
 export async function dumpCommand({ options }: DumpCommandParams): Promise<number> {
+  // 1. Check HS availability
   const available = await hs.isAvailable();
+  console.log('>>>>>>>>>>', { TEST: true });
   if (!available) {
     console.error(
       `${pc.red('Error:')} Hammerspoon is not available. Is \`hs\` on your PATH and Hammerspoon running?`,
@@ -77,21 +79,20 @@ export async function dumpCommand({ options }: DumpCommandParams): Promise<numbe
     return EXIT_CODE.RuntimeUnavailable;
   }
 
-  const result = await hs.dump({ lua: DUMP_LUA });
-  if (!result.ok) {
-    console.error(`${pc.red('Error:')} ${result.error.message}`);
+  // 2. Dump current state
+  const dumpResult = await hs.dump({ lua: DUMP_LUA });
+  if (!dumpResult.ok) {
+    console.error(`${pc.red('Error:')} ${dumpResult.error.message}`);
     return EXIT_CODE.Error;
   }
+  const baseDump = dumpResult.value;
+  const finderWindows = await fetchFinderWindows(baseDump.screens);
+  const dump =
+    finderWindows.length > 0 ? { ...baseDump, windows: [...baseDump.windows, ...finderWindows] } : baseDump;
 
-  const raw = result.value;
-
-  const windows = raw.windows.filter((w) => {
-    if (!options.includeMinimized && w.isMinimized) return false;
-    if (!w.isStandard) return false;
-    return true;
-  });
-
-  const filtered: RuntimeDump = { ...raw, windows };
+  // 3. Filter windows (align with `save`: standard only, not minimized)
+  const windows = dump.windows.filter((w) => w.isStandard && !w.isMinimized);
+  const filtered: RuntimeDump = { ...dump, windows };
 
   if (options.pretty) {
     console.log(JSON.stringify(filtered, null, 2));

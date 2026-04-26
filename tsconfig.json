@@ -19,7 +19,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "paths": {
+      "__mocks__/*": ["./src/__mocks__/*"],
+      "commands/*": ["./src/commands/*"],
+      "config/*": ["./src/config/*"],
+      "lib/*": ["./src/lib/*"],
+      "types/*": ["./src/types/*"],
+      "utils/*": ["./src/utils/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

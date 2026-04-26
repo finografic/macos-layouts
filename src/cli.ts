@@ -89,7 +89,6 @@ async function main(): Promise<void> {
     const options: DumpOptions = {
       json: hasFlag(rest, '--json'),
       pretty: hasFlag(rest, '--pretty'),
-      includeMinimized: hasFlag(rest, '--include-minimized'),
     };
     const code = await dumpCommand({ options });
     process.exit(code);

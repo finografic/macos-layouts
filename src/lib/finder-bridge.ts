@@ -18,22 +18,57 @@ export const FINDER_BUNDLE_ID = 'com.apple.finder';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+interface BoundsRecord {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 /**
- * Parse the AppleScript bounds output. Format: `{left, top, right, bottom}, {left, top, right, bottom}, ...`
+ * Parse AppleScript `get bounds of every window` string output. Two real formats exist:
+ *
+ * - **Braced list:** `{L, T, R, B}, {L, T, R, B}, ...` (older / some contexts)
+ * - **Flat quads (comma-separated, no braces):** `L, T, R, B, L, T, R, B, ...` (common when the list is coerced
+ *   to string on newer macOS — matches only `-?\d+` quads, so braces never appear)
  */
-function parseBoundsOutput(raw: string): Array<{ left: number; top: number; right: number; bottom: number }> {
-  const result: Array<{ left: number; top: number; right: number; bottom: number }> = [];
+export function parseBoundsOutput(raw: string): BoundsRecord[] {
+  const braced: BoundsRecord[] = [];
   const re = /\{\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\}/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) {
-    result.push({
+    braced.push({
       left: parseInt(m[1]!, 10),
       top: parseInt(m[2]!, 10),
       right: parseInt(m[3]!, 10),
       bottom: parseInt(m[4]!, 10),
     });
   }
-  return result;
+  if (braced.length > 0) {
+    return braced;
+  }
+
+  const parts = raw
+    .split(/[,\n]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  const nums: number[] = [];
+  for (const p of parts) {
+    if (!/^-?\d+$/.test(p)) {
+      continue;
+    }
+    nums.push(parseInt(p, 10));
+  }
+  const flat: BoundsRecord[] = [];
+  for (let i = 0; i + 3 < nums.length; i += 4) {
+    flat.push({
+      left: nums[i]!,
+      top: nums[i + 1]!,
+      right: nums[i + 2]!,
+      bottom: nums[i + 3]!,
+    });
+  }
+  return flat;
 }
 
 /** Return the screen ID whose fullFrame contains the window center. Falls back to primary. */
