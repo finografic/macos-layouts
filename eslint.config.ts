@@ -1,7 +1,5 @@
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import markdownlintPlugin from 'eslint-plugin-markdownlint';
-import markdownlintParser from 'eslint-plugin-markdownlint/parser.js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import type { Linter } from 'eslint';
@@ -77,34 +75,6 @@ const config: Linter.Config[] = [
         { overrides: { '?': 'ignore', ':': 'ignore', '|': 'ignore' } },
       ],
       '@stylistic/multiline-ternary': ['warn', 'always-multiline'],
-    },
-  },
-
-  {
-    files: ['**/*.md'],
-    ignores: ['node_modules/**', 'dist/**', '.cursor/**', '.github/instructions/**'],
-    languageOptions: {
-      parser: markdownlintParser,
-    },
-    plugins: {
-      markdownlint: markdownlintPlugin as Linter.Processor,
-      '@stylistic': stylistic,
-    },
-    rules: {
-      ...markdownlintPlugin.configs.recommended.rules,
-      'markdownlint/md012': 'off', // Multiple consecutive blank lines
-      'markdownlint/md013': 'off', // Line length
-      'markdownlint/md024': 'off', // Duplicate headings
-      'markdownlint/md025': 'off', // Single h1
-      'markdownlint/md026': 'off', // Trailing punctuation in heading
-      'markdownlint/md029': 'off', // List style
-      'markdownlint/md036': 'off', // No emphasis as heading
-      'markdownlint/md040': 'off', // Fenced code language
-      'markdownlint/md041': 'off', // First line heading
-      'markdownlint/md043': 'off', // Required heading structure
-
-      // Formatting consistency
-      '@stylistic/no-multi-spaces': ['error', { exceptions: { Property: true } }],
     },
   },
 ];

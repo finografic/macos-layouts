@@ -43,5 +43,5 @@
     "MD041": false, // Don't require first line to be a top-level heading
     "MD060": { "style": "aligned" } // Allow heading indentation
   },
-  "markdown.styles": [".vscode/markdown-github-light.css"]
+  "markdown.styles": ["node_modules/@finografic/md-lint/styles/markdown-github-light.css"]
 }
