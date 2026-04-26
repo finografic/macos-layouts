@@ -1,46 +1,59 @@
 # AGENTS.md - AI Assistant Guide
 
-## Rules - General
+## Rules — Project-Specific
 
-Rules are canonical in `.github/instructions/` and shared across Claude Code, Cursor, and GitHub Copilot.
-Follow general TypeScript, ESLint, and naming conventions from prior context.
-
-- [General](/.github/instructions/00-general.instructions.md)
-- [File Naming](/.github/instructions/01-file-naming.instructions.md)
-- [TypeScript Patterns](/.github/instructions/02-typescript-patterns.instructions.md)
-- [Provider & Context Patterns](/.github/instructions/03-provider-context-patterns.instructions.md)
-- [ESLint & Code Style](/.github/instructions/04-eslint-code-style.instructions.md)
-- [Documentation](/.github/instructions/05-documentation.instructions.md)
-- [Modern TypeScript Patterns](/.github/instructions/06-modern-typescript-patterns.instructions.md)
-- [Variable Naming](/.github/instructions/07-variable-naming.instructions.md)
-- [README Standards](/.github/instructions/08-readme-standards.instructions.md)
-- [Picocolors CLI styling](/.github/instructions/09-picocolors-cli-styling.instructions.md)
-- [Git Policy](/.github/instructions/10-git-policy.instructions.md)
-
-## Rules - Project-Specific
-
-Project-specific rules live in `.github/instructions/project/*.instructions.md`.
-
-<!-- NOTE: CLI projects (genx:type:cli keyword in package.json) only -->
-
-- Generated README sections are managed by `pnpm docs.usage` — never edit content between `<!-- GENERATED:*:START/END -->` markers by hand.
-
-- This is a **standalone installable package** (`@finografic/design-system`), not a monorepo workspace.
-- Published to GitHub Packages (`https://npm.pkg.github.com`).
+- Project-specific rules live in `.github/instructions/project/**/*.instructions.md`.
 - Do not reference `@workspace/*` — all imports and deps must use published package names.
-- The `panda.preset` entry must always build with `platform: 'node'` in tsdown.
-- Never add `watch: true` to `panda.config.ts` — it causes `panda codegen` to hang.
 
-## Rules - Markdown Tables
+## Rules — Global
+
+Rules are canonical in `.github/instructions/` — see `README.md` there for folder structure.
+Shared across Claude Code, Cursor, and GitHub Copilot.
+
+**General**
+
+- General baseline: `.github/instructions/general.instructions.md`
+
+**Code**
+
+- TypeScript patterns: `.github/instructions/code/typescript-patterns.instructions.md`
+- Modern TS patterns: `.github/instructions/code/modern-typescript-patterns.instructions.md`
+- ESLint & style: `.github/instructions/code/eslint-code-style.instructions.md`
+- Provider/context patterns: `.github/instructions/code/provider-context-patterns.instructions.md`
+- Picocolors CLI styling: `.github/instructions/code/picocolors-cli-styling.instructions.md`
+
+**Naming**
+
+- File naming: `.github/instructions/naming/file-naming.instructions.md`
+- Variable naming: `.github/instructions/naming/variable-naming.instructions.md`
+
+**Documentation**
+
+- Documentation: `.github/instructions/documentation/documentation.instructions.md`
+- README standards: `.github/instructions/documentation/readme-standards.instructions.md`
+- Agent-facing markdown: `.github/instructions/documentation/agent-facing-markdown.instructions.md`
+- Feature design specs: `.github/instructions/documentation/feature-design-specs.instructions.md`
+- TODO/DONE docs: `.github/instructions/documentation/todo-done-docs.instructions.md`
+
+**Git**
+
+- Git policy: `.github/instructions/git/git-policy.instructions.md`
+
+---
+
+## Rules — Markdown Tables
 
 - Padded pipes: one space on each side of every `|`, including the separator row.
 - Align column widths so all cells in the same column are equal width.
 
+---
+
 ## Git Policy
 
-- IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages. Not ever, not for any reason.
-- [Git — Commits](/.github/instructions/10-git-policy.instructions.md#commits)
-- [Git — Releases](/.github/instructions/10-git-policy.instructions.md#releases)
+- IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages. Non-negotiable.
+- `.github/instructions/git/git-policy.instructions.md` (see Commits and Releases sections)
+
+---
 
 ## Learned User Preferences
 
