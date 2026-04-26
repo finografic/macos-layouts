@@ -1,4 +1,3 @@
 {
-  "recommendations": ["dbaeumer.vscode-eslint", "davidanson.vscode-markdownlint", "oxc.oxc-vscode"],
-  "unwantedRecommendations": ["esbenp.prettier-vscode"]
+  "recommendations": ["davidanson.vscode-markdownlint", "oxc.oxc-vscode"]
 }
