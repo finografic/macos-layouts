@@ -1,14 +1,12 @@
 /**
- * @finografic/macos-layout — Runtime types
+ * Finografic/macos-layout — Runtime types
  *
- * These types define the contract between the TypeScript CLI and
- * the Hammerspoon runtime. All communication is JSON over stdio:
+ * These types define the contract between the TypeScript CLI and the Hammerspoon runtime. All communication
+ * is JSON over stdio:
  *
- *   TS → HS: JSON on stdin (layout + options)
- *   HS → TS: JSON on stdout (dump or apply result)
+ * TS → HS: JSON on stdin (layout + options) HS → TS: JSON on stdout (dump or apply result)
  *
- * The TS side owns validation. Hammerspoon trusts the input shape
- * and focuses on fast, reliable execution.
+ * The TS side owns validation. Hammerspoon trusts the input shape and focuses on fast, reliable execution.
  */
 
 import type { Rect } from './geometry.types.js';
@@ -54,7 +52,7 @@ export interface RuntimeWindow {
   /** Current window title (informational — not used for matching by default) */
   readonly title: string;
 
-  /** macOS accessibility role (typically "AXWindow") */
+  /** MacOS accessibility role (typically "AXWindow") */
   readonly role: string;
 
   /** Whether this is a "standard" window (not a panel, popover, etc.) */

@@ -2,8 +2,7 @@ import pc from 'picocolors';
 import type { ApplyMove } from '../lib/apply-lua.js';
 import type { ApplyOptions } from '../types/cli.types.js';
 import type { Rect } from '../types/geometry.types.js';
-import type { RuntimeWindow } from '../types/runtime.types.js';
-import type { ApplyError, ApplyMoveResult, ApplySkipResult } from '../types/runtime.types.js';
+import type { ApplyError, ApplyMoveResult, ApplySkipResult, RuntimeWindow } from '../types/runtime.types.js';
 
 import { buildApplyLua } from '../lib/apply-lua.js';
 import { resolveDisplayRoles } from '../lib/display-resolver.js';

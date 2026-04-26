@@ -1,8 +1,8 @@
 /**
- * @finografic/macos-layouts — dump command
+ * Finografic/macos-layouts — dump command
  *
- * Queries Hammerspoon for current screen and window state,
- * then outputs structured JSON or human-readable text.
+ * Queries Hammerspoon for current screen and window state, then outputs structured JSON or human-readable
+ * text.
  */
 
 import pc from 'picocolors';

@@ -98,16 +98,16 @@ function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string 
 }
 
 /**
- * Registers a one-shot Hammerspoon eventtap that captures the next keypress,
- * writes { key, mods } to a temp file, and consumes the event so no bound
- * hotkeys fire during capture. Polls the file until it appears (up to 30s).
+ * Registers a one-shot Hammerspoon eventtap that captures the next keypress, writes { key, mods } to a temp
+ * file, and consumes the event so no bound hotkeys fire during capture. Polls the file until it appears (up
+ * to 30s).
  */
 async function captureHotkeyFromHammerspoon(): Promise<{
   mods: string[];
   key: string;
 } | null> {
   const captureFile = join(tmpdir(), 'macos-layouts-hotkey-capture.json');
-  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  const sleep = (ms: number): Promise<void> => new Promise<void>((r) => setTimeout(r, ms));
 
   // Build Lua as a single expression (hs -c cannot span multiple lines).
   // The eventtap returns true to consume the event — prevents existing
@@ -180,7 +180,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
   let windows = dump.windows.filter((w) => w.isStandard && !w.isMinimized);
 
   if (options.include && options.include.length > 0) {
-    const include = options.include;
+    const { include } = options;
     windows = windows.filter((w) =>
       include.some(
         (f) =>
@@ -191,7 +191,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
   }
 
   if (options.exclude && options.exclude.length > 0) {
-    const exclude = options.exclude;
+    const { exclude } = options;
     windows = windows.filter(
       (w) =>
         !exclude.some(

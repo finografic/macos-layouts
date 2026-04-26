@@ -2,9 +2,27 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { PathLike } from 'node:fs';
 
 import { EXIT_CODE } from '../types/cli.types.js';
 import { compileCommand } from './compile.command.js';
+
+function pathLikeToString(p: PathLike): string {
+  if (typeof p === 'string') return p;
+  if (Buffer.isBuffer(p)) return p.toString('utf8');
+  if (p instanceof URL) return p.href;
+  throw new TypeError('pathLikeToString: unsupported path');
+}
+
+function stringOrBufferToUtf8(data: string | NodeJS.ArrayBufferView): string {
+  if (typeof data === 'string') return data;
+  if (Buffer.isBuffer(data)) return data.toString('utf8');
+  if (ArrayBuffer.isView(data)) {
+    const v = data;
+    return Buffer.from(v.buffer, v.byteOffset, v.byteLength).toString('utf8');
+  }
+  throw new TypeError('compile spec mock: expected string or buffer view');
+}
 
 // ─── Mock fs/promises to intercept init.lua operations ────────────────────────
 
@@ -17,18 +35,20 @@ vi.mock('node:fs/promises', async (importOriginal) => {
   return {
     ...actual,
     readFile: vi.fn(async (...args: Parameters<typeof actual.readFile>) => {
-      if (String(args[0]).includes('.hammerspoon/init.lua')) return initLuaExisting as never;
+      if (pathLikeToString(args[0] as PathLike).includes('.hammerspoon/init.lua')) {
+        return initLuaExisting as never;
+      }
       return actual.readFile(...args);
     }),
     writeFile: vi.fn(async (...args: Parameters<typeof actual.writeFile>) => {
-      if (String(args[0]).includes('.hammerspoon/init.lua')) {
-        initLuaCapture.content = String(args[1]);
+      if (pathLikeToString(args[0] as PathLike).includes('.hammerspoon/init.lua')) {
+        initLuaCapture.content = stringOrBufferToUtf8(args[1] as string | NodeJS.ArrayBufferView);
         return;
       }
       return actual.writeFile(...args);
     }),
     mkdir: vi.fn(async (...args: Parameters<typeof actual.mkdir>) => {
-      if (String(args[0]).includes('.hammerspoon')) return undefined;
+      if (pathLikeToString(args[0] as PathLike).includes('.hammerspoon')) return undefined;
       return actual.mkdir(...args);
     }),
   };

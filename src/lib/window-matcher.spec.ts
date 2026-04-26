@@ -52,7 +52,7 @@ const minimizedGhostty: RuntimeWindow = {
 // Ghostty windows with no focused window (all isFocused: false)
 const ghosttyNoFocus = windows
   .filter((w) => w.app.bundleId === 'com.mitchellh.ghostty')
-  .map((w) => ({ ...w, isFocused: false }));
+  .map((w) => Object.assign({}, w, { isFocused: false }));
 
 describe('matchWindows', () => {
   describe('app matching', () => {

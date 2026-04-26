@@ -58,7 +58,7 @@ export function buildLayout({
   // 1. Build displayRoles — order: primary first, builtin second, others alphabetically
   const entries = Object.entries(displayRoleAssignments);
   entries.sort(([, a], [, b]) => {
-    const rank = (s: RuntimeScreen) => (s.isPrimary ? 0 : s.isBuiltin ? 1 : 2);
+    const rank = (s: RuntimeScreen): number => (s.isPrimary ? 0 : s.isBuiltin ? 1 : 2);
     const ra = rank(a);
     const rb = rank(b);
     if (ra !== rb) return ra - rb;

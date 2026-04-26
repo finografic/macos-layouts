@@ -27,12 +27,14 @@ const LAYOUT_BETA = {
 
 let testDir = '';
 let counter = 0;
+/** Captures `vi.spyOn(console, 'log')` for use outside `beforeEach` bodies (vitest hoisted-api rule). */
+let logSpy: { mock: { calls: unknown[][] } };
 
 beforeEach(async () => {
   counter++;
   testDir = join(tmpdir(), `macos-layouts-list-test-${counter}`);
   await mkdir(testDir, { recursive: true });
-  vi.spyOn(console, 'log').mockImplementation(() => {});
+  logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
 afterEach(async () => {
@@ -48,7 +50,7 @@ describe('listCommand', () => {
     await writeFile(join(testDir, 'alpha.json'), JSON.stringify(LAYOUT_ALPHA));
     const code = await listCommand({ options: { layoutsDir: testDir } });
     expect(code).toBe(EXIT_CODE.Success);
-    const calls = vi.mocked(console.log).mock.calls.map((c) => String(c[0]));
+    const calls = logSpy.mock.calls.map((c: unknown[]) => String(c[0]));
     const combined = calls.join('\n');
     expect(combined).toContain('alpha');
     expect(combined).toContain('beta');
@@ -60,14 +62,15 @@ describe('listCommand', () => {
     await writeFile(join(testDir, 'beta.json'), JSON.stringify(LAYOUT_BETA));
     const code = await listCommand({ options: { layoutsDir: testDir, json: true } });
     expect(code).toBe(EXIT_CODE.Success);
-    const output = vi.mocked(console.log).mock.calls[0]?.[0] ?? '';
-    expect(JSON.parse(output)).toEqual(['alpha', 'beta']);
+    const firstLine = logSpy.mock.calls[0]?.[0];
+    expect(typeof firstLine).toBe('string');
+    expect(JSON.parse(firstLine as string)).toEqual(['alpha', 'beta']);
   });
 
   it('empty directory prints "No layouts found" message', async () => {
     const code = await listCommand({ options: { layoutsDir: testDir } });
     expect(code).toBe(EXIT_CODE.Success);
-    const calls = vi.mocked(console.log).mock.calls.map((c) => String(c[0]));
+    const calls = logSpy.mock.calls.map((c: unknown[]) => String(c[0]));
     const output = calls.join('\n');
     expect(output).toContain('No layouts found');
   });

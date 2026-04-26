@@ -64,6 +64,9 @@ const MOCK_DUMP = {
   },
 } as const;
 
+/** Captures `vi.spyOn(console, 'log')` for use outside `beforeEach` bodies (vitest hoisted-api rule). */
+let logSpy: { mock: { calls: unknown[][] } };
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(execa).mockResolvedValue({ stdout: '/usr/local/bin/hs' } as never);
@@ -71,7 +74,7 @@ beforeEach(() => {
   vi.mocked(hs.runLua).mockResolvedValue({ ok: true, value: 'ok' });
   vi.mocked(hs.dump).mockResolvedValue(MOCK_DUMP as never);
   vi.mocked(access).mockResolvedValue(undefined);
-  vi.spyOn(console, 'log').mockImplementation(() => {});
+  logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -97,10 +100,7 @@ describe('doctorCommand', () => {
     const code = await doctorCommand({ options: {} });
     expect(code).toBe(EXIT_CODE.Error);
 
-    const loggedText = vi
-      .mocked(console.log)
-      .mock.calls.map((c) => String(c[0]))
-      .join('\n');
+    const loggedText = logSpy.mock.calls.map((c: unknown[]) => String(c[0])).join('\n');
     expect(loggedText).toMatch(/not found/i);
   });
 
@@ -128,7 +128,7 @@ describe('doctorCommand', () => {
 
     await doctorCommand({ options: { json: true } });
 
-    const jsonOutput = vi.mocked(console.log).mock.calls[0]?.[0] as string;
+    const jsonOutput = logSpy.mock.calls[0]?.[0] as string;
     const parsed = JSON.parse(jsonOutput) as { checks: unknown[]; screens: unknown[] };
     expect(parsed).toHaveProperty('checks');
     expect(parsed).toHaveProperty('screens');

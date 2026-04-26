@@ -1,10 +1,16 @@
 /**
- * @finografic/macos-layout — Type exports
+ * Finografic/macos-layout — Type exports
  */
 
-export type { ApplyOptions, DoctorOptions, DumpOptions, SaveOptions, SharedCliOptions } from './cli.types.js';
-export type { ExitCode } from './cli.types.js';
 export { EXIT_CODE } from './cli.types.js';
+export type {
+  ApplyOptions,
+  DoctorOptions,
+  DumpOptions,
+  ExitCode,
+  SaveOptions,
+  SharedCliOptions,
+} from './cli.types.js';
 export type {
   DisplayMatch,
   DisplayMatchBuiltin,

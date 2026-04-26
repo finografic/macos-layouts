@@ -1,15 +1,14 @@
 /**
- * @finografic/macos-layout — Layout definition
+ * Finografic/macos-layout — Layout definition
  *
- * A Layout is the complete, portable description of a workspace arrangement.
- * It contains:
- *   - display role definitions (how to identify monitors)
- *   - window rules (what goes where)
- *   - options (behavior tuning)
+ * A Layout is the complete, portable description of a workspace arrangement. It contains:
  *
- * Layouts are stored as JSON files in ~/.config/layout/layouts/<name>.json
- * and are designed to be version-controlled, shared, and portable across
- * different desk setups.
+ * - Display role definitions (how to identify monitors)
+ * - Window rules (what goes where)
+ * - Options (behavior tuning)
+ *
+ * Layouts are stored as JSON files in ~/.config/layout/layouts/<name>.json and are designed to be
+ * version-controlled, shared, and portable across different desk setups.
  */
 
 import type { DisplayRoleMap } from './display.types.js';
@@ -19,39 +18,33 @@ import type { WindowRule } from './window.types.js';
 
 export interface LayoutOptions {
   /**
-   * Whether multiple rules can place windows in overlapping positions.
-   * When false (default), overlapping placements generate warnings.
+   * Whether multiple rules can place windows in overlapping positions. When false (default), overlapping
+   * placements generate warnings.
    */
   readonly allowOverlap?: boolean;
 
   /**
-   * Whether to attempt to un-minimize windows before placing them.
-   * Default: false — minimized windows are skipped with a "minimized" skip reason.
+   * Whether to attempt to un-minimize windows before placing them. Default: false — minimized windows are
+   * skipped with a "minimized" skip reason.
    */
   readonly restoreMinimized?: boolean;
 
   /**
-   * What to focus after applying the layout.
-   *   - "none": don't change focus
-   *   - "first": focus the first rule's window
-   *   - string: focus the window matching this rule id
+   * What to focus after applying the layout: `"none"`, `"first"`, or a window `rule` id (arbitrary id strings
+   * are allowed).
    */
-  readonly focusAfterApply?: 'none' | 'first' | string;
+  readonly focusAfterApply?: string;
 
   /**
-   * Display role name to move the Dock to before applying.
-   * When set, the compiled Lua moves the mouse to the bottom of that
-   * display, waits 500ms for the Dock to follow (which changes frame()),
-   * then re-collects screen frames and applies window positions.
-   * Example: "secondary"
+   * Display role name to move the Dock to before applying. When set, the compiled Lua moves the mouse to the
+   * bottom of that display, waits 500ms for the Dock to follow (which changes frame()), then re-collects
+   * screen frames and applies window positions. Example: "secondary"
    */
   readonly dockDisplay?: string;
 
   /**
-   * Hammerspoon hotkey used to trigger this layout.
-   * Set interactively during `save` and used by `compile` to write
-   * the `hs.hotkey.bind()` call in init.lua.
-   * Example: { mods: ["ctrl","shift"], key: "pad0" }
+   * Hammerspoon hotkey used to trigger this layout. Set interactively during `save` and used by `compile` to
+   * write the `hs.hotkey.bind()` call in init.lua. Example: { mods: ["ctrl","shift"], key: "pad0" }
    */
   readonly hotkey?: {
     readonly mods: readonly string[];
@@ -75,14 +68,14 @@ export interface Layout {
   readonly description?: string;
 
   /**
-   * Display role definitions, resolved in declaration order.
-   * Each role maps a semantic name to a display matcher.
+   * Display role definitions, resolved in declaration order. Each role maps a semantic name to a display
+   * matcher.
    */
   readonly displayRoles: DisplayRoleMap;
 
   /**
-   * Window placement rules, processed in declaration order.
-   * Rules targeting the same app claim windows sequentially.
+   * Window placement rules, processed in declaration order. Rules targeting the same app claim windows
+   * sequentially.
    */
   readonly windows: readonly WindowRule[];
 

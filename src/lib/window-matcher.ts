@@ -1,5 +1,4 @@
-import type { SkipReason } from '../types/runtime.types.js';
-import type { RuntimeWindow } from '../types/runtime.types.js';
+import type { RuntimeWindow, SkipReason } from '../types/runtime.types.js';
 import type { WindowRule } from '../types/window.types.js';
 
 // ─── Result types ─────────────────────────────────────────────────────────────

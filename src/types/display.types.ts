@@ -1,13 +1,11 @@
 /**
- * @finografic/macos-layout — Display role types
+ * Finografic/macos-layout — Display role types
  *
- * Layouts never reference physical displays directly.
- * Instead, they define semantic "roles" that are resolved at runtime
- * by matching against the current display environment.
+ * Layouts never reference physical displays directly. Instead, they define semantic "roles" that are resolved
+ * at runtime by matching against the current display environment.
  *
- * Resolution order matters — roles are resolved top-to-bottom,
- * and each physical display can only satisfy one role.
- * Once a display is claimed by a role, it's excluded from subsequent matching.
+ * Resolution order matters — roles are resolved top-to-bottom, and each physical display can only satisfy one
+ * role. Once a display is claimed by a role, it's excluded from subsequent matching.
  */
 
 // ─── Display matchers ────────────────────────────────────────────────────────
@@ -18,20 +16,18 @@ export interface DisplayMatchBuiltin {
 }
 
 /**
- * Match the macOS primary display — the one with the menu bar,
- * whose coordinate origin is (0, 0) in the global coordinate space.
+ * Match the macOS primary display — the one with the menu bar, whose coordinate origin is (0, 0) in the
+ * global coordinate space.
  *
- * Configurable in System Settings > Displays > Arrange (grey bar).
- * Hammerspoon exposes this via hs.screen.primaryScreen().
+ * Configurable in System Settings > Displays > Arrange (grey bar). Hammerspoon exposes this via
+ * hs.screen.primaryScreen().
  *
- * This is the recommended default "main" matcher for most layouts.
- * It works across any monitor setup as long as the user sets their
- * preferred primary in System Settings — which they typically do
- * for ergonomic reasons anyway.
+ * This is the recommended default "main" matcher for most layouts. It works across any monitor setup as long
+ * as the user sets their preferred primary in System Settings — which they typically do for ergonomic reasons
+ * anyway.
  *
- * Note: at work with a dock, primary is often the laptop (builtin).
- * At home with externals only, primary is whichever external you choose.
- * Both cases are handled naturally.
+ * Note: at work with a dock, primary is often the laptop (builtin). At home with externals only, primary is
+ * whichever external you choose. Both cases are handled naturally.
  */
 export interface DisplayMatchPrimary {
   readonly kind: 'primary';
@@ -48,9 +44,8 @@ export interface DisplayMatchSmallestExternal {
 }
 
 /**
- * Match an external display by index after other roles have claimed theirs.
- * Index 0 = first unclaimed external (sorted by pixel area descending).
- * Useful when you have 3+ externals.
+ * Match an external display by index after other roles have claimed theirs. Index 0 = first unclaimed
+ * external (sorted by pixel area descending). Useful when you have 3+ externals.
  */
 export interface DisplayMatchExternalByIndex {
   readonly kind: 'externalByIndex';
@@ -58,8 +53,8 @@ export interface DisplayMatchExternalByIndex {
 }
 
 /**
- * Match by display name substring (e.g. "DELL", "LG").
- * Fragile — use only when physical identity truly matters.
+ * Match by display name substring (e.g. "DELL", "LG"). Fragile — use only when physical identity truly
+ * matters.
  */
 export interface DisplayMatchByName {
   readonly kind: 'byName';
@@ -79,30 +74,27 @@ export type DisplayMatch =
 /**
  * A display role is a named reference used by window placement rules.
  *
- * Roles are resolved in declaration order. Each matcher is tried
- * against the remaining (unclaimed) displays. First match wins.
+ * Roles are resolved in declaration order. Each matcher is tried against the remaining (unclaimed) displays.
+ * First match wins.
  *
- * If `fallback` is provided and the primary match fails,
- * the fallback role name is used instead (must reference another role).
+ * If `fallback` is provided and the primary match fails, the fallback role name is used instead (must
+ * reference another role).
  */
 export interface DisplayRole {
   /** Primary matcher for this role */
   readonly match: DisplayMatch;
 
   /**
-   * Optional: if no display matches, fall back to this role's resolved display.
-   * Example: secondaryExternal falls back to "builtin" if only one external exists.
+   * Optional: if no display matches, fall back to this role's resolved display. Example: secondaryExternal
+   * falls back to "builtin" if only one external exists.
    */
   readonly fallback?: string;
 }
 
 /**
- * Map of role names to their definitions.
- * Resolution is performed in insertion order (Map-like semantics).
+ * Map of role names to their definitions. Resolution is performed in insertion order (Map-like semantics).
  *
- * Common patterns:
- *   builtin          → { match: { kind: "builtin" } }
- *   mainExternal     → { match: { kind: "largestExternal" } }
- *   secondaryExternal → { match: { kind: "externalByIndex", index: 0 }, fallback: "builtin" }
+ * Common patterns: builtin → { match: { kind: "builtin" } } mainExternal → { match: { kind: "largestExternal"
+ * } } secondaryExternal → { match: { kind: "externalByIndex", index: 0 }, fallback: "builtin" }
  */
 export type DisplayRoleMap = Record<string, DisplayRole>;

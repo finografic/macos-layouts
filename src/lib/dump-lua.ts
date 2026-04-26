@@ -1,7 +1,6 @@
 /**
- * Self-contained Lua script — no require(), no external files.
- * Runs in the live Hammerspoon instance via `hs -c`.
- * Returns a JSON string matching the RuntimeDump shape.
+ * Self-contained Lua script — no require(), no external files. Runs in the live Hammerspoon instance via `hs
+ * -c`. Returns a JSON string matching the RuntimeDump shape.
  *
  * Shared by dump.command.ts and apply.command.ts.
  */

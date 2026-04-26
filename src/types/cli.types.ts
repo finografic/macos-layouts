@@ -1,8 +1,8 @@
 /**
- * @finografic/macos-layout — CLI types
+ * Finografic/macos-layout — CLI types
  *
- * Type definitions for CLI command options and exit codes.
- * These are used internally by the CLI layer, not by Hammerspoon.
+ * Type definitions for CLI command options and exit codes. These are used internally by the CLI layer, not by
+ * Hammerspoon.
  */
 
 // ─── Exit codes ──────────────────────────────────────────────────────────────
@@ -42,8 +42,11 @@ export interface ApplyOptions extends SharedCliOptions {
   /** Print what would happen without moving windows */
   readonly dryRun?: boolean;
 
-  /** What to focus after apply: "none", "first", or a rule id */
-  readonly focus?: 'none' | 'first' | string;
+  /**
+   * What to focus after apply. Use `"none"`, `"first"`, or a window `rule` id from the layout (arbitrary id
+   * strings are allowed).
+   */
+  readonly focus?: string;
 }
 
 export interface SaveOptions extends SharedCliOptions {

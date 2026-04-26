@@ -1,15 +1,14 @@
 /**
- * @finografic/macos-layouts — Hammerspoon communication layer
+ * Finografic/macos-layouts — Hammerspoon communication layer
  *
- * JSON-over-IPC bridge between the TS CLI and the Hammerspoon runtime.
- * All communication flows through `hs -c '<lua expr>'`, which evaluates
- * Lua in the running Hammerspoon instance and returns the result on stdout.
+ * JSON-over-IPC bridge between the TS CLI and the Hammerspoon runtime. All communication flows through `hs -c
+ * '<lua expr>'`, which evaluates Lua in the running Hammerspoon instance and returns the result on stdout.
  *
- * TS → HS: Lua expression with payload embedded as a Lua long string
- * HS → TS: JSON string captured from stdout by execa
+ * TS → HS: Lua expression with payload embedded as a Lua long string HS → TS: JSON string captured from
+ * stdout by execa
  *
- * The Lua module is loaded via require("macos-layout") in the running HS
- * instance. Use `layout doctor` to verify the module is reachable.
+ * The Lua module is loaded via require("macos-layout") in the running HS instance. Use `layout doctor` to
+ * verify the module is reachable.
  */
 
 import { execa, ExecaError } from 'execa';
@@ -47,8 +46,8 @@ export interface HammerspoonError {
 // ─── Result type ─────────────────────────────────────────────────────────────
 
 /**
- * Discriminated union for explicit error handling.
- * Avoids try/catch at call sites — callers pattern-match on `ok`.
+ * Discriminated union for explicit error handling. Avoids try/catch at call sites — callers pattern-match on
+ * `ok`.
  */
 export type HsResult<T> =
   | { readonly ok: true; readonly value: T }
@@ -136,10 +135,9 @@ function parseJson<T>(raw: string): HsResult<T> {
 /**
  * Wrap a string in a Lua long-string literal that safely survives any content.
  *
- * Lua long strings use `[N=[` / `]=N]` delimiters where N is any number of `=`
- * signs. We pick the shortest N such that the closing delimiter cannot appear
- * in the payload. For JSON this is almost always level 0 (`[[...]]`), but the
- * function increments the level defensively.
+ * Lua long strings use `[N=[` / `]=N]` delimiters where N is any number of `=` signs. We pick the shortest N
+ * such that the closing delimiter cannot appear in the payload. For JSON this is almost always level 0
+ * (`[[...]]`), but the function increments the level defensively.
  */
 export function luaLongString(s: string): string {
   let level = 0;
@@ -174,8 +172,8 @@ export interface ApplyParams {
 /**
  * Check whether the Hammerspoon runtime is reachable.
  *
- * Returns false if `hs` is not on PATH, Hammerspoon is not running,
- * or the call times out. Safe to call from `layout doctor`.
+ * Returns false if `hs` is not on PATH, Hammerspoon is not running, or the call times out. Safe to call from
+ * `layout doctor`.
  */
 export async function isAvailable({ timeoutMs = 3_000 }: IsAvailableParams = {}): Promise<boolean> {
   const result = await runHs({ expr: 'return "ok"', timeoutMs });
@@ -185,9 +183,8 @@ export async function isAvailable({ timeoutMs = 3_000 }: IsAvailableParams = {})
 /**
  * Fetch the current runtime state from Hammerspoon.
  *
- * Returns a snapshot of all screens and standard windows.
- * This is the primary data source for `layout dump` and the
- * matching phase of `layout apply`.
+ * Returns a snapshot of all screens and standard windows. This is the primary data source for `layout dump`
+ * and the matching phase of `layout apply`.
  */
 export async function dump({ lua, timeoutMs }: DumpParams): Promise<HsResult<RuntimeDump>> {
   const raw = await runHs({ expr: lua, timeoutMs });
@@ -196,8 +193,8 @@ export async function dump({ lua, timeoutMs }: DumpParams): Promise<HsResult<Run
 }
 
 /**
- * Run an arbitrary Lua expression in the running Hammerspoon instance.
- * Returns the raw stdout string. Use this for self-contained IIFE scripts.
+ * Run an arbitrary Lua expression in the running Hammerspoon instance. Returns the raw stdout string. Use
+ * this for self-contained IIFE scripts.
  */
 export async function runLua(lua: string, timeoutMs?: number): Promise<HsResult<string>> {
   return runHs({ expr: lua, timeoutMs });
@@ -206,9 +203,8 @@ export async function runLua(lua: string, timeoutMs?: number): Promise<HsResult<
 /**
  * Apply a layout to the current windows via Hammerspoon.
  *
- * The layout JSON is embedded in the Lua expression as a long string,
- * avoiding all shell-escaping concerns. Hammerspoon decodes it, executes
- * the placement rules, and returns a structured ApplyResult.
+ * The layout JSON is embedded in the Lua expression as a long string, avoiding all shell-escaping concerns.
+ * Hammerspoon decodes it, executes the placement rules, and returns a structured ApplyResult.
  */
 export async function apply({ layout, options }: ApplyParams): Promise<HsResult<ApplyResult>> {
   const payload = JSON.stringify({ layout, options: options ?? {} });

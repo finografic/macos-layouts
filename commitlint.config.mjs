@@ -1,7 +1,8 @@
 /**
  * Commitlint — enforces **header shape** (type, optional scope, subject).
- * - rule severity is always a number: 0 = off, 1 = warning, 2 = error
- * - commit scopes are optional
+ *
+ * - Rule severity is always a number: 0 = off, 1 = warning, 2 = error
+ * - Commit scopes are optional
  *
  * @type {import('@commitlint/types').UserConfig}
  */

@@ -8,6 +8,14 @@ import fixture from '../__mocks__/dump-home-personal.json';
 import { EXIT_CODE } from '../types/cli.types.js';
 import { applyCommand } from './apply.command.js';
 
+// ─── Mock finder bridge (avoid real osascript / 5s execa timeout in CI) ───────
+
+vi.mock('../lib/finder-bridge.js', () => ({
+  FINDER_BUNDLE_ID: 'com.apple.finder',
+  fetchFinderWindows: vi.fn().mockResolvedValue([]),
+  applyFinderMove: vi.fn().mockResolvedValue({ windowId: 'finder-0', applied: true }),
+}));
+
 // ─── Mock hammerspoon ─────────────────────────────────────────────────────────
 
 vi.mock('../lib/hammerspoon.js', async (importOriginal) => {

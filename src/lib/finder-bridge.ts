@@ -1,12 +1,11 @@
 /**
  * Finder window bridge — AppleScript fallback for Finder windows.
  *
- * macOS no longer exposes Finder windows via the Accessibility (AX) APIs
- * used by Hammerspoon. This module handles Finder capture and apply
- * exclusively via `osascript`, leaving all non-Finder paths unchanged.
+ * MacOS no longer exposes Finder windows via the Accessibility (AX) APIs used by Hammerspoon. This module
+ * handles Finder capture and apply exclusively via `osascript`, leaving all non-Finder paths unchanged.
  *
- * Capture: `osascript -e 'tell application "Finder" to get bounds of every window'`
- * Apply:   `osascript -e 'tell application "Finder" to set bounds of window N to {...}'`
+ * Capture: `osascript -e 'tell application "Finder" to get bounds of every window'` Apply: `osascript -e
+ * 'tell application "Finder" to set bounds of window N to {...}'`
  */
 
 import { execa } from 'execa';
@@ -20,8 +19,7 @@ export const FINDER_BUNDLE_ID = 'com.apple.finder';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Parse the AppleScript bounds output.
- * Format: `{left, top, right, bottom}, {left, top, right, bottom}, ...`
+ * Parse the AppleScript bounds output. Format: `{left, top, right, bottom}, {left, top, right, bottom}, ...`
  */
 function parseBoundsOutput(raw: string): Array<{ left: number; top: number; right: number; bottom: number }> {
   const result: Array<{ left: number; top: number; right: number; bottom: number }> = [];
@@ -54,9 +52,8 @@ function screenForFrame(frame: Rect, screens: readonly RuntimeScreen[]): string 
 // ─── Capture ──────────────────────────────────────────────────────────────────
 
 /**
- * Fetch all open (non-minimized) Finder windows via AppleScript.
- * Returns an empty array if Finder is not running or has no windows.
- * Window IDs are synthetic: `finder-0`, `finder-1`, etc. (0-based).
+ * Fetch all open (non-minimized) Finder windows via AppleScript. Returns an empty array if Finder is not
+ * running or has no windows. Window IDs are synthetic: `finder-0`, `finder-1`, etc. (0-based).
  */
 export async function fetchFinderWindows(screens: readonly RuntimeScreen[]): Promise<RuntimeWindow[]> {
   let raw: string;
@@ -101,9 +98,8 @@ export interface FinderMoveResult {
 /**
  * Move a Finder window via AppleScript.
  *
- * `windowId` must be a synthetic `finder-N` ID (0-based).
- * AppleScript uses 1-based window indexing.
- * `before` is the frame captured during dump, used for the result record.
+ * `windowId` must be a synthetic `finder-N` ID (0-based). AppleScript uses 1-based window indexing. `before`
+ * is the frame captured during dump, used for the result record.
  */
 export async function applyFinderMove(
   windowId: string,

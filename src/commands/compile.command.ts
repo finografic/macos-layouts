@@ -19,9 +19,9 @@ interface CompileCommandParams {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * init.lua snippet (V1): debounced apply shared by hotkey and screen watcher.
- * A raw `dofile` in the hotkey path was prone to bad interactions (e.g. Finder);
- * throttling all entry points and using `hs.screen.watcher.new(fn)` fixes that.
+ * Init.lua snippet (V1): debounced apply shared by hotkey and screen watcher. A raw `dofile` in the hotkey
+ * path was prone to bad interactions (e.g. Finder); throttling all entry points and using
+ * `hs.screen.watcher.new(fn)` fixes that.
  */
 function buildInitSnippet(
   name: string,
@@ -57,10 +57,8 @@ function buildInitSnippet(
 }
 
 /**
- * Ensures Dock animation is instant (required for nudgeDock timing).
- * Writes to the user's own plist — no sudo needed.
- * Only restarts the Dock if the values weren't already 0.
- * Returns true if Dock was restarted.
+ * Ensures Dock animation is instant (required for nudgeDock timing). Writes to the user's own plist — no sudo
+ * needed. Only restarts the Dock if the values weren't already 0. Returns true if Dock was restarted.
  */
 function ensureDockAnimationInstant(): boolean {
   const read = spawnSync('defaults', ['read', 'com.apple.dock', 'autohide-time-modifier'], {

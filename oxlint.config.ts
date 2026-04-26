@@ -61,7 +61,11 @@ export default defineConfig({
     'import/no-duplicates': 'error',
     'typescript/consistent-type-imports': [
       'error',
-      { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
+      {
+        prefer: 'type-imports',
+        fixStyle: 'separate-type-imports',
+        disallowTypeAnnotations: false,
+      },
     ],
 
     'typescript/no-unused-vars': [

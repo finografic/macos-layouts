@@ -26,12 +26,12 @@ export function renderUsage(bin: string, command = '<command>', options?: string
   return `${pc.cyanBright(bin)} ${pc.dim(pc.cyan(command))}${opts}`;
 }
 
-/** Renders a COMMANDS row: `  cmd    description` */
+/** Renders a COMMANDS row: ` cmd description` */
 export function renderCommand({ cmd, desc }: HelpCommand, colWidth: number): string {
   return `  ${pc.cyan(cmd)}${colPad(colWidth, cmd)}${desc}`;
 }
 
-/** Renders an EXAMPLES row: `  cmd    # comment` */
+/** Renders an EXAMPLES row: ` cmd # comment` */
 export function renderExample({ cmd, comment }: HelpExample, colWidth: number): string {
   return `  ${cmd}${colPad(colWidth, cmd)}${pc.dim('# ' + comment)}`;
 }

@@ -31,8 +31,9 @@ function isValidLayout(parsed: unknown): parsed is Layout {
     obj['displayRoles'] === null ||
     Array.isArray(obj['displayRoles']) ||
     Object.keys(obj['displayRoles'] as object).length === 0
-  )
+  ) {
     return false;
+  }
   if (!Array.isArray(obj['windows'])) return false;
   return true;
 }

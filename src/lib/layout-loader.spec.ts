@@ -29,37 +29,36 @@ describe('loadLayout', () => {
   it('loads a valid layout file', async () => {
     await writeFile(join(testDir, 'test.json'), VALID_LAYOUT);
     const result = await loadLayout('test', testDir);
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.layout.name).toBe('test');
-      expect(result.layout.version).toBe('0.1');
-    }
+    expect(result).toEqual({
+      ok: true,
+      layout: expect.objectContaining({ name: 'test', version: '0.1' }),
+    });
   });
 
   it('returns error for non-existent file', async () => {
     const result = await loadLayout('nonexistent', testDir);
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error).toMatch(/not found/i);
-    }
+    expect(result).toEqual({
+      ok: false,
+      error: expect.stringMatching(/not found/i),
+    });
   });
 
   it('returns error for invalid JSON', async () => {
     await writeFile(join(testDir, 'broken.json'), '{ not valid json }');
     const result = await loadLayout('broken', testDir);
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error).toMatch(/invalid json/i);
-    }
+    expect(result).toEqual({
+      ok: false,
+      error: expect.stringMatching(/invalid json/i),
+    });
   });
 
   it('returns error for JSON missing required fields', async () => {
     await writeFile(join(testDir, 'partial.json'), JSON.stringify({ version: '0.1', name: 'partial' }));
     const result = await loadLayout('partial', testDir);
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error).toMatch(/missing required fields/i);
-    }
+    expect(result).toEqual({
+      ok: false,
+      error: expect.stringMatching(/missing required fields/i),
+    });
   });
 
   it('returns error for wrong version', async () => {

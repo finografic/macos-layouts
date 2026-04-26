@@ -10,18 +10,19 @@ export interface GenerateLuaParams {
 }
 
 /**
- * Generates a self-contained Lua script that applies the given layout
- * when loaded via dofile() in Hammerspoon. No require() or external
- * files are needed — all layout data and runtime logic is embedded inline.
+ * Generates a self-contained Lua script that applies the given layout when loaded via dofile() in
+ * Hammerspoon. No require() or external files are needed — all layout data and runtime logic is embedded
+ * inline.
  *
  * The generated file mirrors the behaviour of the Node.js apply command:
- *   - display roles resolved in declaration order (display-resolver.ts)
- *   - windows sorted by (frame.x, frame.y, id) before matching (window-matcher.ts)
- *   - normalized rects converted to absolute pixels via Math.round (rect-converter.ts)
  *
- * `layouts compile` appends a debounced init.lua snippet (`_layoutsApply_*` + hotkey +
- * `hs.screen.watcher`) — see `buildInitSnippet` in compile.command.ts. Manual init.lua can
- * still call `dofile(...)` directly if you prefer.
+ * - Display roles resolved in declaration order (display-resolver.ts)
+ * - Windows sorted by (frame.x, frame.y, id) before matching (window-matcher.ts)
+ * - Normalized rects converted to absolute pixels via Math.round (rect-converter.ts)
+ *
+ * `layouts compile` appends a debounced init.lua snippet (`_layoutsApply_*` + hotkey + `hs.screen.watcher`) —
+ * see `buildInitSnippet` in compile.command.ts. Manual init.lua can still call `dofile(...)` directly if you
+ * prefer.
  */
 export function generateLua({ layout, generatedAt = new Date() }: GenerateLuaParams): string {
   const date = generatedAt.toISOString().split('T')[0];
@@ -99,7 +100,7 @@ function buildWindowRulesTable(rules: readonly WindowRule[]): string {
       appParts.push(`bundleId = ${luaString(rule.app.bundleId)}`);
     }
     if (rule.app.name !== undefined) appParts.push(`name = ${luaString(rule.app.name)}`);
-    const rect = rule.place.rect;
+    const { rect } = rule.place;
     lines.push('    {');
     lines.push(`      id = ${luaString(rule.id)},`);
     lines.push(`      app = { ${appParts.join(', ')} },`);
@@ -150,8 +151,8 @@ function buildLayoutDataBlock(
 // ─── Static Lua function blocks ───────────────────────────────────────────────
 
 /**
- * Mirrors display-resolver.ts: resolves semantic role names to physical screens.
- * Roles are resolved in declaration order; each screen can satisfy at most one role.
+ * Mirrors display-resolver.ts: resolves semantic role names to physical screens. Roles are resolved in
+ * declaration order; each screen can satisfy at most one role.
  */
 const RESOLVE_DISPLAY_ROLES_FN = `\
 -- [[ Display role resolver ]]
@@ -229,12 +230,11 @@ local function resolveDisplayRoles(roles, screens)
 end`;
 
 /**
- * Mirrors window-matcher.ts: pool-based matching with deterministic sort.
- * Windows are sorted by (frame.x, frame.y, id) before index-based rules are applied.
- * Each window can be claimed by at most one rule.
+ * Mirrors window-matcher.ts: pool-based matching with deterministic sort. Windows are sorted by (frame.x,
+ * frame.y, id) before index-based rules are applied. Each window can be claimed by at most one rule.
  *
- * Note: byTitle uses Lua string patterns, which are similar to but not identical
- * to JavaScript regex. Basic patterns (^, $, ., *, +) work the same way.
+ * Note: byTitle uses Lua string patterns, which are similar to but not identical to JavaScript regex. Basic
+ * patterns (^, $, ., *, +) work the same way.
  */
 const MATCH_WINDOWS_FN = `\
 -- [[ Window matcher ]]
@@ -357,21 +357,16 @@ local function matchWindows(rules, windows, resolvedDisplays)
 end`;
 
 /**
- * Runtime body: collects screens and windows from the live Hammerspoon
- * environment, resolves display roles, matches windows, and moves them.
+ * Runtime body: collects screens and windows from the live Hammerspoon environment, resolves display roles,
+ * matches windows, and moves them.
  *
- * If LAYOUT.options.dockDisplay is set:
- *   1. Mouse is moved to the bottom of that display (activates it as the
- *      Dock's target display).
- *   2. Dock autohide is toggled true→false via AppleScript (both calls are
- *      synchronous), forcing the Dock to reappear on the now-active display.
- *   3. After 0.1s (for screen:frame() to reflect the new Dock position),
- *      the layout is applied.
+ * If LAYOUT.options.dockDisplay is set: 1. Mouse is moved to the bottom of that display (activates it as the
+ * Dock's target display). 2. Dock autohide is toggled true→false via AppleScript (both calls are
+ * synchronous), forcing the Dock to reappear on the now-active display. 3. After 0.1s (for screen:frame() to
+ * reflect the new Dock position), the layout is applied.
  *
- * Prerequisite for minimal latency:
- *   defaults write com.apple.dock autohide-delay -float 0
- *   defaults write com.apple.dock autohide-time-modifier -float 0
- *   killall Dock
+ * Prerequisite for minimal latency: defaults write com.apple.dock autohide-delay -float 0 defaults write
+ * com.apple.dock autohide-time-modifier -float 0 killall Dock
  */
 const APPLY_BLOCK = `\
 -- [[ Helpers: collect live state ]]

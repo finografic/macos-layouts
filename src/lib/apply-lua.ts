@@ -10,9 +10,8 @@ export interface ApplyMove {
 /**
  * Build a self-contained Lua IIFE that moves windows via Hammerspoon.
  *
- * The moves array is embedded as JSON. Each move uses hs.window.get(id)
- * to look up the window by numeric ID, then win:setFrame() to move it.
- * Returns a JSON array of per-window results.
+ * The moves array is embedded as JSON. Each move uses hs.window.get(id) to look up the window by numeric ID,
+ * then win:setFrame() to move it. Returns a JSON array of per-window results.
  */
 export function buildApplyLua(moves: readonly ApplyMove[]): string {
   const payload = luaLongString(JSON.stringify(moves));

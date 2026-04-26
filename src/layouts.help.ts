@@ -1,13 +1,7 @@
 import pc from 'picocolors';
 
-import {
-  columnMax,
-  type HelpCommand,
-  type HelpExample,
-  renderCommand,
-  renderExample,
-  renderUsage,
-} from './utils/help.utils.js';
+import { columnMax, renderCommand, renderExample, renderUsage } from './utils/help.utils.js';
+import type { HelpCommand, HelpExample } from './utils/help.utils.js';
 
 export function printHelp(): void {
   const lines: string[] = [];

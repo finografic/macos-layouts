@@ -1,10 +1,7 @@
 /**
- * @file flow.utils.ts — SHARED flow framework for @finografic CLI tools.
- *
- * ⚠️  AVOID EDITING THIS FILE DIRECTLY.
- *
- * The exported API surface and behaviour must remain identical across all repos.
- * Minor formatter adjustments (blank lines, trailing commas) are acceptable.
+ * @file Flow.utils.ts — SHARED flow framework for @finografic CLI tools. ⚠️ AVOID EDITING THIS FILE DIRECTLY.
+ *   The exported API surface and behaviour must remain identical across all repos. Minor formatter
+ *   adjustments (blank lines, trailing commas) are acceptable.
  */
 
 import * as clack from '@clack/prompts';
@@ -39,7 +36,7 @@ export interface PromptSelectOpts<T> {
   /** Convert a flag string value to the prompt's return type. Required when Value is non-primitive. */
   fromFlag?: (flagValue: string) => T | undefined;
   message: string;
-  options: { value: T; label: string; hint?: string }[];
+  options: Array<{ value: T; label: string; hint?: string }>;
   default?: T;
   /** When true, always prompt even in yes-mode */
   required?: boolean;
@@ -73,7 +70,7 @@ export interface PromptMultiSelectOpts<T> {
   /** Flag key whose value auto-resolves this prompt (comma-separated, skips showing the prompt) */
   flagKey?: string;
   message: string;
-  options: { value: T; label: string; hint?: string }[];
+  options: Array<{ value: T; label: string; hint?: string }>;
   initialValues?: T[];
   /** When true, at least one option must be selected (passed to clack) */
   minOne?: boolean;
@@ -83,7 +80,7 @@ export interface PromptMultiSelectOpts<T> {
 
 export interface PromptAutocompleteMultiSelectOpts<T> {
   message: string;
-  options: { value: T; label: string; hint?: string }[];
+  options: Array<{ value: T; label: string; hint?: string }>;
   placeholder?: string;
   initialValues?: T[];
   /** When true, always prompt even in yes-mode */
@@ -176,7 +173,7 @@ export async function promptSelect<T>(flow: FlowContext, opts: PromptSelectOpts<
 
   const result = await clack.select({
     message: opts.message,
-    options: opts.options as clack.Option<T>[],
+    options: opts.options as Array<clack.Option<T>>,
   });
 
   if (clack.isCancel(result)) {
@@ -256,7 +253,7 @@ export async function promptMultiSelect<T>(flow: FlowContext, opts: PromptMultiS
 
   const result = await clack.multiselect({
     message: opts.message,
-    options: opts.options as clack.Option<T>[],
+    options: opts.options as Array<clack.Option<T>>,
     initialValues: opts.initialValues,
     required: opts.minOne,
   });
@@ -280,7 +277,7 @@ export async function promptAutocompleteMultiSelect<T>(
 
   const result = await clack.autocompleteMultiselect({
     message: opts.message,
-    options: opts.options as clack.Option<T>[],
+    options: opts.options as Array<clack.Option<T>>,
     placeholder: opts.placeholder,
     initialValues: opts.initialValues,
   });

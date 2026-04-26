@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { createFlowContext } from './utils/flow.utils.js';
+
 import type {
   ApplyOptions,
   CompileOptions,
@@ -9,6 +10,7 @@ import type {
   ListOptions,
   SaveOptions,
 } from './types/cli.types.js';
+
 import { applyCommand } from './commands/apply.command.js';
 import { compileCommand } from './commands/compile.command.js';
 import { doctorCommand } from './commands/doctor.command.js';
@@ -52,8 +54,7 @@ async function main(): Promise<void> {
 
   if (command === 'save') {
     // Support: save -y home  OR  save home -y
-    const nonFlagArgs = rest.filter((a) => !a.startsWith('-'));
-    const layoutName = nonFlagArgs[0];
+    const layoutName = rest.find((a) => !a.startsWith('-'));
     if (!layoutName) {
       console.error('Error: layout name is required. Usage: layouts save <name>');
       process.exit(1);
