@@ -31,8 +31,8 @@ importers:
         specifier: ^0.9.6
         version: 0.9.6
       '@finografic/oxc-config':
-        specifier: ^2.3.9
-        version: 2.3.9(oxfmt@0.46.0)(oxlint@1.61.0(oxlint-tsgolint@0.22.0))
+        specifier: ^2.4.0
+        version: 2.4.0(oxfmt@0.46.0)(oxlint@1.61.0(oxlint-tsgolint@0.22.0))
       '@types/node':
         specifier: ^24.0.0
         version: 24.10.13
@@ -336,8 +336,8 @@ packages:
     resolution: {integrity: sha512-vpJXCqcV1OD/FovMNIhrnkHrGA2NBHqclb/5d0r9lRZNuo+5KIs7H/K5vci9Ah6/PcVMpJVnaDv34rvHK69yNQ==, tarball: https://npm.pkg.github.com/download/@finografic/md-lint/0.9.6/93dfddec2a85df3ed5802939904bdc8ad786969d}
     hasBin: true
 
-  '@finografic/oxc-config@2.3.9':
-    resolution: {integrity: sha512-Teset1tIJ80eQ0KF6lZiWNjZ9O6mU9n3Or+96+MIVWrWod/0eqLDD7v7Rn0YGniP8Tr4zl/6jO/KZQsJOsFMbA==, tarball: https://npm.pkg.github.com/download/@finografic/oxc-config/2.3.9/12e1fec390e80bb8a8d43dbe0bdc4238d3cc304a}
+  '@finografic/oxc-config@2.4.0':
+    resolution: {integrity: sha512-YLDr8golpvW3yaSbhNXu7prGA6Scu9FYLi5KgNHB3hFK1DMK2GwNNVSiAWBmjat4NKxMwmTrpAwgOmtPIlEKeg==, tarball: https://npm.pkg.github.com/download/@finografic/oxc-config/2.4.0/2318d9f8f425167b9259a162cc5aca4eaba39160}
     peerDependencies:
       oxfmt: '>=0.41.0'
       oxlint: '>=1.0.0'
@@ -2196,7 +2196,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@finografic/oxc-config@2.3.9(oxfmt@0.46.0)(oxlint@1.61.0(oxlint-tsgolint@0.22.0))':
+  '@finografic/oxc-config@2.4.0(oxfmt@0.46.0)(oxlint@1.61.0(oxlint-tsgolint@0.22.0))':
     dependencies:
       execa: 9.6.1
       oxfmt: 0.46.0
