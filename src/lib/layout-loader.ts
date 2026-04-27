@@ -30,7 +30,7 @@ function isValidLayout(parsed: unknown): parsed is Layout {
     typeof obj['displayRoles'] !== 'object' ||
     obj['displayRoles'] === null ||
     Array.isArray(obj['displayRoles']) ||
-    Object.keys(obj['displayRoles'] as object).length === 0
+    Object.keys(obj['displayRoles']).length === 0
   ) {
     return false;
   }
@@ -75,7 +75,7 @@ export async function listLayouts(layoutsDir?: string): Promise<readonly string[
     return entries
       .filter((f) => f.endsWith('.json'))
       .map((f) => f.slice(0, -'.json'.length))
-      .sort();
+      .toSorted();
   } catch {
     return [];
   }

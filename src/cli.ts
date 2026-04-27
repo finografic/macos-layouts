@@ -64,8 +64,8 @@ async function main(): Promise<void> {
     const include: string[] = [];
     const exclude: string[] = [];
     for (let i = 0; i < saveRest.length; i++) {
-      if (saveRest[i] === '--include' && saveRest[i + 1]) include.push(saveRest[++i]!);
-      if (saveRest[i] === '--exclude' && saveRest[i + 1]) exclude.push(saveRest[++i]!);
+      if (saveRest[i] === '--include' && saveRest[i + 1]) include.push(saveRest[++i]);
+      if (saveRest[i] === '--exclude' && saveRest[i + 1]) exclude.push(saveRest[++i]);
     }
     const flow = createFlowContext(saveRest, {
       y: { type: 'boolean' },

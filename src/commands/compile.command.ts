@@ -41,8 +41,8 @@ function applyRoleSwap(layout: Layout): Layout {
 
   const newRoles: DisplayRoleMap = Object.fromEntries(
     Object.entries(roles).map(([k, v]) => {
-      if (k === a) return [k, roles[b!]!];
-      if (k === b) return [k, roles[a!]!];
+      if (k === a) return [k, roles[b]];
+      if (k === b) return [k, roles[a]];
       return [k, v];
     }),
   );

@@ -27,7 +27,7 @@ function appLabel(rule: WindowRule): string {
 }
 
 function sortWindows(windows: RuntimeWindow[]): RuntimeWindow[] {
-  return [...windows].sort((a, b) => {
+  return [...windows].toSorted((a, b) => {
     if (a.frame.x !== b.frame.x) return a.frame.x - b.frame.x;
     if (a.frame.y !== b.frame.y) return a.frame.y - b.frame.y;
     return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;

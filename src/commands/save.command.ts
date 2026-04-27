@@ -52,7 +52,9 @@ function autoAssignRoles(screens: readonly RuntimeScreen[]): Record<string, Runt
   }
 
   const roleNames = ['secondary', 'tertiary', 'quaternary'];
-  const sorted = [...remaining].sort((a, b) => b.fullFrame.w * b.fullFrame.h - a.fullFrame.w * a.fullFrame.h);
+  const sorted = [...remaining].toSorted(
+    (a, b) => b.fullFrame.w * b.fullFrame.h - a.fullFrame.w * a.fullFrame.h,
+  );
   for (let i = 0; i < sorted.length; i++) {
     roles[roleNames[i] ?? `display-${i}`] = sorted[i]!;
   }
@@ -244,7 +246,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
     const defaultRoleNames = ['primary', 'secondary', 'tertiary', 'quaternary'];
 
     for (let i = 0; i < dump.screens.length; i++) {
-      const screen = dump.screens[i]!;
+      const screen = dump.screens[i];
       const defaultRole = screen.isPrimary
         ? 'primary'
         : screen.isBuiltin
@@ -264,7 +266,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       });
 
       if (result !== '__skip__') {
-        displayRoleAssignments[result as string] = screen;
+        displayRoleAssignments[result] = screen;
       }
     }
 
@@ -340,7 +342,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
 
   // 8. Print summary
   const roleCount = Object.keys(displayRoleAssignments).length;
-  const appNames = [...new Set(selectedWindows.map((w) => w.app.name))].sort();
+  const appNames = [...new Set(selectedWindows.map((w) => w.app.name))].toSorted();
 
   if (interactive) {
     outro(`Layout saved`);

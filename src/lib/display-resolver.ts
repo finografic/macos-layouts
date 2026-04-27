@@ -27,7 +27,7 @@ function matchScreen(match: DisplayMatch, pool: RuntimeScreen[]): RuntimeScreen 
 
     case 'externalByIndex': {
       const externals = pool.filter((s) => !s.isBuiltin);
-      const sorted = [...externals].sort((a, b) => area(b.fullFrame) - area(a.fullFrame));
+      const sorted = [...externals].toSorted((a, b) => area(b.fullFrame) - area(a.fullFrame));
       return sorted[match.index] ?? null;
     }
 

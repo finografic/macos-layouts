@@ -39,10 +39,10 @@ export function parseBoundsOutput(raw: string): BoundsRecord[] {
   let m: RegExpExecArray | null;
   while ((m = re.exec(raw)) !== null) {
     braced.push({
-      left: parseInt(m[1]!, 10),
-      top: parseInt(m[2]!, 10),
-      right: parseInt(m[3]!, 10),
-      bottom: parseInt(m[4]!, 10),
+      left: parseInt(m[1], 10),
+      top: parseInt(m[2], 10),
+      right: parseInt(m[3], 10),
+      bottom: parseInt(m[4], 10),
     });
   }
   if (braced.length > 0) {
@@ -63,10 +63,10 @@ export function parseBoundsOutput(raw: string): BoundsRecord[] {
   const flat: BoundsRecord[] = [];
   for (let i = 0; i + 3 < nums.length; i += 4) {
     flat.push({
-      left: nums[i]!,
-      top: nums[i + 1]!,
-      right: nums[i + 2]!,
-      bottom: nums[i + 3]!,
+      left: nums[i],
+      top: nums[i + 1],
+      right: nums[i + 2],
+      bottom: nums[i + 3],
     });
   }
   return flat;
@@ -152,7 +152,7 @@ export async function applyFinderMove(
     return { windowId, applied: false, error: `Invalid Finder window ID: ${windowId}` };
   }
 
-  const index = parseInt(match[1]!, 10);
+  const index = parseInt(match[1], 10);
   const { x, y, w, h } = frame;
   const left = Math.round(x);
   const top = Math.round(y);

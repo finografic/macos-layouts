@@ -37,7 +37,7 @@ describe('buildLayout', () => {
     });
 
     expect(layout.windows).toHaveLength(1);
-    const rule = layout.windows[0]!;
+    const rule = layout.windows[0];
     expect(rule.place.display).toBe('secondary');
     // Obsidian is on screen "3" (x:-3840), frame {x:-3840, y:30, w:2560, h:1394}
     // Normalized: x=(−3840−(−3840))/3840=0, y=(30−30)/2082=0, w=2560/3840≈0.6667, h=1394/2082≈0.6696
@@ -100,7 +100,7 @@ describe('buildLayout', () => {
       displayRoleAssignments: { secondary: secondaryScreen },
     });
 
-    const rule = layout.windows[0]!;
+    const rule = layout.windows[0];
     const recovered = normalizedToAbsolute(rule.place.rect, secondaryScreen.frame);
 
     // normalizedToAbsolute and absoluteToNormalized both round, so tolerance = ±1 px
