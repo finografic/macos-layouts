@@ -46,9 +46,8 @@ Always use absolute ISO dates (`YYYY-MM-DD`), never relative ones ("last week", 
 Match the prefix to the file state:
 
 ```markdown
-# TODO — Feature Name ← active or partial
-
-# DONE — Feature Name ← fully complete
+# TODO — Feature Name      ← active or partial
+# DONE — Feature Name      ← fully complete
 ```
 
 Update the title when renaming the file.

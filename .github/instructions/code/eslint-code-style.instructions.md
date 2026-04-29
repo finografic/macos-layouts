@@ -16,7 +16,7 @@ npm run lint:fix -- "src/**/*.tsx"
 npm run lint -- path/to/file.tsx
 ```
 
-## oxfmt (formatting)
+## oxfmt (lint & format)
 
 **Check vs write:**
 
