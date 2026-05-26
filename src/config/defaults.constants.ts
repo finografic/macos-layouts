@@ -1,7 +1,7 @@
 // ─── Default Paths ────────────────────────────────────────────────────────────
 
 /** Default directory where layout JSON files are stored. */
-export const DEFAULT_LAYOUTS_DIR = '~/.config/macos-layouts/layouts';
+export const DEFAULT_LAYOUTS_DIR = '~/.config/finografic/macos-layouts/layouts';
 
 /** Default directory where compiled Lua files are written. */
 export const DEFAULT_COMPILE_OUTPUT_DIR = '~/.hammerspoon/layouts';
