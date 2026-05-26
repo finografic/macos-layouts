@@ -47,6 +47,10 @@ function matcherForScreen(screen: RuntimeScreen): DisplayMatch {
   return { kind: 'byName', name: screen.name };
 }
 
+function screenSortRank(s: RuntimeScreen): number {
+  return s.isPrimary ? 0 : s.isBuiltin ? 1 : 2;
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export function buildLayout({
@@ -58,9 +62,8 @@ export function buildLayout({
   // 1. Build displayRoles — order: primary first, builtin second, others alphabetically
   const entries = Object.entries(displayRoleAssignments);
   entries.sort(([, a], [, b]) => {
-    const rank = (s: RuntimeScreen): number => (s.isPrimary ? 0 : s.isBuiltin ? 1 : 2);
-    const ra = rank(a);
-    const rb = rank(b);
+    const ra = screenSortRank(a);
+    const rb = screenSortRank(b);
     if (ra !== rb) return ra - rb;
     return a.name.localeCompare(b.name);
   });

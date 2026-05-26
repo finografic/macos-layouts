@@ -161,7 +161,7 @@ export function createFlowContext<F extends FlagDefs>(argv: string[], flagDefs: 
 export async function promptSelect<T>(flow: FlowContext, opts: PromptSelectOpts<T>): Promise<T> {
   // Resolution chain: 1. explicit flag (with optional fromFlag resolver)  2. yes-mode default  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey] !== undefined) {
-    const raw = String(flow.flags[opts.flagKey]);
+    const raw = flow.flags[opts.flagKey];
     const resolved = opts.fromFlag ? opts.fromFlag(raw) : (raw as unknown as T);
     if (resolved !== undefined) return resolved;
     // fromFlag returned undefined → unknown flag value, fall through to prompt
@@ -187,7 +187,7 @@ export async function promptSelect<T>(flow: FlowContext, opts: PromptSelectOpts<
 export async function promptText(flow: FlowContext, opts: PromptTextOpts): Promise<string> {
   // Resolution chain: 1. explicit flag  2. yes-mode default  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey] !== undefined) {
-    const value = String(flow.flags[opts.flagKey]);
+    const value = flow.flags[opts.flagKey];
     if (opts.validate) {
       const error = opts.validate(value);
       if (error) {
@@ -243,7 +243,7 @@ export async function promptConfirm(flow: FlowContext, opts: PromptConfirmOpts):
 export async function promptMultiSelect<T>(flow: FlowContext, opts: PromptMultiSelectOpts<T>): Promise<T[]> {
   // Resolution chain: 1. explicit flag  2. yes-mode defaults  3. prompt
   if (opts.flagKey && flow.flags[opts.flagKey] !== undefined) {
-    const raw = String(flow.flags[opts.flagKey]);
+    const raw = flow.flags[opts.flagKey];
     return raw.split(',').map((s) => s.trim()) as T[];
   }
 

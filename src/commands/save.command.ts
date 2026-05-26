@@ -77,6 +77,8 @@ function formatHotkey(hotkey: { mods: readonly string[]; key: string }): string 
   return [...hotkey.mods, hotkey.key].join('+');
 }
 
+const sleep = (ms: number): Promise<void> => new Promise<void>((r) => setTimeout(r, ms));
+
 /**
  * Registers a one-shot Hammerspoon eventtap that captures the next keypress, writes { key, mods } to a temp
  * file, and consumes the event so no bound hotkeys fire during capture. Polls the file until it appears (up
@@ -87,7 +89,6 @@ async function captureHotkeyFromHammerspoon(): Promise<{
   key: string;
 } | null> {
   const captureFile = join(tmpdir(), 'macos-layouts-hotkey-capture.json');
-  const sleep = (ms: number): Promise<void> => new Promise<void>((r) => setTimeout(r, ms));
 
   // Build Lua as a single expression (hs -c cannot span multiple lines).
   // The eventtap returns true to consume the event — prevents existing
