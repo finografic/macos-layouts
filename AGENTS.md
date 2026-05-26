@@ -80,3 +80,6 @@ Shared across Claude Code, Cursor, and GitHub Copilot.
 - `eslint.config.ts` and `oxlint.config.ts`: on `consistent-type-imports`, set `disallowTypeAnnotations: false` so Vitest mocks can use `importOriginal<typeof import('…')>()` while keeping `prefer: 'type-imports'` for real imports
 - In unit tests, mock `../lib/finder-bridge.js` (or avoid real AppleScript) where the code path would run `osascript`; a real subprocess can hit Vitest’s default timeout
 - `layouts compile` / `lua-codegen` use `-- 🖥️ macos-layouts: {layoutName}` in init.lua and generated layout headers for a consistent on-disk marker
+- `release:check` uses `lint:strict` (oxlint `--deny-warnings`) to fail on any lint warnings, not just errors; never use `lint:fix` as a release gate since it exits 0 on warnings
+- `vitest.config.ts` mirrors `tsconfig.json` `compilerOptions.paths` via Vite `resolve.alias` (`__mocks__`, `commands`, `config`, `lib`, `types`, `utils` → `src/<dir>`); Vitest does not read tsconfig paths by default
+- Finder AppleScript uses `window N` (1-indexed) syntax for both bounds capture and placement; `item N of (every window)` does not work reliably for Finder
