@@ -1,3 +1,4 @@
+import type { OxfmtConfig, OxfmtOverrideConfig } from '@finografic/oxc-config/oxfmt';
 import {
   AGENT_DOC_MARKDOWN_PATHS,
   agentMarkdown,
@@ -7,7 +8,6 @@ import {
   markdown,
   sorting,
 } from '@finografic/oxc-config/oxfmt';
-import type { OxfmtConfig, OxfmtOverrideConfig } from '@finografic/oxc-config/oxfmt';
 import { defineConfig } from 'oxfmt';
 
 export default defineConfig({
