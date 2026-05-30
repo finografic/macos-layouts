@@ -53,21 +53,6 @@
     "editor.defaultFormatter": "oxc.oxc-vscode",
     "editor.formatOnSave": true
   },
-  "markdownlint.config": {
-    "default": true,
-    "MD013": {
-      "line_length": 120,
-      "tables": false,
-      "code_blocks": false
-    },
-    "MD024": false,
-    "MD025": false,
-    "MD036": false,
-    "MD040": false,
-    "MD041": false,
-    "MD060": {
-      "style": "aligned"
-    }
-  },
+
   "markdown.styles": ["node_modules/@finografic/md-lint/styles/markdown-github-light.css"]
 }

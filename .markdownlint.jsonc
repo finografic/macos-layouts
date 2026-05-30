@@ -1,1 +1,4 @@
-{ "extends": "node_modules/@finografic/md-lint/.markdownlint.jsonc" }
+{
+  "extends": "node_modules/@finografic/md-lint/.markdownlint.jsonc"
+  // "MD013": false
+}
