@@ -1,5 +1,6 @@
 {
   "npm.packageManager": "pnpm",
+
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "oxc.oxc-vscode",
@@ -9,23 +10,20 @@
     "source.sortImports": "explicit",
     "source.addMissingImports": "explicit"
   },
+
   "eslint.enable": false,
-  "eslint.validate": ["javascript", "typescript"],
   "prettier.enable": false,
+
   "oxc.typeAware": true,
   "oxc.lint.run": "onSave",
+
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.preferTypeOnlyAutoImports": true,
+
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[typescript]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[typescriptreact]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[json]": {
@@ -38,15 +36,6 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[toml]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[scss]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
-  },
-  "[html]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[markdown]": {

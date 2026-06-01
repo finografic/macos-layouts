@@ -28,14 +28,14 @@ importers:
         specifier: ^21.0.2
         version: 21.0.2
       '@finografic/md-lint':
-        specifier: ^0.16.0
-        version: 0.16.0
+        specifier: ^0.16.2
+        version: 0.16.2
       '@finografic/oxc-config':
         specifier: ^2.6.4
         version: 2.6.4(oxfmt@0.52.0)(oxlint@1.67.0(oxlint-tsgolint@0.23.0))
       '@finografic/project-scripts':
         specifier: ^1.3.3
-        version: 1.3.3(@types/node@24.12.0)(tsx@4.22.3)
+        version: 1.3.3(@types/node@24.12.0)(tsx@4.22.4)
       '@types/node':
         specifier: 24.12.0
         version: 24.12.0
@@ -56,13 +56,13 @@ importers:
         version: 0.23.0
       tsdown:
         specifier: ^0.22.1
-        version: 0.22.1(tsx@4.22.3)(typescript@5.9.3)
+        version: 0.22.1(tsx@4.22.4)(typescript@5.9.3)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
         specifier: ^4.1.7
-        version: 4.1.7(@types/node@24.12.0)(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0))
+        version: 4.1.7(@types/node@24.12.0)(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
 
 packages:
 
@@ -349,8 +349,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@finografic/md-lint@0.16.0':
-    resolution: {integrity: sha512-t3iJg/o0N0OuPJV00G0y4jkdMqQUZfg9mSdtUxHXePfnhmxgFzaGsCo1EB7b57GW19zv8rehgsJR5Bcb52Z+MQ==, tarball: https://npm.pkg.github.com/download/@finografic/md-lint/0.16.0/34850c0bcf9e6f3ac11a77555db00a08185c316b}
+  '@finografic/md-lint@0.16.2':
+    resolution: {integrity: sha512-9OqreaDzpid0/mlnUZElJkcFqwEmUdmcp+wfOmHxknwAv0Vm9WiZEX6+zwVRFqlzjfj5jEzbgxh1fW+ujg+G0A==, tarball: https://npm.pkg.github.com/download/@finografic/md-lint/0.16.2/4ca0b3797c9b089ed600585d8d922efe2731f159}
     hasBin: true
 
   '@finografic/oxc-config@2.6.4':
@@ -2023,6 +2023,10 @@ packages:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
     engines: {node: '>=12.0.0'}
 
+  tinyglobby@0.2.17:
+    resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
+    engines: {node: '>=12.0.0'}
+
   tinypool@2.1.0:
     resolution: {integrity: sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==}
     engines: {node: ^20.0.0 || >=22.0.0}
@@ -2076,8 +2080,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.22.3:
-    resolution: {integrity: sha512-mdoNxBC/cSQObGGVQ5Bpn5i+yv7j68gk3Nfm3wFjcJg3Z0Mix9jzAFfP12prmm5eVGmDKtp0yyArrs0Q+8gZHg==}
+  tsx@4.22.4:
+    resolution: {integrity: sha512-X8EX+XV4QR5xCsrgxaED954zTDfY8KqlDtskKEL0cHhyS/P8b4IFOvGDQpsC9Q1XnLq915wEfwwY/zzskCtmhg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -2489,7 +2493,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.0':
     optional: true
 
-  '@finografic/md-lint@0.16.0':
+  '@finografic/md-lint@0.16.2':
     dependencies:
       globby: 16.2.0
       ignore: 7.0.5
@@ -2497,7 +2501,7 @@ snapshots:
       markdownlint: 0.40.0
       picocolors: 1.1.1
       picomatch: 4.0.4
-      tsx: 4.22.3
+      tsx: 4.22.4
     transitivePeerDependencies:
       - supports-color
 
@@ -2509,7 +2513,7 @@ snapshots:
       picocolors: 1.1.1
       type-fest: 5.6.0
 
-  '@finografic/project-scripts@1.3.3(@types/node@24.12.0)(tsx@4.22.3)':
+  '@finografic/project-scripts@1.3.3(@types/node@24.12.0)(tsx@4.22.4)':
     dependencies:
       '@inquirer/confirm': 5.1.18(@types/node@24.12.0)
       '@inquirer/core': 10.2.2(@types/node@24.12.0)
@@ -2520,7 +2524,7 @@ snapshots:
       ora: 9.0.0
       parse-gitignore: 2.0.0
       picocolors: 1.1.1
-      tsx: 4.22.3
+      tsx: 4.22.4
       yargs: 18.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -2989,13 +2993,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.7(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.7(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0)
+      vite: 8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.7':
     dependencies:
@@ -4011,6 +4015,11 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
 
+  tinyglobby@0.2.17:
+    dependencies:
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+
   tinypool@2.1.0: {}
 
   tinyrainbow@3.1.0: {}
@@ -4021,7 +4030,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.22.1(tsx@4.22.3)(typescript@5.9.3):
+  tsdown@0.22.1(tsx@4.22.4)(typescript@5.9.3):
     dependencies:
       ansis: 4.3.0
       cac: 7.0.0
@@ -4039,7 +4048,7 @@ snapshots:
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
     optionalDependencies:
-      tsx: 4.22.3
+      tsx: 4.22.4
       typescript: 5.9.3
     transitivePeerDependencies:
       - '@ts-macro/tsc'
@@ -4050,7 +4059,7 @@ snapshots:
   tslib@2.8.1:
     optional: true
 
-  tsx@4.22.3:
+  tsx@4.22.4:
     dependencies:
       esbuild: 0.28.0
     optionalDependencies:
@@ -4073,25 +4082,25 @@ snapshots:
 
   unicorn-magic@0.4.0: {}
 
-  vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0):
+  vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
       postcss: 8.5.15
       rolldown: 1.0.2
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 24.12.0
       esbuild: 0.28.0
       fsevents: 2.3.3
       jiti: 2.6.1
-      tsx: 4.22.3
+      tsx: 4.22.4
       yaml: 2.9.0
 
-  vitest@4.1.7(@types/node@24.12.0)(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0)):
+  vitest@4.1.7(@types/node@24.12.0)(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.7
-      '@vitest/mocker': 4.1.7(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.7(vite@8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.7
       '@vitest/runner': 4.1.7
       '@vitest/snapshot': 4.1.7
@@ -4108,7 +4117,7 @@ snapshots:
       tinyexec: 1.2.3
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.3)(yaml@2.9.0)
+      vite: 8.0.14(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.12.0
