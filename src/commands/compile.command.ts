@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import pc from 'picocolors';
 
+import { layoutBlockExists, upsertLayoutBlock } from 'lib/init-lua.js';
+import type { HotkeyBinding } from 'lib/init-lua.js';
 import { expandHome, loadLayout } from 'lib/layout-loader.js';
 import { generateLua } from 'lib/lua-codegen.js';
 
@@ -60,44 +62,6 @@ interface CompileCommandParams {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Init.lua snippet (V1): debounced apply shared by hotkey and screen watcher. A raw `dofile` in the hotkey
- * path was prone to bad interactions (e.g. Finder); throttling all entry points and using
- * `hs.screen.watcher.new(fn)` fixes that.
- */
-function buildInitSnippet(
-  name: string,
-  hotkey?: { readonly mods: readonly string[]; readonly key: string },
-  dockScreenWatcherComment = false,
-): string {
-  const path = `os.getenv("HOME") .. "/.hammerspoon/layouts/${name}.lua"`;
-  const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
-  const fn = `_layoutsApply_${safeName}`;
-  const lastRun = `${fn}_lastRun`;
-  const hotkeyLine = hotkey
-    ? `hs.hotkey.bind({${hotkey.mods.map((m) => `"${m}"`).join(', ')}}, "${hotkey.key}", ${fn})`
-    : `hs.hotkey.bind({"cmd","alt"}, "h", ${fn})  -- change key binding as needed`;
-
-  const watcherSuffix = dockScreenWatcherComment ? '  -- re-applies when Dock moves/shows/hides' : '';
-
-  const lines = [
-    '',
-    `-- 🖥️ macos-layouts: ${name}`,
-    `local ${lastRun} = 0`,
-    `local function ${fn}()`,
-    `  local now = hs.timer.secondsSinceEpoch()`,
-    `  if now - ${lastRun} < 2.0 then return end`,
-    `  ${lastRun} = now`,
-    `  dofile(${path})`,
-    `end`,
-    hotkeyLine,
-    `hs.screen.watcher.new(${fn}):start()${watcherSuffix}`,
-    '',
-  ];
-
-  return lines.join('\n');
-}
-
-/**
  * Ensures Dock animation is instant (required for nudgeDock timing). Writes to the user's own plist — no sudo
  * needed. Only restarts the Dock if the values weren't already 0. Returns true if Dock was restarted.
  */
@@ -116,11 +80,10 @@ function ensureDockAnimationInstant(): boolean {
 
 async function updateInitLua(
   name: string,
-  hotkey?: { readonly mods: readonly string[]; readonly key: string },
+  hotkey?: HotkeyBinding,
   dockScreenWatcherComment = false,
-): Promise<'added' | 'exists'> {
+): Promise<'added' | 'updated'> {
   const initLuaPath = resolve(expandHome(INIT_LUA_PATH));
-  const marker = `layouts/${name}.lua`;
 
   let existing = '';
   try {
@@ -129,13 +92,12 @@ async function updateInitLua(
     // File doesn't exist yet — will be created
   }
 
-  if (existing.includes(marker)) {
-    return 'exists';
-  }
+  const hadBlock = layoutBlockExists(existing, name);
+  const updated = upsertLayoutBlock(existing, name, hotkey, dockScreenWatcherComment);
 
   await mkdir(dirname(initLuaPath), { recursive: true });
-  await writeFile(initLuaPath, existing + buildInitSnippet(name, hotkey, dockScreenWatcherComment), 'utf-8');
-  return 'added';
+  await writeFile(initLuaPath, updated.endsWith('\n') ? updated : `${updated}\n`, 'utf-8');
+  return hadBlock ? 'updated' : 'added';
 }
 
 // ─── Command ──────────────────────────────────────────────────────────────────
@@ -181,7 +143,7 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
   }
 
   // Update init.lua
-  let initLuaStatus: 'added' | 'exists' | 'failed' = 'failed';
+  let initLuaStatus: 'added' | 'updated' | 'failed' = 'failed';
   try {
     initLuaStatus = await updateInitLua(
       name,
@@ -209,8 +171,10 @@ export async function compileCommand({ name, options }: CompileCommandParams): P
       `  ${pc.bold(pc.green('✓'))} Added hotkey to ${pc.white(resolve(expandHome(INIT_LUA_PATH)))}`,
     );
     console.log(`    ${pc.dim('(change the key binding as needed, then reload Hammerspoon config)')}`);
-  } else if (initLuaStatus === 'exists') {
-    console.log(`  ${pc.dim(`~ init.lua already contains a hotkey for "${name}"`)}`);
+  } else if (initLuaStatus === 'updated') {
+    console.log(
+      `  ${pc.bold(pc.green('✓'))} Updated hotkey in ${pc.white(resolve(expandHome(INIT_LUA_PATH)))}`,
+    );
   }
 
   console.log();

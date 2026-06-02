@@ -8,6 +8,7 @@ import { resolveDisplayRoles } from 'lib/display-resolver.js';
 import { DUMP_LUA } from 'lib/dump-lua.js';
 import { fetchFinderWindows } from 'lib/finder-bridge.js';
 import * as hs from 'lib/hammerspoon.js';
+import { parseInitLuaLayoutHotkeys, readInitLuaContent, validateHotkeyForLayout } from 'lib/init-lua.js';
 import { buildLayout } from 'lib/layout-builder.js';
 import { DEFAULT_LAYOUTS_DIR, expandHome, loadLayout } from 'lib/layout-loader.js';
 import type { FlowContext } from 'utils/flow.utils.js';
@@ -134,6 +135,40 @@ async function captureHotkeyFromHammerspoon(): Promise<{
   return null; // Timed out after 30 s
 }
 
+async function promptAndValidateHotkey(
+  layoutName: string,
+): Promise<{ mods: string[]; key: string } | undefined> {
+  const initContent = await readInitLuaContent();
+  const entries = parseInitLuaLayoutHotkeys(initContent);
+
+  while (true) {
+    const s = spinner();
+    s.start('Listening for hotkey — press your combination now...');
+    const detected = await captureHotkeyFromHammerspoon();
+    const validDetection = detected !== null && detected.mods.length > 0;
+
+    if (!validDetection || !detected) {
+      s.stop('No key detected');
+      return undefined;
+    }
+
+    if (validateHotkeyForLayout(layoutName, detected, entries) === 'conflict') {
+      s.stop(`Conflict: ${pc.bold(formatHotkey(detected))} already assigned`);
+      console.log('');
+      console.log(
+        pc.yellow(
+          '  Hotkey already assigned. Please choose a different hotkey — press your combination now.',
+        ),
+      );
+      console.log('');
+      continue;
+    }
+
+    s.stop(`Detected: ${pc.bold(formatHotkey(detected))}`);
+    return { mods: [...detected.mods], key: detected.key };
+  }
+}
+
 // ─── Command ──────────────────────────────────────────────────────────────────
 
 export async function saveCommand({ name, options, flow }: SaveCommandParams): Promise<number> {
@@ -212,14 +247,7 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
       selectedWindows = windows;
 
       intro(`Save windows layout: ${pc.bold(pc.cyan(name))}`);
-      const s = spinner();
-      s.start('Listening for hotkey — press your combination now...');
-      const detected = await captureHotkeyFromHammerspoon();
-      const validDetection = detected !== null && detected.mods.length > 0;
-      s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
-      if (validDetection && detected) {
-        hotkeyResult = { mods: [...detected.mods], key: detected.key };
-      }
+      hotkeyResult = await promptAndValidateHotkey(name);
     }
   } else if (!interactive) {
     // Non-interactive: auto-assign roles, include all filtered windows
@@ -291,16 +319,8 @@ export async function saveCommand({ name, options, flow }: SaveCommandParams): P
 
     selectedWindows = windows.filter((w) => selectedIds.includes(w.id));
 
-    // 4d. Hotkey — Hammerspoon eventtap; on failed capture, existing layout hotkey is kept if re-saving
-    const s = spinner();
-    s.start('Listening for hotkey — press your combination now...');
-    const detected = await captureHotkeyFromHammerspoon();
-    const validDetection = detected !== null && detected.mods.length > 0;
-    s.stop(validDetection && detected ? `Detected: ${pc.bold(formatHotkey(detected))}` : 'No key detected');
-
-    if (validDetection && detected) {
-      hotkeyResult = { mods: [...detected.mods], key: detected.key };
-    }
+    // 4d. Hotkey — validate against active init.lua bindings before accepting
+    hotkeyResult = await promptAndValidateHotkey(name);
   }
 
   // 6. Build layout

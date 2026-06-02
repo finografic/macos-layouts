@@ -205,14 +205,27 @@ describe('compileCommand', () => {
     expect(swapped).toContain('role = "secondary", match = { kind = "externalByIndex", index = 0 }');
   });
 
-  it('skips init.lua update when marker already exists', async () => {
-    await writeFile(join(testDir, 'test.json'), JSON.stringify(VALID_LAYOUT));
-    initLuaExisting = 'layouts/test.lua'; // simulate marker already in init.lua
+  it('replaces init.lua block when layout already exists', async () => {
+    await writeFile(
+      join(testDir, 'test.json'),
+      JSON.stringify({ ...VALID_LAYOUT, options: { hotkey: { mods: ['alt'], key: 'pad1' } } }),
+    );
+    initLuaExisting = [
+      '-- 🖥️ macos-layouts: test',
+      'local _layoutsApply_test_lastRun = 0',
+      'local function _layoutsApply_test()',
+      '  dofile(os.getenv("HOME") .. "/.hammerspoon/layouts/test.lua")',
+      'end',
+      'hs.hotkey.bind({"ctrl"}, "pad0", _layoutsApply_test)',
+      'hs.screen.watcher.new(_layoutsApply_test):start()',
+      '',
+    ].join('\n');
     const code = await compileCommand({
       name: 'test',
       options: { layoutsDir: testDir, output: join(testDir, 'test.lua') },
     });
     expect(code).toBe(EXIT_CODE.Success);
-    expect(initLuaCapture.content).toBeNull(); // no write
+    expect(initLuaCapture.content).toContain('hs.hotkey.bind({"alt"}, "pad1", _layoutsApply_test)');
+    expect(initLuaCapture.content).not.toContain('"pad0"');
   });
 });
