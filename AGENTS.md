@@ -1,5 +1,36 @@
 # AGENTS.md — AI Assistant Guide
 
+## Project Memory Model
+
+- `docs/todo/ROADMAP.md` = curated milestone plan + completed milestone history.
+- `docs/todo/NEXT_STEPS.md` = near-term working list, manual testing, and small follow-ups.
+- `.agents/handoff.md` = current project state snapshot.
+- `.agents/memory.md` = chronological working memory / session log.
+
+Promotion rule:
+
+- session detail, partial work, and temporary context belong in `.agents/memory.md`
+- stable current truth belongs in `.agents/handoff.md`
+- project priorities and completed milestone-scale work belong in `ROADMAP.md`
+- small actionable follow-ups and manual verification belong in `NEXT_STEPS.md`
+
+Do not duplicate the same item across all four files unless it truly belongs in each role.
+
+Reference: [`docs/process/PROJECT_MEMORY_MODEL.md`](./docs/process/PROJECT_MEMORY_MODEL.md)
+
+---
+
+## Roadmap and Planning Docs
+
+- Before proposing or generating new features, check `ROADMAP.md` for existing priorities.
+- When conceiving a new feature or initiative, add it to the appropriate roadmap tier.
+- Use `NEXT_STEPS.md` for concrete follow-ups, manual validation, and small tasks that do not need full roadmap treatment.
+- Detailed feature planning docs live in `docs/todo/` as `TODO_*.md` (active) or `DONE_*.md` (complete).
+- **TODO/DONE doc conventions:** `.github/instructions/documentation/todo-done-docs.instructions.md`
+  — rules for naming, status headers, checkboxes, and graduating `TODO_` → `DONE_`.
+
+---
+
 ## Rules — Project-Specific
 
 - Project-specific rules live in `.github/instructions/project/**/*.instructions.md`.
@@ -18,7 +49,7 @@ Shared across Claude Code, Cursor, and GitHub Copilot.
 
 - TypeScript patterns: `.github/instructions/code/typescript-patterns.instructions.md`
 - Modern TS patterns: `.github/instructions/code/modern-typescript-patterns.instructions.md`
-- ESLint & style: `.github/instructions/code/linting-code-style.instructions.md`
+- Oxlint & style: `.github/instructions/code/linting-code-style.instructions.md`
 - Provider/context patterns: `.github/instructions/code/provider-context-patterns.instructions.md`
 - Picocolors CLI styling: `.github/instructions/code/picocolors-cli-styling.instructions.md`
 
@@ -52,15 +83,6 @@ Shared across Claude Code, Cursor, and GitHub Copilot.
 
 - IMPORTANT: NEVER include `Co-Authored-By` lines in commit messages. Non-negotiable.
 - `.github/instructions/git/git-policy.instructions.md` (see Commits and Releases sections)
-
----
-
-## Claude Code — Session Memory and Handoff
-
-> This section applies to Claude Code only. Other agents can ignore it.
-
-- **Session log:** `.claude/memory.md` (gitignored) — maintenance rules are in that file.
-- **Project state snapshot:** `.agents/handoff.md` (git-tracked) — maintenance rules are in that file.
 
 ---
 

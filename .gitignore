@@ -11,12 +11,12 @@ build/
 .env.local
 .env.*.local
 
-# Agents — ignore everything in .agents except tracked handoff (parent must not be fully ignored)
+# Agents
 .agents/*
+!.agents/
 !.agents/handoff.md
 .codex/
 .claude/
-!.claude/handoff.md
 !.claude/settings.json
 .worktrees/
 **/worktrees/

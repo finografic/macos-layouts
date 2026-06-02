@@ -28,8 +28,8 @@ importers:
         specifier: ^21.0.2
         version: 21.0.2
       '@finografic/md-lint':
-        specifier: ^0.16.2
-        version: 0.16.2
+        specifier: ^0.16.4
+        version: 0.16.4
       '@finografic/oxc-config':
         specifier: ^2.6.4
         version: 2.6.4(oxfmt@0.52.0)(oxlint@1.67.0(oxlint-tsgolint@0.23.0))
@@ -349,8 +349,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@finografic/md-lint@0.16.2':
-    resolution: {integrity: sha512-9OqreaDzpid0/mlnUZElJkcFqwEmUdmcp+wfOmHxknwAv0Vm9WiZEX6+zwVRFqlzjfj5jEzbgxh1fW+ujg+G0A==, tarball: https://npm.pkg.github.com/download/@finografic/md-lint/0.16.2/4ca0b3797c9b089ed600585d8d922efe2731f159}
+  '@finografic/md-lint@0.16.4':
+    resolution: {integrity: sha512-yg1rw/4lHEHoVGQcGzXVlS4sLVgdR6PynbhEXJV/LVeO/2uJoMyxYn/QuRCCGNujS20ifc+lta70wPAqqTdx0g==, tarball: https://npm.pkg.github.com/download/@finografic/md-lint/0.16.4/18f7eaccd0a8bf5e22162f7b8d5e1b4fb0d821e9}
     hasBin: true
 
   '@finografic/oxc-config@2.6.4':
@@ -2493,7 +2493,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.0':
     optional: true
 
-  '@finografic/md-lint@0.16.2':
+  '@finografic/md-lint@0.16.4':
     dependencies:
       globby: 16.2.0
       ignore: 7.0.5

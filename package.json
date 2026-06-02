@@ -88,7 +88,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
-    "@finografic/md-lint": "^0.16.2",
+    "@finografic/md-lint": "^0.16.4",
     "@finografic/oxc-config": "^2.6.4",
     "@finografic/project-scripts": "^1.3.3",
     "@types/node": "24.12.0",
